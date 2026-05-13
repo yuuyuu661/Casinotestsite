@@ -603,25 +603,98 @@ function renderBoard(){
 
       cell.className = "cell";
 
+      if(canPlace(x, y, currentTurn)){
+
+        cell.style.background =
+          "rgba(34,197,94,0.25)";
+
+        cell.style.boxShadow =
+          "inset 0 0 12px rgba(34,197,94,0.35)";
+      }
+
 
       cell.addEventListener("click", () => {
 
         /* 既に石あるなら置けない */
 
-        if(grid[y][x]){
+        if(!canPlace(x, y, currentTurn)){
           return;
         }
+
 
         /* 石を置く */
 
         grid[y][x] = currentTurn;
 
+
+        /* 石を置く */
+
+        grid[y][x] = currentTurn;
+
+        /* 裏返し */
+
+        flipStones(x, y, currentTurn);
+
         /* ターン変更 */
 
-        currentTurn =
+        let nextTurn =
           currentTurn === "black"
           ? "white"
           : "black";
+
+        /* 相手が置ける？ */
+
+        if(hasValidMove(nextTurn)){
+
+          currentTurn = nextTurn;
+
+        }
+
+        /* 相手置けない → 自分継続 */
+
+        else if(hasValidMove(currentTurn)){
+
+          alert(
+            `${nextTurn === "black" ? "⚫黒" : "⚪白"} は置ける場所がありません！`
+          );
+
+        }
+
+        /* 両方置けない → 終了 */
+
+        else{
+
+          const result = countStones();
+
+          let message = `
+
+          ⚫ 黒：${result.black}
+          ⚪ 白：${result.white}
+
+          `;
+
+          if(result.black > result.white){
+
+            message += "⚫ 黒の勝利！";
+
+          }
+
+          else if(result.white > result.black){
+
+            message += "⚪ 白の勝利！";
+
+          }
+
+          else{
+
+            message += "🤝 引き分け！";
+
+          }
+
+          alert(message);
+
+        }
+
 
         /* 表示更新 */
 
@@ -656,6 +729,213 @@ function renderBoard(){
     }
 
   }
+
+}
+
+function canPlace(x, y, color){
+
+  /* 既に石あるなら不可 */
+
+  if(grid[y][x]){
+    return false;
+  }
+
+  const enemy =
+    color === "black"
+    ? "white"
+    : "black";
+
+  const directions = [
+
+    [-1,-1],
+    [ 0,-1],
+    [ 1,-1],
+
+    [-1, 0],
+    [ 1, 0],
+
+    [-1, 1],
+    [ 0, 1],
+    [ 1, 1]
+
+  ];
+
+  for(const [dx,dy] of directions){
+
+    let nx = x + dx;
+    let ny = y + dy;
+
+    let foundEnemy = false;
+
+    while(
+      nx >= 0 &&
+      nx < SIZE &&
+      ny >= 0 &&
+      ny < SIZE
+    ){
+
+      const value = grid[ny][nx];
+
+      /* 相手石 */
+
+      if(value === enemy){
+
+        foundEnemy = true;
+
+      }
+
+      /* 自分石 */
+
+      else if(value === color){
+
+        if(foundEnemy){
+          return true;
+        }
+
+        break;
+
+      }
+
+      /* 空 */
+
+      else{
+        break;
+      }
+
+      nx += dx;
+      ny += dy;
+
+    }
+
+  }
+
+  return false;
+
+}
+
+function flipStones(x, y, color){
+
+  const enemy =
+    color === "black"
+    ? "white"
+    : "black";
+
+  const directions = [
+
+    [-1,-1],
+    [ 0,-1],
+    [ 1,-1],
+
+    [-1, 0],
+    [ 1, 0],
+
+    [-1, 1],
+    [ 0, 1],
+    [ 1, 1]
+
+  ];
+
+  for(const [dx,dy] of directions){
+
+    let nx = x + dx;
+    let ny = y + dy;
+
+    const targets = [];
+
+    while(
+      nx >= 0 &&
+      nx < SIZE &&
+      ny >= 0 &&
+      ny < SIZE
+    ){
+
+      const value = grid[ny][nx];
+
+      /* 相手石 */
+
+      if(value === enemy){
+
+        targets.push([nx, ny]);
+
+      }
+
+      /* 自分石 */
+
+      else if(value === color){
+
+        /* 挟めてる */
+
+        if(targets.length > 0){
+
+          for(const [tx, ty] of targets){
+
+            grid[ty][tx] = color;
+
+          }
+
+        }
+
+        break;
+
+      }
+
+      /* 空 */
+
+      else{
+        break;
+      }
+
+      nx += dx;
+      ny += dy;
+
+    }
+
+  }
+
+}
+
+function hasValidMove(color){
+
+  for(let y=0;y<SIZE;y++){
+
+    for(let x=0;x<SIZE;x++){
+
+      if(canPlace(x, y, color)){
+        return true;
+      }
+
+    }
+
+  }
+
+  return false;
+
+}
+function countStones(){
+
+  let black = 0;
+  let white = 0;
+
+  for(let y=0;y<SIZE;y++){
+
+    for(let x=0;x<SIZE;x++){
+
+      if(grid[y][x] === "black"){
+        black++;
+      }
+
+      else if(grid[y][x] === "white"){
+        white++;
+      }
+
+    }
+
+  }
+
+  return {
+    black,
+    white
+  };
 
 }
 
