@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>oasis 対戦ルーム</title>
+
+<style>
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  padding:0;
+
+  font-family:
+    "Hiragino Sans",
+    "Yu Gothic UI",
+    sans-serif;
+
+  background:
+    radial-gradient(circle at top,#111827 0%,#020617 45%,#000 100%);
+
+  color:#f8fafc;
+}
+
+/* =========================
+   全体
+========================= */
+
+.container{
+  width:100%;
+  max-width:1400px;
+  margin:auto;
+  padding:24px;
+}
+
+/* =========================
+   上部
+========================= */
+
+.top-bar{
+
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  gap:16px;
+
+  flex-wrap:wrap;
+
+  margin-bottom:24px;
+}
+
+.back-btn{
+
+  background:#1e293b;
+  border:none;
+
+  color:#fff;
+
+  padding:12px 18px;
+
+  border-radius:12px;
+
+  cursor:pointer;
+
+  font-weight:700;
+
+  transition:0.2s;
+}
+
+.back-btn:hover{
+  background:#334155;
+}
+
+.balance{
+
+  color:#facc15;
+
+  font-size:1rem;
+  font-weight:800;
+}
+
+/* =========================
+   タイトル
+========================= */
+
+.title-area{
+  text-align:center;
+  margin-bottom:28px;
+}
+
+.room-title{
+
+  font-size:clamp(2rem,5vw,3rem);
+
+  font-weight:900;
+
+  margin-bottom:10px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #facc15,
+      #fde68a,
+      #facc15
+    );
+
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.room-status{
+
+  display:inline-block;
+
+  padding:10px 18px;
+
+  border-radius:999px;
+
+  background:
+    rgba(34,197,94,0.18);
+
+  border:
+    1px solid rgba(34,197,94,0.4);
+
+  color:#86efac;
+
+  font-weight:800;
+}
+
+/* =========================
+   メイン
+========================= */
+
+.main-layout{
+
+  display:grid;
+
+  grid-template-columns:
+    280px 1fr 320px;
+
+  gap:24px;
+}
+
+/* =========================
+   共通BOX
+========================= */
+
+.panel{
+
+  background:
+    rgba(15,23,42,0.82);
+
+  border:
+    1px solid rgba(255,255,255,0.08);
+
+  border-radius:20px;
+
+  padding:20px;
+
+  backdrop-filter:blur(8px);
+}
+
+.panel-title{
+
+  font-size:1.2rem;
+  font-weight:900;
+
+  margin-bottom:18px;
+
+  color:#facc15;
+}
+
+/* =========================
+   プレイヤー
+========================= */
+
+.player-card{
+
+  background:
+    rgba(255,255,255,0.04);
+
+  border-radius:14px;
+
+  padding:16px;
+
+  margin-bottom:14px;
+}
+
+.player-name{
+
+  font-size:1.1rem;
+  font-weight:900;
+
+  margin-bottom:10px;
+}
+
+.player-info{
+  color:#cbd5e1;
+  line-height:1.8;
+}
+
+/* =========================
+   盤面
+========================= */
+
+.board-area{
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.board{
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(8,70px);
+
+  grid-template-rows:
+    repeat(8,70px);
+
+  background:#14532d;
+
+  border:
+    6px solid #78350f;
+
+  border-radius:10px;
+
+  overflow:hidden;
+
+  box-shadow:
+    0 0 25px rgba(0,0,0,0.4);
+}
+
+.cell{
+
+  width:70px;
+  height:70px;
+
+  border:
+    1px solid rgba(255,255,255,0.15);
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
+
+  cursor:pointer;
+
+  transition:0.15s;
+}
+
+.cell:hover{
+  background:
+    rgba(255,255,255,0.08);
+}
+
+/* 石 */
+
+.stone{
+
+  width:52px;
+  height:52px;
+
+  border-radius:50%;
+}
+
+.black{
+  background:#000;
+
+  box-shadow:
+    inset -5px -5px 10px rgba(255,255,255,0.08);
+}
+
+.white{
+  background:#fff;
+
+  box-shadow:
+    inset -5px -5px 10px rgba(0,0,0,0.12);
+}
+
+/* =========================
+   チャット
+========================= */
+
+.chat-box{
+
+  height:500px;
+
+  overflow-y:auto;
+
+  display:flex;
+  flex-direction:column;
+
+  gap:12px;
+
+  margin-bottom:16px;
+}
+
+.chat-message{
+
+  background:
+    rgba(255,255,255,0.05);
+
+  border-radius:12px;
+
+  padding:12px;
+}
+
+.chat-user{
+
+  font-weight:900;
+  margin-bottom:6px;
+
+  color:#facc15;
+}
+
+.chat-text{
+  color:#e2e8f0;
+}
+
+/* =========================
+   入力
+========================= */
+
+.chat-input-area{
+
+  display:flex;
+  gap:10px;
+}
+
+.chat-input{
+
+  flex:1;
+
+  background:#0f172a;
+
+  border:
+    1px solid rgba(255,255,255,0.08);
+
+  border-radius:12px;
+
+  padding:12px;
+
+  color:#fff;
+}
+
+.send-btn{
+
+  background:
+    linear-gradient(
+      135deg,
+      #facc15,
+      #eab308
+    );
+
+  border:none;
+
+  color:#000;
+
+  font-weight:900;
+
+  padding:12px 18px;
+
+  border-radius:12px;
+
+  cursor:pointer;
+}
+
+/* =========================
+   スマホ
+========================= */
+
+@media(max-width:1200px){
+
+  .main-layout{
+    grid-template-columns:1fr;
+  }
+
+  .board{
+    grid-template-columns:
+      repeat(8,42px);
+
+    grid-template-rows:
+      repeat(8,42px);
+  }
+
+  .cell{
+    width:42px;
+    height:42px;
+  }
+
+  .stone{
+    width:30px;
+    height:30px;
+  }
+
+}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- 上部 -->
+  <div class="top-bar">
+
+    <button
+      class="back-btn"
+      onclick="history.back()"
+    >
+      ← ロビーへ戻る
+    </button>
+
+    <div class="balance">
+      残高：999,999 rrc
+    </div>
+
+  </div>
+
+  <!-- タイトル -->
+  <div class="title-area">
+
+    <div class="room-title">
+      ⚫ オセロ対戦ルーム
+    </div>
+
+    <div class="room-status">
+      🟢 対戦中
+    </div>
+
+  </div>
+
+  <!-- メイン -->
+  <div class="main-layout">
+
+    <!-- 左 -->
+    <div class="panel">
+
+      <div class="panel-title">
+        👥 プレイヤー
+      </div>
+
+      <div class="player-card">
+
+        <div class="player-name">
+          ⚫ 先手：ゅゅ
+        </div>
+
+        <div class="player-info">
+          レート：1520<br>
+          勝率：58%
+        </div>
+
+      </div>
+
+      <div class="player-card">
+
+        <div class="player-name">
+          ⚪ 後手：ゲロ
+        </div>
+
+        <div class="player-info">
+          レート：1482<br>
+          勝率：49%
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- 中央 -->
+    <div class="panel board-area">
+
+      <div
+        class="board"
+        id="board"
+      ></div>
+
+    </div>
+
+    <!-- 右 -->
+    <div class="panel">
+
+      <div class="panel-title">
+        💬 ルームチャット
+      </div>
+
+      <div
+        class="chat-box"
+        id="chatBox"
+      >
+
+        <div class="chat-message">
+          <div class="chat-user">
+            ゅゅ
+          </div>
+
+          <div class="chat-text">
+            よろしく！
+          </div>
+        </div>
+
+        <div class="chat-message">
+          <div class="chat-user">
+            ゲロ
+          </div>
+
+          <div class="chat-text">
+            対戦お願いします！
+          </div>
+        </div>
+
+      </div>
+
+      <div class="chat-input-area">
+
+        <input
+          type="text"
+          class="chat-input"
+          placeholder="メッセージを入力"
+        >
+
+        <button class="send-btn">
+          送信
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+
+/* =========================
+   オセロ盤面
+========================= */
+
+const board =
+  document.getElementById("board");
+
+const SIZE = 8;
+
+/* 初期盤面 */
+
+const grid = [];
+
+for(let y=0;y<SIZE;y++){
+
+  grid[y] = [];
+
+  for(let x=0;x<SIZE;x++){
+    grid[y][x] = null;
+  }
+
+}
+
+grid[3][3] = "white";
+grid[4][4] = "white";
+
+grid[3][4] = "black";
+grid[4][3] = "black";
+
+/* 描画 */
+
+function renderBoard(){
+
+  board.innerHTML = "";
+
+  for(let y=0;y<SIZE;y++){
+
+    for(let x=0;x<SIZE;x++){
+
+      const cell =
+        document.createElement("div");
+
+      cell.className = "cell";
+
+      const value = grid[y][x];
+
+      if(value){
+
+        const stone =
+          document.createElement("div");
+
+        stone.className =
+          `stone ${value}`;
+
+        cell.appendChild(stone);
+
+      }
+
+      board.appendChild(cell);
+
+    }
+
+  }
+
+}
+
+renderBoard();
+
+</script>
+
+</body>
+</html>
