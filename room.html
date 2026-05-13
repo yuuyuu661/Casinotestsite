@@ -436,6 +436,18 @@ body{
       🟢 対戦中
     </div>
 
+    <div
+        id="turnDisplay"
+        style="
+          margin-top:14px;
+          font-weight:900;
+          font-size:1.1rem;
+          color:#facc15;
+        "
+      >
+        ⚫ 黒のターン
+      </div>
+
   </div>
 
   <!-- メイン -->
@@ -551,6 +563,11 @@ const board =
 
 const SIZE = 8;
 
+let currentTurn = "black";
+
+const turnDisplay =
+  document.getElementById("turnDisplay");
+
 /* 初期盤面 */
 
 const grid = [];
@@ -585,6 +602,40 @@ function renderBoard(){
         document.createElement("div");
 
       cell.className = "cell";
+
+
+      cell.addEventListener("click", () => {
+
+        /* 既に石あるなら置けない */
+
+        if(grid[y][x]){
+          return;
+        }
+
+        /* 石を置く */
+
+        grid[y][x] = currentTurn;
+
+        /* ターン変更 */
+
+        currentTurn =
+          currentTurn === "black"
+          ? "white"
+          : "black";
+
+        /* 表示更新 */
+
+        turnDisplay.innerText =
+          currentTurn === "black"
+          ? "⚫ 黒のターン"
+          : "⚪ 白のターン";
+
+        renderBoard();
+
+      });
+
+
+
 
       const value = grid[y][x];
 
