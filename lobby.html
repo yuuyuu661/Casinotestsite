@@ -549,11 +549,23 @@ function renderRooms(){
 
       <div class="room-buttons">
 
-        <button class="join-btn">
+        <button
+          class="join-btn"
+          onclick="
+            location.href=
+            'room.html?game=${game}&room=${room.id}'
+          "
+        >
           参加
         </button>
 
-        <button class="watch-btn">
+        <button
+          class="watch-btn"
+          onclick="
+            location.href=
+            'room.html?game=${game}&room=${room.id}&watch=1'
+          "
+        >
           観戦
         </button>
 
