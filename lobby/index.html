@@ -651,6 +651,14 @@ const gameNames = {
 gameTitle.innerText =
   gameNames[game] || "🎮 ロビー";
 
+/* モーダルタイトル */
+
+const modalTitle =
+  document.getElementById("modalTitle");
+
+modalTitle.innerText =
+  `${gameNames[game]} 作成`;
+
 /* =========================
    ダミーロビー
 ========================= */
@@ -842,8 +850,11 @@ document
 
   <div class="modal-box">
 
-    <div class="modal-title">
-      ⚫ オセロロビー作成
+    <div
+      class="modal-title"
+      id="modalTitle"
+    >
+      ロビー作成
     </div>
 
     <!-- レート -->
