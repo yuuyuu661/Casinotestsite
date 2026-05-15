@@ -755,36 +755,58 @@ gameTitle.innerText =
 
 
 /* =========================
-   ダミーロビー
+   ロビー取得
 ========================= */
 
-const rooms = [
+async function loadRooms(){
 
-  {
-    id:"A102",
-    players:1,
-    max:2,
-    status:"waiting",
-    host:"ゅゅ"
-  },
+  try{
 
-  {
-    id:"B841",
-    players:2,
-    max:2,
-    status:"playing",
-    host:"ゲロ"
-  },
+    const res = await fetch(
+      `${API_BASE}/api/casino/rooms?game=${game}`
+    );
 
-  {
-    id:"C225",
-    players:1,
-    max:2,
-    status:"waiting",
-    host:"しょあ"
+    const data = await res.json();
+
+    if(!data.ok){
+      return;
+    }
+
+    rooms.length = 0;
+
+    data.rooms.forEach(r => {
+
+      rooms.push({
+
+        id: r.room_id,
+
+        players: r.players,
+
+        max: r.max_players,
+
+        status: r.status,
+
+        host: r.host_name,
+
+        rate_name: r.rate_name,
+
+        rate_amount: r.rate_amount
+
+      });
+
+    });
+
+    renderRooms();
+
   }
 
-];
+  catch(err){
+
+    console.error(err);
+
+  }
+
+}
 
 /* =========================
    描画
