@@ -838,6 +838,71 @@ document
   createModal.classList.remove("show");
 
 });
+
+/* =========================
+   ロビー作成送信
+========================= */
+
+document
+.getElementById("submitRoomBtn")
+.addEventListener("click", async () => {
+
+  const rate =
+    Number(
+      document.getElementById("rateSelect").value
+    );
+
+  const password =
+    document.getElementById("roomPassword").value;
+
+  try{
+
+    const res = await fetch(
+      `${API_BASE}/api/casino/create-room`,
+      {
+        method:"POST",
+
+        headers:{
+          "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify({
+
+          session,
+          game,
+          rate,
+          password
+
+        })
+
+      }
+    );
+
+    const data = await res.json();
+
+    if(!data.ok){
+
+      alert(data.error || "作成失敗");
+
+      return;
+    }
+
+    alert("ロビー作成成功！");
+
+    createModal.classList.remove("show");
+
+  }
+
+  catch(err){
+
+    console.error(err);
+
+    alert("通信エラー");
+
+  }
+
+});
+  
 </script>
 <!-- =========================
    ロビー作成モーダル
