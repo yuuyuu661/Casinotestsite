@@ -366,6 +366,126 @@ body{
 
 }
 
+/* =========================
+   モーダル
+========================= */
+
+.modal-overlay{
+
+  position:fixed;
+  inset:0;
+
+  background:rgba(0,0,0,0.7);
+
+  display:none;
+
+  justify-content:center;
+  align-items:center;
+
+  z-index:9999;
+}
+
+.modal-overlay.show{
+  display:flex;
+}
+
+.modal-box{
+
+  width:100%;
+  max-width:420px;
+
+  background:#0f172a;
+
+  border:
+    1px solid rgba(255,255,255,0.08);
+
+  border-radius:20px;
+
+  padding:24px;
+}
+
+.modal-title{
+
+  font-size:1.4rem;
+  font-weight:900;
+
+  margin-bottom:24px;
+
+  color:#facc15;
+}
+
+.form-group{
+
+  display:flex;
+  flex-direction:column;
+
+  gap:10px;
+
+  margin-bottom:20px;
+}
+
+.form-group label{
+
+  font-weight:800;
+}
+
+.form-group select,
+.form-group input{
+
+  background:#020617;
+
+  border:
+    1px solid rgba(255,255,255,0.08);
+
+  border-radius:12px;
+
+  padding:14px;
+
+  color:#fff;
+
+  font-size:1rem;
+}
+
+.modal-buttons{
+
+  display:flex;
+  gap:12px;
+}
+
+.cancel-btn,
+.create-submit-btn{
+
+  flex:1;
+
+  border:none;
+
+  padding:14px;
+
+  border-radius:12px;
+
+  font-weight:900;
+
+  cursor:pointer;
+}
+
+.cancel-btn{
+
+  background:#334155;
+  color:#fff;
+}
+
+.create-submit-btn{
+
+  background:
+    linear-gradient(
+      135deg,
+      #facc15,
+      #eab308
+    );
+
+  color:#000;
+}
+
 </style>
 </head>
 <body>
@@ -692,8 +812,128 @@ document
 
 
 loadMe();
+/* =========================
+   モーダル
+========================= */
 
+const createModal =
+  document.getElementById("createModal");
+
+/* 開く */
+
+document
+.getElementById("createRoomBtn")
+.addEventListener("click", () => {
+
+  createModal.classList.add("show");
+
+});
+
+/* 閉じる */
+
+document
+.getElementById("closeModalBtn")
+.addEventListener("click", () => {
+
+  createModal.classList.remove("show");
+
+});
 </script>
+<!-- =========================
+   ロビー作成モーダル
+========================= -->
 
+<div
+  class="modal-overlay"
+  id="createModal"
+>
+
+  <div class="modal-box">
+
+    <div class="modal-title">
+      ⚫ オセロロビー作成
+    </div>
+
+    <!-- レート -->
+
+    <div class="form-group">
+
+      <label>
+        レート
+      </label>
+
+      <select id="rateSelect">
+
+        <option value="2000">
+          超低レート - 2000rrc
+        </option>
+
+        <option value="5000">
+          低レート - 5000rrc
+        </option>
+
+        <option value="10000">
+          中レート - 10000rrc
+        </option>
+
+        <option value="30000">
+          高レート - 30000rrc
+        </option>
+
+        <option value="50000">
+          超高レート - 50000rrc
+        </option>
+
+        <option value="100000">
+          絶頂レート - 100000rrc
+        </option>
+
+        <option value="300000">
+          超絶頂レート - 300000rrc
+        </option>
+
+      </select>
+
+    </div>
+
+    <!-- パスワード -->
+
+    <div class="form-group">
+
+      <label>
+        パスワード
+      </label>
+
+      <input
+        type="password"
+        id="roomPassword"
+        placeholder="未入力で公開部屋"
+      >
+
+    </div>
+
+    <!-- ボタン -->
+
+    <div class="modal-buttons">
+
+      <button
+        class="cancel-btn"
+        id="closeModalBtn"
+      >
+        キャンセル
+      </button>
+
+      <button
+        class="create-submit-btn"
+        id="submitRoomBtn"
+      >
+        作成
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
 </body>
 </html>
