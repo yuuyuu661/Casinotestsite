@@ -565,8 +565,14 @@ body{
 const params =
   new URLSearchParams(location.search);
 
+const session =
+  params.get("session");
+
 const game =
   params.get("game") || "othello";
+
+const roomId =
+  params.get("room");
 
 /* =========================
    タイトル変更
