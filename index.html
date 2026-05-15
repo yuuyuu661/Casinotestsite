@@ -531,8 +531,11 @@ async function loadMe(){
 
   try{
 
+    const API_BASE =
+      "https://oasisbot-production.up.railway.app";
+
     const res = await fetch(
-      `/api/casino/me?session=${session}`
+     `${API_BASE}/api/casino/me?session=${session}`
     );
 
     if(!res.ok){
