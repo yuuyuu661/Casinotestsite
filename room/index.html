@@ -463,7 +463,7 @@ body{
         👥 プレイヤー
       </div>
 
-      <div class="player-card">
+      <div id="playerList"></div>
 
         <div class="player-name">
           ⚫ 先手：ゅゅ
@@ -979,6 +979,84 @@ function countStones(){
 }
 
 renderBoard();
+/* =========================
+   ルーム情報取得
+========================= */
+
+async function loadRoomInfo(){
+
+  try{
+
+    const res = await fetch(
+      `${API_BASE}/api/casino/room-info?room_id=${roomId}`
+    );
+
+    const data = await res.json();
+
+    if(!data.ok){
+      return;
+    }
+
+    renderPlayers(data.players);
+
+  }
+
+  catch(err){
+
+    console.error(err);
+
+  }
+
+}
+
+/* =========================
+   プレイヤー描画
+========================= */
+
+function renderPlayers(players){
+
+  const playerList =
+    document.getElementById("playerList");
+
+  playerList.innerHTML = "";
+
+  players.forEach((player, index) => {
+
+    const color =
+      index === 0
+      ? "⚫"
+      : "⚪";
+
+    const role =
+      index === 0
+      ? "先手"
+      : "後手";
+
+    const card =
+      document.createElement("div");
+
+    card.className = "player-card";
+
+    card.innerHTML = `
+
+      <div class="player-name">
+        ${color} ${role}：${player.user_name}
+      </div>
+
+      <div class="player-info">
+        接続中
+      </div>
+
+    `;
+
+    playerList.appendChild(card);
+
+  });
+
+}
+
+loadRoomInfo();
+  
 
 </script>
 
