@@ -312,9 +312,12 @@ body{
       🎰 oasisカジノサイト
     </div>
 
-    <div class="balance">
-      残高：999,999 rrc
-    </div>
+    <div
+      class="balance"
+      id="balance"
+    >
+      残高取得中...
+</div>
 
     <div class="description">
       oasisカジノへようこそ。<br>
@@ -339,7 +342,7 @@ body{
           class="game-card"
           onclick="
             location.href=
-            '/lobby?game=poker'
+            '/lobby?game=poker&session=${session}'
           "
         >
           <div class="game-title">🃏 ポーカー</div>
@@ -353,7 +356,7 @@ body{
           class="game-card"
           onclick="
             location.href=
-            '/lobby?game=othello'
+            '/lobby?game=othello&session=${session}'
           "
         >
           <div class="game-title">⚫ オセロ</div>
@@ -366,7 +369,7 @@ body{
           class="game-card"
           onclick="
             location.href=
-            '/lobby?game=chinchiro'
+            '/lobby?game=chinchiro&session=${session}'
           "
         >
           <div class="game-title">🎲 チンチロ</div>
@@ -379,7 +382,7 @@ body{
           class="game-card"
           onclick="
             location.href=
-            '/lobby?game=daifugo'
+            '/lobby?game=daifugo&session=${session}'
           "
         >
           <div class="game-title">👑 大富豪</div>
@@ -409,7 +412,7 @@ body{
           class="game-card"
           onclick="
             location.href=
-            '/lobby?game=blackjack'
+            '/lobby?game=blackjack&session=${session}'
           "
         >
           <div class="game-title">🂡 ブラックジャック</div>
@@ -422,7 +425,7 @@ body{
           class="game-card"
           onclick="
             location.href=
-            '/lobby?game=slot'
+            '/lobby?game=slot&session=${session}'
           "
         >
           <div class="game-title">🎰 スロット</div>
@@ -499,6 +502,78 @@ categories.forEach(category => {
   });
 
 });
+
+/* =========================
+   session取得
+========================= */
+
+const params =
+  new URLSearchParams(location.search);
+
+const session =
+  params.get("session");
+
+/* =========================
+   ユーザー情報取得
+========================= */
+
+async function loadMe(){
+
+  // sessionない
+  if(!session){
+
+    document.getElementById("balance")
+      .innerText =
+      "ログインしてください";
+
+    return;
+  }
+
+  try{
+
+    const res = await fetch(
+      `/api/casino/me?session=${session}`
+    );
+
+    if(!res.ok){
+
+      document.getElementById("balance")
+        .innerText =
+        "認証失敗";
+
+      return;
+    }
+
+    const data = await res.json();
+
+    if(!data.ok){
+
+      document.getElementById("balance")
+        .innerText =
+        "セッション無効";
+
+      return;
+    }
+
+    document.getElementById("balance")
+      .innerText =
+      `残高：${data.balance.toLocaleString()} rrc`;
+
+  }
+
+  catch(err){
+
+    console.error(err);
+
+    document.getElementById("balance")
+      .innerText =
+      "通信エラー";
+
+  }
+
+}
+
+loadMe();
 
 </script>
 
