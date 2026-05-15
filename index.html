@@ -340,10 +340,7 @@ body{
 
         <div
           class="game-card"
-          onclick="
-            location.href=
-            '/lobby?game=poker&session=${session}'
-          "
+          id="pokerCard"
         >
           <div class="game-title">🃏 ポーカー</div>
           <div class="game-desc">
@@ -354,10 +351,7 @@ body{
 
         <div
           class="game-card"
-          onclick="
-            location.href=
-            '/lobby?game=othello&session=${session}'
-          "
+          id="othelloCard"
         >
           <div class="game-title">⚫ オセロ</div>
           <div class="game-desc">
@@ -367,10 +361,7 @@ body{
 
         <div
           class="game-card"
-          onclick="
-            location.href=
-            '/lobby?game=chinchiro&session=${session}'
-          "
+          id="chinchiroCard"
         >
           <div class="game-title">🎲 チンチロ</div>
           <div class="game-desc">
@@ -379,12 +370,9 @@ body{
         </div>
 
                 <div
-          class="game-card"
-          onclick="
-            location.href=
-            '/lobby?game=daifugo&session=${session}'
-          "
-        >
+                  class="game-card"
+                  id="daifugoCard"
+                >
           <div class="game-title">👑 大富豪</div>
           <div class="game-desc">
             手札を制し、頂点を目指せ。
@@ -409,12 +397,9 @@ body{
       <div class="game-grid">
 
                 <div
-          class="game-card"
-          onclick="
-            location.href=
-            '/lobby?game=blackjack&session=${session}'
-          "
-        >
+                  class="game-card"
+                  id="blackjackCard"
+                >
           <div class="game-title">🂡 ブラックジャック</div>
           <div class="game-desc">
             21を目指す王道カードゲーム。
@@ -422,12 +407,9 @@ body{
         </div>
 
                 <div
-          class="game-card"
-          onclick="
-            location.href=
-            '/lobby?game=slot&session=${session}'
-          "
-        >
+                  class="game-card"
+                  id="slotCard"
+                >
           <div class="game-title">🎰 スロット</div>
           <div class="game-desc">
             リールを回して大当たりを狙え。
@@ -575,6 +557,64 @@ async function loadMe(){
   }
 
 }
+
+/* =========================
+   ゲーム遷移
+========================= */
+
+document
+.getElementById("pokerCard")
+.addEventListener("click", () => {
+
+  location.href =
+    `/lobby?game=poker&session=${session}`;
+
+});
+
+document
+.getElementById("othelloCard")
+.addEventListener("click", () => {
+
+  location.href =
+    `/lobby?game=othello&session=${session}`;
+
+});
+
+document
+.getElementById("chinchiroCard")
+.addEventListener("click", () => {
+
+  location.href =
+    `/lobby?game=chinchiro&session=${session}`;
+
+});
+
+document
+.getElementById("daifugoCard")
+.addEventListener("click", () => {
+
+  location.href =
+    `/lobby?game=daifugo&session=${session}`;
+
+});
+
+document
+.getElementById("blackjackCard")
+.addEventListener("click", () => {
+
+  location.href =
+    `/lobby?game=blackjack&session=${session}`;
+
+});
+
+document
+.getElementById("slotCard")
+.addEventListener("click", () => {
+
+  location.href =
+    `/lobby?game=slot&session=${session}`;
+
+});
 
 loadMe();
 
