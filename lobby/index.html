@@ -382,8 +382,11 @@ body{
       ← トップへ戻る
     </button>
 
-    <div class="balance">
-      残高：999,999 rrc
+    <div
+      class="balance"
+      id="balance"
+    >
+      残高取得中...
     </div>
 
   </div>
@@ -442,6 +445,72 @@ const game =
 
 const session =
   params.get("session");
+
+/* =========================
+   API
+========================= */
+
+const API_BASE =
+  "https://oasisbot-production.up.railway.app";
+
+/* =========================
+   ユーザー情報取得
+========================= */
+
+async function loadMe(){
+
+  if(!session){
+
+    document.getElementById("balance")
+      .innerText =
+      "ログインしてください";
+
+    return;
+  }
+
+  try{
+
+    const res = await fetch(
+      `${API_BASE}/api/casino/me?session=${session}`
+    );
+
+    if(!res.ok){
+
+      document.getElementById("balance")
+        .innerText =
+        "認証失敗";
+
+      return;
+    }
+
+    const data = await res.json();
+
+    if(!data.ok){
+
+      document.getElementById("balance")
+        .innerText =
+        "セッション無効";
+
+      return;
+    }
+
+    document.getElementById("balance")
+      .innerText =
+      `残高：${data.balance.toLocaleString()} rrc`;
+
+  }
+
+  catch(err){
+
+    console.error(err);
+
+    document.getElementById("balance")
+      .innerText =
+      "通信エラー";
+
+  }
+
+}
 
 /* =========================
    タイトル変更
@@ -620,6 +689,9 @@ document
     `/?session=${session}`;
 
 });
+
+
+loadMe();
 
 </script>
 
