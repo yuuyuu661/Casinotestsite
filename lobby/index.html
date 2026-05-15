@@ -549,6 +549,107 @@ body{
 
 </div>
 
+
+<!-- =========================
+   ロビー作成モーダル
+========================= -->
+
+<div
+  class="modal-overlay"
+  id="createModal"
+>
+
+  <div class="modal-box">
+
+    <div
+      class="modal-title"
+      id="modalTitle"
+    >
+      ロビー作成
+    </div>
+
+    <!-- レート -->
+
+    <div class="form-group">
+
+      <label>
+        レート
+      </label>
+
+      <select id="rateSelect">
+
+        <option value="2000">
+          超低レート - 2000rrc
+        </option>
+
+        <option value="5000">
+          低レート - 5000rrc
+        </option>
+
+        <option value="10000">
+          中レート - 10000rrc
+        </option>
+
+        <option value="30000">
+          高レート - 30000rrc
+        </option>
+
+        <option value="50000">
+          超高レート - 50000rrc
+        </option>
+
+        <option value="100000">
+          絶頂レート - 100000rrc
+        </option>
+
+        <option value="300000">
+          超絶頂レート - 300000rrc
+        </option>
+
+      </select>
+
+    </div>
+
+    <!-- パスワード -->
+
+    <div class="form-group">
+
+      <label>
+        パスワード
+      </label>
+
+      <input
+        type="password"
+        id="roomPassword"
+        placeholder="未入力で公開部屋"
+      >
+
+    </div>
+
+    <!-- ボタン -->
+
+    <div class="modal-buttons">
+
+      <button
+        class="cancel-btn"
+        id="closeModalBtn"
+      >
+        キャンセル
+      </button>
+
+      <button
+        class="create-submit-btn"
+        id="submitRoomBtn"
+      >
+        作成
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
 <script>
 
 
@@ -908,104 +1009,5 @@ modalTitle.innerText =
   `${gameNames[game]} 作成`;
   
 </script>
-<!-- =========================
-   ロビー作成モーダル
-========================= -->
-
-<div
-  class="modal-overlay"
-  id="createModal"
->
-
-  <div class="modal-box">
-
-    <div
-      class="modal-title"
-      id="modalTitle"
-    >
-      ロビー作成
-    </div>
-
-    <!-- レート -->
-
-    <div class="form-group">
-
-      <label>
-        レート
-      </label>
-
-      <select id="rateSelect">
-
-        <option value="2000">
-          超低レート - 2000rrc
-        </option>
-
-        <option value="5000">
-          低レート - 5000rrc
-        </option>
-
-        <option value="10000">
-          中レート - 10000rrc
-        </option>
-
-        <option value="30000">
-          高レート - 30000rrc
-        </option>
-
-        <option value="50000">
-          超高レート - 50000rrc
-        </option>
-
-        <option value="100000">
-          絶頂レート - 100000rrc
-        </option>
-
-        <option value="300000">
-          超絶頂レート - 300000rrc
-        </option>
-
-      </select>
-
-    </div>
-
-    <!-- パスワード -->
-
-    <div class="form-group">
-
-      <label>
-        パスワード
-      </label>
-
-      <input
-        type="password"
-        id="roomPassword"
-        placeholder="未入力で公開部屋"
-      >
-
-    </div>
-
-    <!-- ボタン -->
-
-    <div class="modal-buttons">
-
-      <button
-        class="cancel-btn"
-        id="closeModalBtn"
-      >
-        キャンセル
-      </button>
-
-      <button
-        class="create-submit-btn"
-        id="submitRoomBtn"
-      >
-        作成
-      </button>
-
-    </div>
-
-  </div>
-
-</div>
 </body>
 </html>
