@@ -1005,8 +1005,12 @@ document
 const modalTitle =
   document.getElementById("modalTitle");
 
-modalTitle.innerText =
-  `${gameNames[game]} 作成`;
+if(modalTitle){
+
+  modalTitle.innerText =
+    `${gameNames[game]} 作成`;
+
+}
   
 </script>
 </body>
