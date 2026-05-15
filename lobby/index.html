@@ -428,8 +428,10 @@ body{
 
 <script>
 
+
+
 /* =========================
-   ゲーム名取得
+   URLパラメータ
 ========================= */
 
 const params =
@@ -437,6 +439,9 @@ const params =
 
 const game =
   params.get("game") || "othello";
+
+const session =
+  params.get("session");
 
 /* =========================
    タイトル変更
@@ -553,7 +558,7 @@ function renderRooms(){
           class="join-btn"
           onclick="
             location.href=
-            'room.html?game=${game}&room=${room.id}'
+            `/room?game=${game}&room=${room.id}&session=${session}`
           "
         >
           参加
@@ -563,7 +568,7 @@ function renderRooms(){
           class="watch-btn"
           onclick="
             location.href=
-            'room.html?game=${game}&room=${room.id}&watch=1'
+            `/room?game=${game}&room=${room.id}&watch=1&session=${session}`
           "
         >
           観戦
