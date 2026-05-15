@@ -428,8 +428,11 @@ body{
   <!-- タイトル -->
   <div class="title-area">
 
-    <div class="room-title">
-      ⚫ オセロ対戦ルーム
+    <div
+      class="room-title"
+      id="roomTitle"
+    >
+      🎮 対戦ルーム
     </div>
 
     <div class="room-status">
@@ -553,6 +556,36 @@ body{
 </div>
 
 <script>
+
+
+/* =========================
+   URL取得
+========================= */
+
+const params =
+  new URLSearchParams(location.search);
+
+const game =
+  params.get("game") || "othello";
+
+/* =========================
+   タイトル変更
+========================= */
+
+const roomTitle =
+  document.getElementById("roomTitle");
+
+const roomTitles = {
+
+  othello : "⚫ オセロ対戦ルーム",
+  poker : "🃏 ポーカー対戦ルーム",
+  daifugo : "👑 大富豪対戦ルーム",
+  chinchiro : "🎲 チンチロ対戦ルーム"
+
+};
+
+roomTitle.innerText =
+  roomTitles[game] || "🎮 対戦ルーム";
 
 /* =========================
    オセロ盤面
