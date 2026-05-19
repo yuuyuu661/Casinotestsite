@@ -669,18 +669,9 @@ function renderBoard(){
 
         console.log("CLICK", x, y);
 
-        /* 既に石あるなら置けない */
-
         if(!canPlace(x, y, currentTurn)){
           return;
         }
-
-        /* 既に石あるなら置けない */
-
-        if(!canPlace(x, y, currentTurn)){
-          return;
-        }
-
 
         try{
 
@@ -709,12 +700,16 @@ function renderBoard(){
 
           const data = await res.json();
 
+          console.log(data);
+
           if(!data.ok){
 
-            console.log(data.error);
+            alert(data.error);
 
             return;
           }
+
+          await loadBoardState();
 
         }
 
@@ -724,7 +719,7 @@ function renderBoard(){
 
         }
 
-        });
+      });
 
 
 
