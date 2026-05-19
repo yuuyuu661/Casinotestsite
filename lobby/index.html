@@ -867,7 +867,7 @@ function renderRooms(){
         <div>
           🎮 人数：
           <span>
-            ${room.players}/${room.max_players}
+            ${room.current_players}/${room.max_players}
           </span>
         </div>
 
@@ -877,14 +877,14 @@ function renderRooms(){
 
         <button
           class="join-btn"
-          data-room="${room.id}"
+          data-room="${room.room_id}"
         >
           参加
        </button>
 
         <button
           class="watch-btn"
-          data-room="${room.id}"
+          data-room="${room.room_id}"
         >
           観戦
         </button>
