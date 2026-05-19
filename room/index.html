@@ -694,63 +694,6 @@ function renderBoard(){
 
         }
 
-        /* 相手置けない → 自分継続 */
-
-        else if(hasValidMove(currentTurn)){
-
-          alert(
-            `${nextTurn === "black" ? "⚫黒" : "⚪白"} は置ける場所がありません！`
-          );
-
-        }
-
-        /* 両方置けない → 終了 */
-
-        else{
-
-          const result = countStones();
-
-          let message = `
-
-          ⚫ 黒：${result.black}
-          ⚪ 白：${result.white}
-
-          `;
-
-          if(result.black > result.white){
-
-            message += "⚫ 黒の勝利！";
-
-          }
-
-          else if(result.white > result.black){
-
-            message += "⚪ 白の勝利！";
-
-          }
-
-          else{
-
-            message += "🤝 引き分け！";
-
-          }
-
-          alert(message);
-
-        }
-
-
-        /* 表示更新 */
-
-        turnDisplay.innerText =
-          currentTurn === "black"
-          ? "⚫ 黒のターン"
-          : "⚪ 白のターン";
-
-        renderBoard();
-
-      });
-
 
 
 
