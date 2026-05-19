@@ -551,6 +551,14 @@ const roomId =
   params.get("room");
 
 /* =========================
+   自分情報
+========================= */
+
+let myUserId = null;
+let myUserName = null;
+  
+
+/* =========================
    API
 ========================= */
 
@@ -635,7 +643,7 @@ function renderBoard(){
       }
 
 
-      cell.addEventListener("click", () => {
+      cell.addEventListener("click", async () => {
 
         /* 既に石あるなら置けない */
 
@@ -644,31 +652,45 @@ function renderBoard(){
         }
 
 
-        /* 石を置く */
+        try{
 
-        grid[y][x] = currentTurn;
+          const res = await fetch(
+            `${API_BASE}/api/othello/place`,
+            {
+              method:"POST",
 
+              headers:{
+                "Content-Type":"application/json"
+              },
 
-        /* 石を置く */
+              body:JSON.stringify({
 
-        grid[y][x] = currentTurn;
+                room_id: roomId,
+                x: x,
+                y: y,
 
-        /* 裏返し */
+                user_id: myUserId,
+                user_name: myUserName
 
-        flipStones(x, y, currentTurn);
+              })
 
-        /* ターン変更 */
+            }
+          );
 
-        let nextTurn =
-          currentTurn === "black"
-          ? "white"
-          : "black";
+          const data = await res.json();
 
-        /* 相手が置ける？ */
+          if(!data.ok){
 
-        if(hasValidMove(nextTurn)){
+            console.log(data.error);
 
-          currentTurn = nextTurn;
+            return;
+          }
+
+        }
+
+        catch(err){
+
+          console.error(err);
 
         }
 
@@ -1038,6 +1060,37 @@ function renderPlayers(players){
 
 }
 
+/* =========================
+   自分情報取得
+========================= */
+
+async function loadMe(){
+
+  try{
+
+    const res = await fetch(
+      `${API_BASE}/api/casino/me?session=${session}`
+    );
+
+    const data = await res.json();
+
+    if(!data.ok){
+      return;
+    }
+
+    myUserId = data.user_id;
+
+  }
+
+  catch(err){
+
+    console.error(err);
+
+  }
+
+}
+
+loadMe();
 loadRoomInfo();
   
 
