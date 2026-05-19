@@ -667,6 +667,14 @@ function renderBoard(){
 
       cell.addEventListener("click", async () => {
 
+        console.log("CLICK", x, y);
+
+        /* 既に石あるなら置けない */
+
+        if(!canPlace(x, y, currentTurn)){
+          return;
+        }
+
         /* 既に石あるなら置けない */
 
         if(!canPlace(x, y, currentTurn)){
@@ -744,6 +752,13 @@ function renderBoard(){
 }
 
 function canPlace(x, y, color){
+
+  console.log(
+    "CHECK",
+    x,
+    y,
+    grid[y][x]
+  );
 
   /* 既に石あるなら不可 */
 
@@ -973,6 +988,10 @@ async function loadBoardState(){
     }
 
     const state = data.state;
+
+    console.log("BOARD DATA", state.board);
+
+    currentTurn = state.current_turn;
 
     if(typeof state.board === "string"){
 
