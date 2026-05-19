@@ -981,6 +981,51 @@ async function loadBoardState(){
   }
 
 }
+
+/* =========================
+   Socket.IO
+========================= */
+
+const socket = io(API_BASE);
+
+/* ルーム参加 */
+
+socket.emit(
+  "join_room",
+  {
+    room_id: roomId
+  }
+);
+
+/* 盤面更新 */
+
+socket.on(
+  "othello:update",
+  (data) => {
+
+    currentTurn =
+      data.current_turn;
+
+    turnDisplay.innerText =
+      currentTurn === "black"
+      ? "⚫ 黒のターン"
+      : "⚪ 白のターン";
+
+    for(let y=0;y<SIZE;y++){
+
+      for(let x=0;x<SIZE;x++){
+
+        grid[y][x] =
+          data.board[y][x];
+
+      }
+
+    }
+
+    renderBoard();
+
+  }
+);
   
 /* =========================
    ルーム情報取得
@@ -1091,6 +1136,8 @@ async function loadMe(){
 loadMe();
 loadRoomInfo();
 loadBoardState();
+
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 
 </script>
 
