@@ -919,7 +919,37 @@ function renderRooms(){
 
 }
 
-loadRooms();
+let loadingRooms = false;
+
+async function safeLoadRooms(){
+
+  if(loadingRooms) return;
+
+  loadingRooms = true;
+
+  try{
+
+    await loadRooms();
+
+  }
+
+  catch(err){
+
+    console.error(err);
+
+  }
+
+  finally{
+
+    loadingRooms = false;
+
+  }
+
+}
+
+safeLoadRooms();
+
+setInterval(safeLoadRooms, 3000);
 
 /* =========================
    ロビー作成
@@ -1011,7 +1041,8 @@ document
       return;
     }
 
-    alert("ロビー作成成功！");
+    location.href =
+      `/room?game=${game}&room=${data.room_id}&session=${session}`;
 
     createModal.classList.remove("show");
 
