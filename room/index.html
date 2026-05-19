@@ -1048,6 +1048,14 @@ socket.on(
   "othello:update",
   (data) => {
 
+    if(typeof data.board === "string"){
+
+      data.board = JSON.parse(
+        data.board
+      );
+
+    }
+
     currentTurn =
       data.current_turn;
 
@@ -1180,9 +1188,13 @@ async function loadMe(){
 
 }
 
-loadMe();
-loadRoomInfo();
-loadBoardState();
+(async () => {
+
+  await loadMe();
+  await loadRoomInfo();
+  await loadBoardState();
+
+})();
 
 
 
