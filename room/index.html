@@ -668,6 +668,7 @@ function renderBoard(){
       cell.addEventListener("click", async () => {
 
         console.log("CLICK", x, y);
+        console.log("ROOM ID =", roomId);
 
         if(!canPlace(x, y, currentTurn)){
           return;
