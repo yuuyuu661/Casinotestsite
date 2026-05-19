@@ -974,6 +974,14 @@ async function loadBoardState(){
 
     const state = data.state;
 
+    if(typeof state.board === "string"){
+
+      state.board = JSON.parse(
+        state.board
+      );
+
+    }
+
     currentTurn = state.current_turn;
 
     turnDisplay.innerText =
