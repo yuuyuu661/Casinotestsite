@@ -440,6 +440,18 @@ body{
     </div>
 
     <div
+      id="roomIdDisplay"
+      style="
+        margin-top:10px;
+        color:#cbd5e1;
+        font-weight:700;
+        font-size:0.95rem;
+      "
+    >
+      Room ID : ---
+    </div>
+
+    <div
         id="turnDisplay"
         style="
           margin-top:14px;
@@ -551,6 +563,14 @@ const game =
 
 const roomId =
   params.get("room");
+
+const roomIdDisplay =
+  document.getElementById(
+    "roomIdDisplay"
+  );
+
+roomIdDisplay.innerText =
+  `Room ID : ${roomId}`;
 
 /* =========================
    自分情報
