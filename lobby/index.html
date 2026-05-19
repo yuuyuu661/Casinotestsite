@@ -848,7 +848,7 @@ function renderRooms(){
       <div class="room-top">
 
         <div class="room-name">
-          ルーム ${room.id}
+          ルーム ${room.room_id}
         </div>
 
         <div class="room-status ${statusClass}">
@@ -861,13 +861,13 @@ function renderRooms(){
 
         <div>
           👤 ホスト：
-          <span>${room.host}</span>
+          <span>${room.host_name}</span>
         </div>
 
         <div>
           🎮 人数：
           <span>
-            ${room.players}/${room.max}
+            ${room.players}/${room.max_players}
           </span>
         </div>
 
@@ -896,10 +896,50 @@ function renderRooms(){
     const joinBtn =
       card.querySelector(".join-btn");
 
-    joinBtn.addEventListener("click", () => {
+    joinBtn.addEventListener("click", async () => {
 
-      location.href =
-        `/room?game=${game}&room=${room.id}&session=${session}`;
+      try{
+
+        const res = await fetch(
+          `${API_BASE}/api/casino/join-room`,
+          {
+            method:"POST",
+
+            headers:{
+              "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify({
+
+              room_id: room.room_id,
+              session: session
+
+            })
+
+          }
+        );
+
+        const data = await res.json();
+
+        if(!data.ok){
+
+          alert(data.error || "参加失敗");
+
+          return;
+        }
+
+        location.href =
+          `/room?game=${game}&room=${room.room_id}&session=${session}`;
+
+      }
+
+      catch(err){
+
+        console.error(err);
+
+        alert("通信エラー");
+
+      }
 
     });
 
