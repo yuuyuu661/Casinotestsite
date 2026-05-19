@@ -784,15 +784,15 @@ async function loadRooms(){
 
       rooms.push({
 
-        id: r.room_id,
+        room_id: r.room_id,
 
-        players: r.players,
+        current_players: r.current_players,
 
-        max: r.max_players,
+        max_players: r.max_players,
 
         status: r.status,
 
-        host: r.host_name,
+        host_name: r.host_name,
 
         rate_name: r.rate_name,
 
@@ -949,7 +949,7 @@ function renderRooms(){
     watchBtn.addEventListener("click", () => {
 
       location.href =
-        `/room?game=${game}&room=${room.id}&watch=1&session=${session}`;
+        `/room?game=${game}&room=${room.room_id}&watch=1&session=${session}`;
 
     });
 
