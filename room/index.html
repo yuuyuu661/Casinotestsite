@@ -1065,6 +1065,34 @@ socket.on("connect", () => {
 
 });
 
+socket.on(
+  "othello:finish",
+  (data) => {
+
+    let resultText = "";
+
+    if(data.winner === "black"){
+
+      resultText =
+        `⚫ 黒の勝利！\n\n⚫ ${data.black} - ${data.white} ⚪`;
+
+    }else if(data.winner === "white"){
+
+      resultText =
+        `⚪ 白の勝利！\n\n⚫ ${data.black} - ${data.white} ⚪`;
+
+    }else{
+
+      resultText =
+        `🤝 引き分け！\n\n⚫ ${data.black} - ${data.white} ⚪`;
+
+    }
+
+    alert(resultText);
+
+  }
+);
+
 /* 盤面更新 */
 
 socket.on(
