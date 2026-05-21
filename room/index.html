@@ -595,6 +595,56 @@ body{
 
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 
+<!-- =========================
+     じゃんけんモーダル
+========================= -->
+
+<div
+  id="jankenModal"
+  class="janken-modal"
+>
+
+  <div class="janken-box">
+
+    <div class="janken-title">
+      先攻を決めるじゃんけん
+    </div>
+
+    <div class="janken-desc">
+      好きな手を選んでください
+    </div>
+
+    <div class="janken-buttons">
+
+      <button
+        class="janken-btn"
+        data-hand="gu"
+      >
+        <img src="/images/gu5.jpg">
+      </button>
+
+      <button
+        class="janken-btn"
+        data-hand="choki"
+      >
+        <img src="/images/cyo5.jpg">
+      </button>
+
+      <button
+        class="janken-btn"
+        data-hand="pa"
+      >
+        <img src="/images/pa5.jpg">
+      </button>
+
+    </div>
+
+    <div id="jankenResult"></div>
+
+  </div>
+
+</div>
+
 <script>
 
 
@@ -1351,55 +1401,7 @@ socket.on(
 
 
 </script>
-<!-- =========================
-     じゃんけんモーダル
-========================= -->
 
-<div
-  id="jankenModal"
-  class="janken-modal"
->
-
-  <div class="janken-box">
-
-    <div class="janken-title">
-      先攻を決めるじゃんけん
-    </div>
-
-    <div class="janken-desc">
-      好きな手を選んでください
-    </div>
-
-    <div class="janken-buttons">
-
-      <button
-        class="janken-btn"
-        data-hand="gu"
-      >
-        <img src="/images/gu5.jpg">
-      </button>
-
-      <button
-        class="janken-btn"
-        data-hand="choki"
-      >
-        <img src="/images/cyo5.jpg">
-      </button>
-
-      <button
-        class="janken-btn"
-        data-hand="pa"
-      >
-        <img src="/images/pa5.jpg">
-      </button>
-
-    </div>
-
-    <div id="jankenResult"></div>
-
-  </div>
-
-</div>
 
 </body>
 </html>
