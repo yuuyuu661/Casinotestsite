@@ -518,16 +518,16 @@ body{
     </div>
 
     <div
-        id="turnDisplay"
-        style="
-          margin-top:14px;
-          font-weight:900;
-          font-size:1.1rem;
-          color:#facc15;
-        "
-      >
-        ⚫ 黒のターン
-      </div>
+      id="turnDisplay"
+      style="
+        margin-top:14px;
+        font-weight:900;
+        font-size:1.1rem;
+        color:#facc15;
+      "
+    >
+      対戦開始待機中...
+    </div>
 
   </div>
 
@@ -715,7 +715,7 @@ const board =
 
 const SIZE = 8;
 
-let currentTurn = "black";
+let currentTurn = null;
 
 const turnDisplay =
   document.getElementById("turnDisplay");
@@ -755,7 +755,10 @@ function renderBoard(){
 
       cell.className = "cell";
 
-      if(canPlace(x, y, currentTurn)){
+      if(
+        currentTurn &&
+        canPlace(x, y, currentTurn)
+      ){
 
         cell.style.background =
           "rgba(34,197,94,0.25)";
