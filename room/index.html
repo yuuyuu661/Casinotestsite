@@ -1033,11 +1033,11 @@ renderBoard();
 /* =========================
    Socket.IO
 ========================= */
+
 const placeSound = new Audio(
   "/static/sounds/nyu3.mp3"
 );
 
-  
 const socket = io(
   API_BASE,
   {
@@ -1047,8 +1047,20 @@ const socket = io(
   }
 );
 
+/* 接続完了 */
 
+socket.on("connect", () => {
 
+  console.log("SOCKET CONNECTED");
+
+  socket.emit(
+    "join_room",
+    {
+      room_id: roomId
+    }
+  );
+
+});
 
 /* 盤面更新 */
 
