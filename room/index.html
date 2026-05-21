@@ -419,9 +419,12 @@ body{
       ← ロビーへ戻る
     </button>
 
-    <div class="balance">
-      残高：999,999 rrc
-    </div>
+    <div
+      class="balance"
+      id="balanceDisplay"
+    >
+      残高：---
+</div>
 
   </div>
 
@@ -1082,6 +1085,18 @@ async function loadMe(){
 
     myUserName = data.user_name;
 
+    /* 残高表示 */
+
+    const balanceDisplay =
+      document.getElementById(
+        "balanceDisplay"
+      );
+
+    balanceDisplay.innerText =
+      `残高：${Number(
+        data.balance
+      ).toLocaleString()} rrc`;
+
   }
 
   catch(err){
@@ -1110,7 +1125,12 @@ setInterval(() => {
   loadRoomInfo();
 
 }, 1000);
+  
+setInterval(() => {
 
+  loadMe();
+
+}, 5000);
 
 
 </script>
