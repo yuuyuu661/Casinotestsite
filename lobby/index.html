@@ -291,6 +291,29 @@ body{
   color:#cbd5e1;
 }
 
+.room-rate{
+
+  margin-top:12px;
+
+  display:inline-block;
+
+  padding:6px 12px;
+
+  border-radius:999px;
+
+  background:
+    rgba(250,204,21,0.12);
+
+  border:
+    1px solid rgba(250,204,21,0.35);
+
+  color:#facc15;
+
+  font-weight:800;
+
+  font-size:0.9rem;
+}
+
 .room-info span{
   font-weight:700;
 }
@@ -869,6 +892,13 @@ function renderRooms(){
           <span>
             ${room.current_players}/${room.max_players}
           </span>
+        </div>
+
+        <div class="room-rate">
+          💰 ${room.rate_name}
+          (${Number(
+            room.rate_amount
+          ).toLocaleString()} rrc)
         </div>
 
       </div>
