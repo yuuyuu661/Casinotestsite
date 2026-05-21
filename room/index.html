@@ -665,60 +665,23 @@ function renderBoard(){
       }
 
 
-      cell.addEventListener("click", async () => {
+      cell.addEventListener("click", () => {
 
         console.log("CLICK", x, y);
-        console.log("ROOM ID =", roomId);
 
         if(!canPlace(x, y, currentTurn)){
           return;
         }
 
-        try{
-
-          const res = await fetch(
-            `${API_BASE}/api/othello/place`,
-            {
-              method:"POST",
-
-              headers:{
-                "Content-Type":"application/json"
-              },
-
-              body:JSON.stringify({
-
-                room_id: roomId,
-                x: x,
-                y: y,
-
-                user_id: myUserId,
-                user_name: myUserName
-
-              })
-
-            }
-          );
-
-          const data = await res.json();
-
-          console.log(data);
-
-          if(!data.ok){
-
-            alert(data.error);
-
-            return;
+        socket.emit(
+          "othello_move",
+          {
+            room_id: roomId,
+            x: x,
+            y: y,
+            user_id: myUserId
           }
-
-          await loadBoardState();
-
-        }
-
-        catch(err){
-
-          console.error(err);
-
-        }
+        );
 
       });
 
@@ -965,82 +928,23 @@ renderBoard();
 
 
 
-/* =========================
-   盤面取得
-========================= */
 
-async function loadBoardState(){
-
-  try{
-
-    const res = await fetch(
-      `${API_BASE}/api/othello/state/${roomId}`
-    );
-
-    const data = await res.json();
-
-    if(!data.ok){
-      return;
-    }
-
-    const state = data.state;
-
-    console.log("BOARD DATA", state.board);
-
-    currentTurn = state.current_turn;
-
-    if(typeof state.board === "string"){
-
-      state.board = JSON.parse(
-        state.board
-      );
-
-    }
-
-    currentTurn = state.current_turn;
-
-    turnDisplay.innerText =
-      currentTurn === "black"
-      ? "⚫ 黒のターン"
-      : "⚪ 白のターン";
-
-    for(let y=0;y<SIZE;y++){
-
-      for(let x=0;x<SIZE;x++){
-
-        grid[y][x] =
-          state.board[y][x];
-
-      }
-
-    }
-
-    renderBoard();
-
-  }
-
-  catch(err){
-
-    console.error(err);
-
-  }
-
-}
 
 /* =========================
    Socket.IO
 ========================= */
 
-const socket = io(API_BASE);
-
-/* ルーム参加 */
-
-socket.emit(
-  "join_room",
+const socket = io(
+  API_BASE,
   {
-    room_id: roomId
+    auth: {
+      room_id: roomId
+    }
   }
 );
+
+
+
 
 /* 盤面更新 */
 
@@ -1192,7 +1096,6 @@ async function loadMe(){
 
   await loadMe();
   await loadRoomInfo();
-  await loadBoardState();
 
 })();
 
@@ -1205,8 +1108,6 @@ async function loadMe(){
 setInterval(() => {
 
   loadRoomInfo();
-
-  loadBoardState();
 
 }, 1000);
 
