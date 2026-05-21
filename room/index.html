@@ -920,7 +920,11 @@ renderBoard();
 /* =========================
    Socket.IO
 ========================= */
+const placeSound = new Audio(
+  "/static/sounds/nyu3.mp3"
+);
 
+  
 const socket = io(
   API_BASE,
   {
@@ -967,6 +971,10 @@ socket.on(
     }
 
     renderBoard();
+
+    placeSound.currentTime = 0;
+    placeSound.play();
+    placeSound.volume = 0.35;
 
   }
 );
