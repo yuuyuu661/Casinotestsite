@@ -1154,9 +1154,11 @@ async function loadRoomInfo(){
       return;
     }
 
-    renderPlayers(data.players);
-
-  }
+    renderPlayers(
+      data.players,
+      data.black_user_id,
+      data.white_user_id
+    );
 
   catch(err){
 
@@ -1170,24 +1172,35 @@ async function loadRoomInfo(){
    プレイヤー描画
 ========================= */
 
-function renderPlayers(players){
+function renderPlayers(
+  players,
+  blackUserId,
+  whiteUserId
+){
 
   const playerList =
     document.getElementById("playerList");
 
   playerList.innerHTML = "";
 
-  players.forEach((player, index) => {
+  players.forEach((player) => {
 
-    const color =
-      index === 0
-      ? "⚫"
-      : "⚪";
+    let color = "👤";
+    let role = "観戦";
 
-    const role =
-      index === 0
-      ? "先手"
-      : "後手";
+    if(player.user_id === blackUserId){
+
+      color = "⚫";
+      role = "先手";
+
+    }
+
+    else if(player.user_id === whiteUserId){
+
+      color = "⚪";
+      role = "後手";
+
+    }
 
     const card =
       document.createElement("div");
