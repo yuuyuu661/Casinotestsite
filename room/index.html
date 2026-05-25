@@ -677,6 +677,7 @@ roomIdDisplay.innerText =
 ========================= */
 
 let myUserId = null;
+let myColor = null;
 let myUserName = null;
   
 
@@ -771,6 +772,18 @@ function renderBoard(){
       cell.addEventListener("click", () => {
 
         console.log("CLICK", x, y);
+
+        // =========================
+        // 自分のターン確認
+        // =========================
+
+        if(myColor !== currentTurn){
+          return;
+        }
+
+        // =========================
+        // 置ける確認
+        // =========================
 
         if(!canPlace(x, y, currentTurn)){
           return;
@@ -1152,6 +1165,28 @@ async function loadRoomInfo(){
 
     if(!data.ok){
       return;
+    }
+
+    // =========================
+    // 自分の色判定
+    // =========================
+
+    if(myUserId === data.black_user_id){
+
+      myColor = "black";
+
+    }
+
+    else if(myUserId === data.white_user_id){
+
+      myColor = "white";
+
+    }
+
+    else{
+
+      myColor = null;
+
     }
 
     renderPlayers(
