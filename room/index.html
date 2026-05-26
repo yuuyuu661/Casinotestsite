@@ -477,7 +477,7 @@ body{
 
     <button
       class="back-btn"
-      onclick="history.back()"
+      id="backLobbyBtn"
     >
       ← ロビーへ戻る
     </button>
@@ -1487,6 +1487,84 @@ socket.on(
 
     chatBox.scrollTop =
       chatBox.scrollHeight;
+
+  }
+);
+
+/* =========================
+   退出処理
+========================= */
+
+async function leaveRoom(){
+
+  try{
+
+    await fetch(
+      `${API_BASE}/api/casino/leave-room`,
+      {
+        method:"POST",
+
+        headers:{
+          "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify({
+
+          room_id: roomId,
+
+          session: session
+
+        })
+
+      }
+    );
+
+  }
+
+  catch(err){
+
+    console.error(err);
+
+  }
+
+}
+
+/* =========================
+   ロビーへ戻る
+========================= */
+
+document
+.getElementById("backLobbyBtn")
+.addEventListener("click", async () => {
+
+  await leaveRoom();
+
+  location.href =
+    `/lobby?game=${game}&session=${session}`;
+
+});
+
+/* =========================
+   ブラウザ閉じる
+========================= */
+
+window.addEventListener(
+  "beforeunload",
+  () => {
+
+    navigator.sendBeacon(
+
+      `${API_BASE}/api/casino/leave-room`,
+
+      JSON.stringify({
+
+        room_id: roomId,
+
+        session: session
+
+      })
+
+    );
 
   }
 );
