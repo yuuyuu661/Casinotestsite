@@ -1028,6 +1028,10 @@ function renderRooms(){
 
           alert(data.error || "参加失敗");
 
+          document
+            .getElementById("joinPassword")
+            .value = "";
+
           return;
         }
 
