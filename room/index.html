@@ -1058,7 +1058,11 @@ const socket = io(
   API_BASE,
   {
     auth: {
-      room_id: roomId
+
+      room_id: roomId,
+
+      session: session
+
     }
   }
 );
