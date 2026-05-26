@@ -544,10 +544,6 @@ body{
       ⚫ オセロ ロビー
     </div>
 
-    <div class="online-box">
-      🟢 現在 8人 プレイ中
-    </div>
-
   </div>
 
   <!-- 作成 -->
@@ -630,6 +626,23 @@ body{
         </option>
 
       </select>
+
+    </div>
+
+    <!-- ロビー名 -->
+
+    <div class="form-group">
+
+      <label>
+        ロビー名
+      </label>
+
+      <input
+        type="text"
+        id="roomName"
+        placeholder="ロビー名を入力"
+        maxlength="30"
+      >
 
     </div>
 
@@ -806,21 +819,15 @@ async function loadRooms(){
     data.rooms.forEach(r => {
 
       rooms.push({
-
         room_id: r.room_id,
-
+        room_name: r.room_name,
+        has_password: r.has_password,
         current_players: r.current_players,
-
         max_players: r.max_players,
-
         status: r.status,
-
         host_name: r.host_name,
-
         rate_name: r.rate_name,
-
         rate_amount: r.rate_amount
-
       });
 
     });
@@ -871,7 +878,11 @@ function renderRooms(){
       <div class="room-top">
 
         <div class="room-name">
-          ルーム ${room.room_id}
+
+          ${room.has_password ? "🔒 " : ""}
+
+          ${room.room_name}
+
         </div>
 
         <div class="room-status ${statusClass}">
@@ -1075,6 +1086,9 @@ document
     Number(
       document.getElementById("rateSelect").value
     );
+
+  const room_name =
+    document.getElementById("roomName").value.trim();
 
   const password =
     document.getElementById("roomPassword").value;
