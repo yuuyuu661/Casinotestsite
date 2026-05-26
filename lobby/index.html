@@ -686,8 +686,60 @@ body{
 
 </div>
 
-<script>
+<!-- =========================
+   パスワード入力モーダル
+========================= -->
 
+<div
+  class="modal-overlay"
+  id="passwordModal"
+>
+
+  <div class="modal-box">
+
+    <div class="modal-title">
+      パスワード入力
+    </div>
+
+    <div class="form-group">
+
+      <label>
+        パスワード
+      </label>
+
+      <input
+        type="password"
+        id="joinPassword"
+        placeholder="パスワードを入力"
+      >
+
+    </div>
+
+    <div class="modal-buttons">
+
+      <button
+        class="cancel-btn"
+        id="closePasswordModalBtn"
+      >
+        キャンセル
+      </button>
+
+      <button
+        class="create-submit-btn"
+        id="submitPasswordBtn"
+      >
+        参加
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+let pendingJoinRoom = null;
 
 
 /* =========================
@@ -940,6 +992,16 @@ function renderRooms(){
     joinBtn.addEventListener("click", async () => {
 
       try{
+        if(room.has_password){
+
+          pendingJoinRoom = room;
+
+          document
+            .getElementById("passwordModal")
+            .classList.add("show");
+
+          return;
+        }
 
         const res = await fetch(
           `${API_BASE}/api/casino/join-room`,
@@ -999,6 +1061,80 @@ function renderRooms(){
   });
 
 }
+/* =========================
+   パスワードモーダル
+========================= */
+
+document
+.getElementById("closePasswordModalBtn")
+.addEventListener("click", () => {
+
+  document
+    .getElementById("passwordModal")
+    .classList.remove("show");
+
+});
+
+document
+.getElementById("submitPasswordBtn")
+.addEventListener("click", async () => {
+
+  if(!pendingJoinRoom) return;
+
+  const password =
+    document.getElementById("joinPassword").value;
+
+  try{
+
+    const res = await fetch(
+      `${API_BASE}/api/casino/join-room`,
+      {
+        method:"POST",
+
+        headers:{
+          "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify({
+
+          room_id: pendingJoinRoom.room_id,
+
+          session: session,
+
+          password: password
+
+        })
+
+      }
+    );
+
+    const data = await res.json();
+
+    if(!data.ok){
+
+      alert(data.error || "参加失敗");
+
+      return;
+    }
+
+    document
+      .getElementById("passwordModal")
+      .classList.remove("show");
+
+    location.href =
+      `/room?game=${game}&room=${pendingJoinRoom.room_id}&session=${session}`;
+
+  }
+
+  catch(err){
+
+    console.error(err);
+
+    alert("通信エラー");
+
+  }
+
+});
 
 let loadingRooms = false;
 
