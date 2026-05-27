@@ -700,6 +700,7 @@ const roomTitle =
 const roomTitles = {
 
   othello : "⚫ オセロ対戦ルーム",
+  dobutsu : "🦁 どうぶつしょうぎ対戦ルーム",
   poker : "🃏 ポーカー対戦ルーム",
   daifugo : "👑 大富豪対戦ルーム",
   chinchiro : "🎲 チンチロ対戦ルーム"
@@ -710,13 +711,21 @@ roomTitle.innerText =
   roomTitles[game] || "🎮 対戦ルーム";
 
 /* =========================
-   オセロ盤面
+   盤面
 ========================= */
 
 const board =
   document.getElementById("board");
 
-const SIZE = 8;
+const BOARD_W =
+  gameType === "dobutsu"
+    ? 3
+    : 8;
+
+const BOARD_H =
+  gameType === "dobutsu"
+    ? 4
+    : 8;
 
 let currentTurn = null;
 
@@ -727,21 +736,31 @@ const turnDisplay =
 
 const grid = [];
 
-for(let y=0;y<SIZE;y++){
+for(let y=0;y<BOARD_H;y++){
 
   grid[y] = [];
 
-  for(let x=0;x<SIZE;x++){
+  for(let x=0;x<BOARD_W;x++){
+
     grid[y][x] = null;
+
   }
 
 }
 
-grid[3][3] = "white";
-grid[4][4] = "white";
+/* =========================
+   オセロ初期配置
+========================= */
 
-grid[3][4] = "black";
-grid[4][3] = "black";
+if(gameType === "othello"){
+
+  grid[3][3] = "white";
+  grid[4][4] = "white";
+
+  grid[3][4] = "black";
+  grid[4][3] = "black";
+
+}
 
 /* 描画 */
 
@@ -749,9 +768,9 @@ function renderBoard(){
 
   board.innerHTML = "";
 
-  for(let y=0;y<SIZE;y++){
+  for(let y=0;y<BOARD_H;y++){
 
-    for(let x=0;x<SIZE;x++){
+    for(let x=0;x<BOARD_W;x++){
 
       const cell =
         document.createElement("div");
@@ -872,9 +891,9 @@ function canPlace(x, y, color){
 
     while(
       nx >= 0 &&
-      nx < SIZE &&
+      nx < BOARD_W &&
       ny >= 0 &&
-      ny < SIZE
+      ny < BOARD_H
     ){
 
       const value = grid[ny][nx];
@@ -947,9 +966,9 @@ function flipStones(x, y, color){
 
     while(
       nx >= 0 &&
-      nx < SIZE &&
+      nx < BOARD_W &&
       ny >= 0 &&
-      ny < SIZE
+      ny < BOARD_H
     ){
 
       const value = grid[ny][nx];
@@ -1019,9 +1038,9 @@ function countStones(){
   let black = 0;
   let white = 0;
 
-  for(let y=0;y<SIZE;y++){
+  for(let y=0;y<BOARD_H;y++){
 
-    for(let x=0;x<SIZE;x++){
+    for(let x=0;x<BOARD_W;x++){
 
       if(grid[y][x] === "black"){
         black++;
@@ -1437,7 +1456,8 @@ function sendChat(){
     {
       room_id: roomId,
       user_name: myUserName,
-      message: message
+      message: message,
+      game: gameType
     }
   );
 
