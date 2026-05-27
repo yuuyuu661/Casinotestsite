@@ -271,6 +271,17 @@ body{
   border-radius:50%;
 }
 
+.dobutsu-piece{
+
+  width:58px;
+  height:58px;
+
+  object-fit:contain;
+
+  pointer-events:none;
+
+}
+
 .black{
   background:#000;
 
@@ -858,7 +869,14 @@ function renderBoard(){
             "dobutsu-piece";
 
           piece.src =
-            `/static/dobutsu/${value.owner}_${value.type}.png`;
+            `/static/dobutsu/${value.type}.png`;
+
+          if(value.owner === "white"){
+
+            piece.style.transform =
+              "rotate(180deg)";
+
+          }
 
           cell.appendChild(piece);
 
