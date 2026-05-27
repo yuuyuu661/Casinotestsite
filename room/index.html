@@ -661,6 +661,8 @@ const session =
 const game =
   params.get("game") || "othello";
 
+const gameType = game;
+
 const roomId =
   params.get("room");
 
@@ -1078,7 +1080,8 @@ socket.on("connect", () => {
   socket.emit(
     "join_room",
     {
-      room_id: roomId
+      room_id: roomId,
+      game: gameType
     }
   );
 
