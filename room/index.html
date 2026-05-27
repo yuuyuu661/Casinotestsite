@@ -829,13 +829,40 @@ function renderBoard(){
 
       if(value){
 
-        const stone =
-          document.createElement("div");
+        // =========================
+        // オセロ
+        // =========================
 
-        stone.className =
-          `stone ${value}`;
+        if(gameType === "othello"){
 
-        cell.appendChild(stone);
+          const stone =
+            document.createElement("div");
+
+          stone.className =
+            `stone ${value}`;
+
+          cell.appendChild(stone);
+
+        }
+
+        // =========================
+        // どうぶつしょうぎ
+        // =========================
+
+        else if(gameType === "dobutsu"){
+
+          const piece =
+            document.createElement("img");
+
+          piece.className =
+            "dobutsu-piece";
+
+          piece.src =
+            `/static/dobutsu/${value.owner}_${value.type}.png`;
+
+          cell.appendChild(piece);
+
+        }
 
       }
 
