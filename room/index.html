@@ -1018,9 +1018,9 @@ function flipStones(x, y, color){
 
 function hasValidMove(color){
 
-  for(let y=0;y<SIZE;y++){
+  for(let y=0;y<BOARD_H;y++){
 
-    for(let x=0;x<SIZE;x++){
+    for(let x=0;x<BOARD_W;x++){
 
       if(canPlace(x, y, color)){
         return true;
@@ -1156,9 +1156,9 @@ socket.on(
       ? "⚫ 黒のターン"
       : "⚪ 白のターン";
 
-    for(let y=0;y<SIZE;y++){
+    for(let y=0;y<BOARD_H;y++){
 
-      for(let x=0;x<SIZE;x++){
+      for(let x=0;x<BOARD_W;x++){
 
         grid[y][x] =
           data.board[y][x];
