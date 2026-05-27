@@ -239,6 +239,29 @@ body{
     0 0 25px rgba(0,0,0,0.4);
 }
 
+/* =========================
+   どうぶつしょうぎ盤面
+========================= */
+
+.board.dobutsu{
+
+  grid-template-columns:
+    repeat(3,90px);
+
+  grid-template-rows:
+    repeat(4,90px);
+
+  background-image:
+    url("/static/dobutsu/background.jpg");
+
+  background-size:cover;
+  background-position:center;
+
+  border:
+    6px solid #92400e;
+
+}
+
 .cell{
 
   width:70px;
@@ -473,6 +496,15 @@ body{
   .stone{
     width:30px;
     height:30px;
+  }
+  .board.dobutsu{
+
+    grid-template-columns:
+      repeat(3,72px);
+
+    grid-template-rows:
+      repeat(4,72px);
+
   }
 
 }
