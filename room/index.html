@@ -1061,7 +1061,9 @@ const socket = io(
 
       room_id: roomId,
 
-      session: session
+      session: session,
+      game: gameType
+      
 
     }
   }
@@ -1362,7 +1364,8 @@ document
       {
         room_id: roomId,
         user_id: myUserId,
-        hand: hand
+        hand: hand,
+        game: gameType
       }
     );
 
