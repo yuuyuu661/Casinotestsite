@@ -760,6 +760,12 @@ roomTitle.innerText =
 const board =
   document.getElementById("board");
 
+if(gameType === "dobutsu"){
+
+  board.classList.add("dobutsu");
+
+}
+
 const BOARD_W =
   gameType === "dobutsu"
     ? 3
@@ -771,7 +777,7 @@ const BOARD_H =
     : 8;
 
 let currentTurn = null;
-
+  
 const turnDisplay =
   document.getElementById("turnDisplay");
 
