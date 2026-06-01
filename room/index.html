@@ -840,6 +840,46 @@ function renderBoard(){
           "inset 0 0 12px rgba(34,197,94,0.35)";
       }
 
+      // =========================
+      // どうぶつ移動可能表示
+      // =========================
+
+      if(
+        gameType === "dobutsu" &&
+        selectedPiece
+      ){
+
+        const validMoves =
+          getValidMoves(
+            selectedPiece.piece,
+            selectedPiece.x,
+            selectedPiece.y
+          );
+
+        const canMove =
+          validMoves.some(move =>
+            move.x === x &&
+            move.y === y
+          );
+
+        if(canMove){
+
+          cell.style.background =
+            "rgba(239,68,68,0.25)";
+
+          cell.style.boxShadow =
+            "inset 0 0 12px rgba(239,68,68,0.35)";
+        }
+
+      }
+
+        cell.style.background =
+          "rgba(34,197,94,0.25)";
+
+        cell.style.boxShadow =
+          "inset 0 0 12px rgba(34,197,94,0.35)";
+      }
+
 
       cell.addEventListener("click", () => {
 
@@ -913,6 +953,23 @@ function renderBoard(){
           // =========================
 
           if(!selectedPiece){
+            return;
+          }
+          
+          const validMoves =
+            getValidMoves(
+              selectedPiece.piece,
+              selectedPiece.x,
+              selectedPiece.y
+            );
+
+          const canMove =
+            validMoves.some(move =>
+              move.x === x &&
+              move.y === y
+            );
+
+          if(!canMove){
             return;
           }
 
@@ -999,6 +1056,133 @@ function renderBoard(){
     }
 
   }
+
+}
+
+
+
+function getValidMoves(
+  piece,
+  x,
+  y
+){
+
+  let moves = [];
+
+  // =========================
+  // ライオン
+  // =========================
+
+  if(piece.type === "lion"){
+
+    moves = [
+      [-1,-1],[0,-1],[1,-1],
+      [-1,0],         [1,0],
+      [-1,1],[0,1],[1,1]
+    ];
+
+  }
+
+  // =========================
+  // キリン
+  // =========================
+
+  else if(piece.type === "giraffe"){
+
+    moves = [
+      [0,-1],
+      [-1,0],[1,0],
+      [0,1]
+    ];
+
+  }
+
+  // =========================
+  // ゾウ
+  // =========================
+
+  else if(piece.type === "elephant"){
+
+    moves = [
+      [-1,-1],[1,-1],
+      [-1,1],[1,1]
+    ];
+
+  }
+
+  // =========================
+  // ヒヨコ
+  // =========================
+
+  else if(piece.type === "chick"){
+
+    if(piece.owner === "black"){
+
+      moves = [
+        [0,-1]
+      ];
+
+    }
+
+    else{
+
+      moves = [
+        [0,1]
+      ];
+
+    }
+
+  }
+
+  // =========================
+  // にわとり
+  // =========================
+
+  else if(piece.type === "hen"){
+
+    if(piece.owner === "black"){
+
+      moves = [
+        [-1,-1],[0,-1],[1,-1],
+        [-1,0], [1,0],
+        [0,1]
+      ];
+
+    }
+
+    else{
+
+      moves = [
+        [0,-1],
+        [-1,0], [1,0],
+        [-1,1],[0,1],[1,1]
+      ];
+
+    }
+
+  }
+
+  // =========================
+  // 実座標化
+  // =========================
+
+  return moves.map(([dx,dy]) => {
+
+    return {
+      x: x + dx,
+      y: y + dy
+    };
+
+  }).filter(move => {
+
+    return (
+      move.x >= 0 &&
+      move.x < BOARD_W &&
+      move.y >= 0 &&
+      move.y < BOARD_H
+    );
+
+  });
 
 }
 
