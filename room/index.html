@@ -725,6 +725,7 @@ let myUserId = null;
 let myColor = null;
 let myUserName = null;
 let selectedPiece = null;
+let tryWinner = null;
   
 
 /* =========================
@@ -1545,6 +1546,10 @@ socket.on(
 
     }
 
+    // =========================
+    // 相手駒取得
+    // =========================
+
     if(
       target &&
       target.owner !== piece.owner
@@ -1552,6 +1557,14 @@ socket.on(
 
       target.owner =
         piece.owner;
+
+      // にわとりはヒヨコに戻す
+      if(target.type === "hen"){
+
+        target.type = "chick";
+
+      }
+
     }
 
     // =========================
@@ -1600,7 +1613,48 @@ socket.on(
         ? "white"
         : "black";
     // =========================
-    // トライ勝利
+    // トライ勝利確定
+    // =========================
+
+    if(tryWinner){
+
+      let lionAlive = false;
+
+      for(let yy=0;yy<BOARD_H;yy++){
+
+        for(let xx=0;xx<BOARD_W;xx++){
+
+          const p = grid[yy][xx];
+
+          if(
+            p &&
+            p.type === "lion" &&
+            p.owner === tryWinner
+          ){
+
+            lionAlive = true;
+
+          }
+
+        }
+
+      }
+
+      if(lionAlive){
+
+        alert(
+          tryWinner === "black"
+            ? "⚫ トライ勝利！"
+            : "⚪ トライ勝利！"
+        );
+
+      }
+
+      tryWinner = null;
+
+    }
+    // =========================
+    // トライ判定
     // =========================
 
     if(piece.type === "lion"){
@@ -1611,7 +1665,7 @@ socket.on(
         data.to_y === 0
       ){
 
-        alert("⚫ 勝利！");
+        tryWinner = "black";
 
       }
 
@@ -1621,7 +1675,13 @@ socket.on(
         data.to_y === 3
       ){
 
-        alert("⚪ 勝利！");
+        tryWinner = "white";
+
+      }
+
+      else{
+
+        tryWinner = null;
 
       }
 
