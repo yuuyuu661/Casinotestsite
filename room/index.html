@@ -1605,6 +1605,32 @@ socket.on(
       null;
 
     // =========================
+    // トライ判定
+    // =========================
+
+    if(piece.type === "lion"){
+
+      // 黒
+      if(
+        piece.owner === "black" &&
+        data.to_y === 0
+      ){
+
+        tryWinner = "black";
+
+      }
+
+      // 白
+      else if(
+        piece.owner === "white" &&
+        data.to_y === 3
+      ){
+
+        tryWinner = "white";
+
+      }
+
+    // =========================
     // ターン変更
     // =========================
 
@@ -1653,37 +1679,8 @@ socket.on(
       tryWinner = null;
 
     }
-    // =========================
-    // トライ判定
-    // =========================
 
-    if(piece.type === "lion"){
 
-      // 黒
-      if(
-        piece.owner === "black" &&
-        data.to_y === 0
-      ){
-
-        tryWinner = "black";
-
-      }
-
-      // 白
-      else if(
-        piece.owner === "white" &&
-        data.to_y === 3
-      ){
-
-        tryWinner = "white";
-
-      }
-
-      else{
-
-        tryWinner = null;
-
-      }
 
     }
 
