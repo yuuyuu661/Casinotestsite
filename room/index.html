@@ -922,71 +922,22 @@ function renderBoard(){
             y
           );
 
-          const target = grid[y][x];
+          socket.emit(
+            "dobutsu_move",
+            {
+              room_id: roomId,
 
-          // =========================
-          // 自分の駒には置けない
-          // =========================
+              from_x: selectedPiece.x,
+              from_y: selectedPiece.y,
 
-          if(
-            target &&
-            target.owner === myColor
-          ){
-            return;
-          }
-
-          // =========================
-          // 相手駒を取る
-          // =========================
-
-          if(
-            target &&
-            target.owner !== myColor
-          ){
-
-            target.owner = myColor;
-
-            // ここで持ち駒へ追加予定
-            console.log(
-              "CAPTURE",
-              target
-            );
-
-          }
-
-          // =========================
-          // 駒移動
-          // =========================
-
-          grid[y][x] =
-            selectedPiece.piece;
-
-          grid[
-            selectedPiece.y
-          ][
-            selectedPiece.x
-          ] = null;
-
-          // =========================
-          // 選択解除
-          // =========================
+              to_x: x,
+              to_y: y
+            }
+          );
 
           selectedPiece = null;
 
-          // =========================
-          // ターン変更
-          // =========================
 
-          currentTurn =
-            currentTurn === "black"
-              ? "white"
-              : "black";
-
-          // =========================
-          // 再描画
-          // =========================
-
-          renderBoard();
 
         }
 
@@ -1377,6 +1328,57 @@ socket.on(
 
     placeSound.currentTime = 0;
     placeSound.play();
+
+  }
+);
+
+socket.on(
+  "dobutsu_move",
+  (data) => {
+
+    const piece =
+      grid[data.from_y][data.from_x];
+
+    if(!piece){
+      return;
+    }
+
+    // =========================
+    // 相手駒取得
+    // =========================
+
+    const target =
+      grid[data.to_y][data.to_x];
+
+    if(
+      target &&
+      target.owner !== piece.owner
+    ){
+
+      target.owner =
+        piece.owner;
+    }
+
+    // =========================
+    // 駒移動
+    // =========================
+
+    grid[data.to_y][data.to_x] =
+      piece;
+
+    grid[data.from_y][data.from_x] =
+      null;
+
+    // =========================
+    // ターン変更
+    // =========================
+
+    currentTurn =
+      currentTurn === "black"
+        ? "white"
+        : "black";
+
+    renderBoard();
 
   }
 );
