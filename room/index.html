@@ -1528,6 +1528,22 @@ socket.on(
 
     const target =
       grid[data.to_y][data.to_x];
+    // =========================
+    // ライオン取った
+    // =========================
+
+    if(
+      target &&
+      target.type === "lion"
+    ){
+
+      alert(
+        piece.owner === "black"
+          ? "⚫ 先手勝利！"
+          : "⚪ 後手勝利！"
+      );
+
+    }
 
     if(
       target &&
@@ -1544,6 +1560,33 @@ socket.on(
 
     grid[data.to_y][data.to_x] =
       piece;
+    // =========================
+    // ひよこ成り
+    // =========================
+
+    if(piece.type === "chick"){
+
+      // 黒が最上段
+      if(
+        piece.owner === "black" &&
+        data.to_y === 0
+      ){
+
+        piece.type = "hen";
+
+      }
+
+      // 白が最下段
+      else if(
+        piece.owner === "white" &&
+        data.to_y === 3
+      ){
+
+        piece.type = "hen";
+
+      }
+
+    }
 
     grid[data.from_y][data.from_x] =
       null;
@@ -1556,6 +1599,34 @@ socket.on(
       currentTurn === "black"
         ? "white"
         : "black";
+    // =========================
+    // トライ勝利
+    // =========================
+
+    if(piece.type === "lion"){
+
+      // 黒
+      if(
+        piece.owner === "black" &&
+        data.to_y === 0
+      ){
+
+        alert("⚫ 勝利！");
+
+      }
+
+      // 白
+      else if(
+        piece.owner === "white" &&
+        data.to_y === 3
+      ){
+
+        alert("⚪ 勝利！");
+
+      }
+
+    }
+
 
     renderBoard();
 
