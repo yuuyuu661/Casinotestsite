@@ -827,6 +827,7 @@ function renderBoard(){
       cell.className = "cell";
 
       if(
+        gameType === "othello" &&
         currentTurn &&
         canPlace(x, y, currentTurn)
       ){
@@ -855,19 +856,27 @@ function renderBoard(){
         // 置ける確認
         // =========================
 
-        if(!canPlace(x, y, currentTurn)){
-          return;
+        if(gameType === "othello"){
+
+          if(!canPlace(x, y, currentTurn)){
+            return;
+          }
+
         }
 
-        socket.emit(
-          "othello_move",
-          {
-            room_id: roomId,
-            x: x,
-            y: y,
-            user_id: myUserId
-          }
-        );
+        if(gameType === "othello"){
+
+          socket.emit(
+            "othello_move",
+            {
+              room_id: roomId,
+             x: x,
+              y: y,
+              user_id: myUserId
+            }
+          );
+
+        }
 
       });
 
