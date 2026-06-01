@@ -1559,7 +1559,7 @@ socket.on(
         piece.owner;
 
       // にわとりはヒヨコに戻す
-      if(target.type === "hen"){
+      if(target.type === "chicken"){
 
         target.type = "chick";
 
@@ -1585,7 +1585,7 @@ socket.on(
         data.to_y === 0
       ){
 
-        piece.type = "hen";
+        piece.type = "chicken";
 
       }
 
@@ -1595,7 +1595,7 @@ socket.on(
         data.to_y === 3
       ){
 
-        piece.type = "hen";
+        piece.type = "chicken";
 
       }
 
@@ -1604,33 +1604,7 @@ socket.on(
     grid[data.from_y][data.from_x] =
       null;
 
-    // =========================
-    // トライ判定
-    // =========================
 
-    if(piece.type === "lion"){
-
-      // 黒
-      if(
-        piece.owner === "black" &&
-        data.to_y === 0
-      ){
-
-        tryWinner = "black";
-
-      }
-
-      // 白
-      else if(
-        piece.owner === "white" &&
-        data.to_y === 3
-      ){
-
-        tryWinner = "white";
-
-      }
-
-    }
 
     // =========================
     // ターン変更
@@ -1642,7 +1616,7 @@ socket.on(
         : "black";
     
     // =========================
-    // トライ勝利確定
+    // 前回トライ勝利確定
     // =========================
 
     if(tryWinner){
@@ -1680,6 +1654,34 @@ socket.on(
       }
 
       tryWinner = null;
+
+    }
+
+    // =========================
+    // 今回トライ予約
+    // =========================
+
+    if(piece.type === "lion"){
+
+      // 黒
+      if(
+        piece.owner === "black" &&
+        data.to_y === 0
+      ){
+
+        tryWinner = "black";
+
+      }
+
+      // 白
+      else if(
+        piece.owner === "white" &&
+        data.to_y === 3
+      ){
+
+        tryWinner = "white";
+
+      }
 
     }
 
