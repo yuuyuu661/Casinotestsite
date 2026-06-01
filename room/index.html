@@ -726,6 +726,7 @@ let myColor = null;
 let myUserName = null;
 let selectedPiece = null;
 let tryWinner = null;
+let gameEnded = false;
   
 
 /* =========================
@@ -878,6 +879,10 @@ function renderBoard(){
 
 
       cell.addEventListener("click", () => {
+
+        if(gameEnded){
+          return;
+        }
 
         console.log("CLICK", x, y);
 
@@ -1538,6 +1543,16 @@ socket.on(
       target.type === "lion"
     ){
 
+      gameEnded = true;
+
+      socket.emit(
+        "dobutsu_finish",
+        {
+          room_id: roomId,
+          winner: piece.owner
+        }
+      );
+
       alert(
         piece.owner === "black"
           ? "⚫ 先手勝利！"
@@ -1644,6 +1659,16 @@ socket.on(
       }
 
       if(lionAlive){
+
+        gameEnded = true;
+
+        socket.emit(
+          "dobutsu_finish",
+          {
+            room_id: roomId,
+            winner: piece.owner
+          }
+        );
 
         alert(
           tryWinner === "black"
