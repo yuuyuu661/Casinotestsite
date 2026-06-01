@@ -1520,6 +1520,20 @@ document
     const hand =
       btn.dataset.hand;
 
+    console.log(
+      "JANKEN CLICK",
+      myUserId,
+      hand
+    );
+
+    if(!myUserId){
+
+      alert("ユーザー情報読み込み中");
+
+      return;
+
+    }
+
     socket.emit(
       "janken_select",
       {
