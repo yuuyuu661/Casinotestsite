@@ -922,6 +922,40 @@ function renderBoard(){
             y
           );
 
+          // =========================
+          // 駒移動
+          // =========================
+
+          grid[y][x] =
+            selectedPiece.piece;
+
+          grid[
+            selectedPiece.y
+          ][
+            selectedPiece.x
+          ] = null;
+
+          // =========================
+          // 選択解除
+          // =========================
+
+          selectedPiece = null;
+
+          // =========================
+          // ターン変更
+          // =========================
+
+          currentTurn =
+            currentTurn === "black"
+              ? "white"
+              : "black";
+
+          // =========================
+          // 再描画
+          // =========================
+
+          renderBoard();
+
         }
 
       });
