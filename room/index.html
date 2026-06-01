@@ -922,6 +922,38 @@ function renderBoard(){
             y
           );
 
+          const target = grid[y][x];
+
+          // =========================
+          // 自分の駒には置けない
+          // =========================
+
+          if(
+            target &&
+            target.owner === myColor
+          ){
+            return;
+          }
+
+          // =========================
+          // 相手駒を取る
+          // =========================
+
+          if(
+            target &&
+            target.owner !== myColor
+          ){
+
+            target.owner = myColor;
+
+            // ここで持ち駒へ追加予定
+            console.log(
+              "CAPTURE",
+              target
+            );
+
+          }
+
           // =========================
           // 駒移動
           // =========================
