@@ -1259,6 +1259,43 @@ socket.on(
 
   }
 );
+
+/* =========================
+   どうぶつしょうぎ更新
+========================= */
+
+socket.on(
+  "dobutsu:update",
+  (data) => {
+
+    console.log(
+      "DOBUTSU UPDATE",
+      data
+    );
+
+    currentTurn =
+      data.turn;
+
+    turnDisplay.innerText =
+      currentTurn === "black"
+      ? "🦁 先手のターン"
+      : "🐘 後手のターン";
+
+    for(let y=0;y<BOARD_H;y++){
+
+      for(let x=0;x<BOARD_W;x++){
+
+        grid[y][x] =
+          data.board[y][x];
+
+      }
+
+    }
+
+    renderBoard();
+
+  }
+);
   
 /* =========================
    ルーム情報取得
