@@ -724,6 +724,7 @@ roomIdDisplay.innerText =
 let myUserId = null;
 let myColor = null;
 let myUserName = null;
+let selectedPiece = null;
   
 
 /* =========================
@@ -880,8 +881,43 @@ function renderBoard(){
 
         else if(gameType === "dobutsu"){
 
+          const piece = grid[y][x];
+
+          // =========================
+          // 自分の駒選択
+          // =========================
+
+          if(
+            piece &&
+            piece.owner === myColor
+          ){
+
+            selectedPiece = {
+              x,
+              y,
+              piece
+            };
+
+            console.log(
+              "SELECT",
+              selectedPiece
+            );
+
+            renderBoard();
+
+            return;
+          }
+
+          // =========================
+          // 未選択
+          // =========================
+
+          if(!selectedPiece){
+            return;
+          }
+
           console.log(
-            "DOBUTSU CLICK",
+            "MOVE TO",
             x,
             y
           );
