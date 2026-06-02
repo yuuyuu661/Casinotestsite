@@ -464,6 +464,24 @@ body{
   object-fit:cover;
   border-radius:12px;
 }
+.captured-area{
+  display:flex;
+  gap:8px;
+  justify-content:center;
+  margin-top:12px;
+  flex-wrap:wrap;
+}
+
+.captured-piece{
+  width:48px;
+  height:48px;
+  cursor:pointer;
+  transition:0.15s;
+}
+
+.captured-piece:hover{
+  transform:scale(1.08);
+}
 
 #jankenResult{
   margin-top:18px;
@@ -594,6 +612,17 @@ body{
       <div
         class="board"
         id="board"
+      ></div>
+
+      <!-- 持ち駒 -->
+      <div
+        id="captured-black"
+        class="captured-area"
+      ></div>
+
+      <div
+        id="captured-white"
+        class="captured-area"
       ></div>
 
     </div>
