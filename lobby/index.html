@@ -1054,7 +1054,7 @@ function renderRooms(){
       const roomPage = roomPages[game] || "room";
 
       location.href =
-        `/${roomPage}?game=${game}&room=${room.room_id}&watch=1&session=${session}`;
+        `${roomPage}?game=${game}&room=${room.room_id}&watch=1&session=${session}`;
 
     });
 
@@ -1271,7 +1271,7 @@ document
     const roomPage = roomPages[game] || "room";
 
     location.href =
-      `/${roomPage}?game=${game}&room=${data.room_id}&session=${session}`;
+      `${roomPage}?game=${game}&room=${data.room_id}&session=${session}`;
 
     createModal.classList.remove("show");
 
