@@ -1123,8 +1123,16 @@ document
       .getElementById("passwordModal")
       .classList.remove("show");
 
+    const roomPages = {
+      othello: "/room/othello_room.html",
+      dobutsu: "/room/dobutsu_room.html",
+      chinchiro: "/room/chinchiro_room.html"
+    };
+
+    const roomPage = roomPages[game] || "/room.html";
+
     location.href =
-      `/room?game=${game}&room=${pendingJoinRoom.room_id}&session=${session}`;
+      `${roomPage}?game=${game}&room=${pendingJoinRoom.room_id}&session=${session}`;
 
   }
 
