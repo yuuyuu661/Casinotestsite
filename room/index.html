@@ -1529,6 +1529,13 @@ socket.on(
 
     gameEnded = true;
 
+    const text =
+      data.winner === "black"
+        ? "🦁 先手の勝利！"
+        : "🐘 後手の勝利！";
+
+    alert(text);
+
   }
 );
 
