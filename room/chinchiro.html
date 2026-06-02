@@ -232,7 +232,9 @@ button:active{
 
         <div class="info-box">
             <div class="label">レート</div>
-            <div class="value">1000 Spt</div>
+            <div class="value" id="rateText">
+                1000 Spt
+            </div>
         </div>
 
         <div class="info-box">
@@ -664,8 +666,8 @@ async function loadRoomInfo(){
 
     }
 
-    document.querySelector(
-        ".info-box .value"
+    document.getElementById(
+        "rateText"
     ).textContent =
         `${Number(
             data.room.rate_amount
