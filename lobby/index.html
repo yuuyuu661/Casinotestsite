@@ -1017,8 +1017,16 @@ function renderRooms(){
           return;
         }
 
+        const roomPages = {
+          othello: "othello_room",
+          dobutsu: "dobutsu_room",
+          chinchiro: "chinchiro_room"
+        };
+
+        const roomPage = roomPages[game] || "room";
+
         location.href =
-          `/room?game=${game}&room=${room.room_id}&session=${session}`;
+          `/${roomPage}?game=${game}&room=${room.room_id}&session=${session}`;
 
       }
 
@@ -1037,8 +1045,16 @@ function renderRooms(){
 
     watchBtn.addEventListener("click", () => {
 
+      const roomPages = {
+        othello: "othello_room",
+        dobutsu: "dobutsu_room",
+        chinchiro: "chinchiro_room"
+      };
+
+      const roomPage = roomPages[game] || "room";
+
       location.href =
-        `/room?game=${game}&room=${room.room_id}&watch=1&session=${session}`;
+        `/${roomPage}?game=${game}&room=${room.room_id}&watch=1&session=${session}`;
 
     });
 
@@ -1246,8 +1262,16 @@ document
       return;
     }
 
+    const roomPages = {
+      othello: "othello_room",
+      dobutsu: "dobutsu_room",
+      chinchiro: "chinchiro_room"
+    };
+
+    const roomPage = roomPages[game] || "room";
+
     location.href =
-      `/room?game=${game}&room=${data.room_id}&session=${session}`;
+      `/${roomPage}?game=${game}&room=${data.room_id}&session=${session}`;
 
     createModal.classList.remove("show");
 
