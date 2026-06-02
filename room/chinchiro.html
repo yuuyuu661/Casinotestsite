@@ -393,6 +393,12 @@ const subText =
     document.getElementById("subText");
 
 /* =========================
+   Reroll
+========================= */
+
+let rerollRemaining = 2;
+
+/* =========================
    Sound
 ========================= */
 
@@ -405,6 +411,17 @@ const rollSound = new Audio(
 ========================= */
 
 rollBtn.onclick = async () => {
+
+    rollBtn.disabled = true;
+
+    startRoll();
+
+};
+
+rerollBtn.onclick = async () => {
+
+    rerollBtn.style.display =
+        "none";
 
     rollBtn.disabled = true;
 
@@ -454,6 +471,30 @@ async function startRoll(){
         result.sub;
 
     rollBtn.disabled = false;
+
+    if(result.none){
+
+        if(rerollRemaining > 0){
+
+            rerollBtn.style.display =
+                "inline-block";
+
+            rerollRemaining--;
+
+            document.getElementById(
+                "rerollCount"
+            ).textContent =
+                `${rerollRemaining + 1}回`;
+
+        }
+
+    }
+    else{
+
+        rerollBtn.style.display =
+            "none";
+
+    }
 
 }
 
@@ -594,7 +635,8 @@ function judgeDice(dice){
     // 役なし
     return {
         text:"役なし",
-        sub:"振り直し可能"
+        sub:`あと${rerollRemaining}回 振り直せます`,
+        none:true
     };
 
 }
