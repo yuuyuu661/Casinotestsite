@@ -212,8 +212,12 @@ body{
 .board-area{
 
   display:flex;
+
+  flex-direction:column;
+
   justify-content:center;
   align-items:center;
+
 }
 
 .board{
@@ -466,10 +470,13 @@ body{
 }
 .captured-area{
   display:flex;
-  gap:8px;
   justify-content:center;
-  margin-top:12px;
+  align-items:center;
   flex-wrap:wrap;
+  gap:8px;
+  width:100%;
+  min-height:72px;
+  margin-top:12px;
 }
 
 .captured-piece{
