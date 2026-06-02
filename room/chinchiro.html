@@ -316,25 +316,9 @@ button:active{
             参加プレイヤー
         </div>
 
-        <div class="player-list">
+        <div class="player-list" id="playerList">
 
-            <div class="player-card">
-                <div class="player-name">
-                    ゆう
-                </div>
-                <div class="player-status">
-                    待機中
-                </div>
-            </div>
 
-            <div class="player-card">
-                <div class="player-name">
-                    Player2
-                </div>
-                <div class="player-status">
-                    待機中
-                </div>
-            </div>
 
         </div>
 
@@ -346,10 +330,25 @@ button:active{
 
 <script>
 
+
+
 /* =========================
    Socket
 ========================= */
+const params =
+    new URLSearchParams(location.search);
 
+const roomId =
+    params.get("room");
+
+const session =
+    params.get("session");
+
+const isWatch =
+    params.get("watch") === "1";
+
+const API_BASE =
+    "https://oasisbot-production.up.railway.app";
 
 
 /* =========================
@@ -647,6 +646,67 @@ function judgeDice(dice){
     };
 
 }
+
+async function loadRoomInfo(){
+
+    const res = await fetch(
+        `${API_BASE}/api/casino/room-info?room_id=${roomId}`
+    );
+
+    const data = await res.json();
+
+    if(!data.ok){
+
+        resultText.textContent =
+            "ルーム情報の取得に失敗しました";
+
+        return;
+
+    }
+
+    document.querySelector(
+        ".info-box .value"
+    ).textContent =
+        `${Number(
+            data.room.rate_amount
+        ).toLocaleString()} Spt`;
+
+    renderPlayers(data.players);
+
+}
+
+function renderPlayers(players){
+
+    const playerList =
+        document.getElementById("playerList");
+
+    playerList.innerHTML = "";
+
+    players.forEach(player => {
+
+        const card =
+            document.createElement("div");
+
+        card.className =
+            "player-card";
+
+        card.innerHTML = `
+            <div class="player-name">
+                ${player.user_name}
+            </div>
+
+            <div class="player-status">
+                待機中
+            </div>
+        `;
+
+        playerList.appendChild(card);
+
+    });
+
+}
+
+loadRoomInfo();
 
 </script>
 
