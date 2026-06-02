@@ -977,6 +977,27 @@ function renderBoard(){
 
             return;
           }
+          // =========================
+          // 持ち駒設置
+          // =========================
+
+          if(selectedCaptured){
+
+            socket.emit(
+              "dobutsu_drop",
+              {
+                room_id: roomId,
+                piece_type: selectedCaptured,
+                x: x,
+                y: y
+              }
+            );
+
+            selectedCaptured = null;
+
+            return;
+
+          }
 
           // =========================
           // 未選択
@@ -1087,6 +1108,8 @@ function renderBoard(){
     }
 
   }
+
+  updateCaptured();
 
 }
 
@@ -1403,6 +1426,85 @@ function hasValidMove(color){
   return false;
 
 }
+
+let selectedCaptured = null;
+let gameState = null;
+
+function updateCaptured(){
+
+  const blackDiv =
+    document.getElementById(
+      "captured-black"
+    );
+
+  const whiteDiv =
+    document.getElementById(
+      "captured-white"
+    );
+
+  blackDiv.innerHTML = "";
+  whiteDiv.innerHTML = "";
+
+  if(!gameState?.captured){
+    return;
+  }
+
+  // =========================
+  // 黒持ち駒
+  // =========================
+
+  for(const type of gameState.captured.black){
+
+    const img =
+      document.createElement("img");
+
+    img.src =
+      `/static/dobutsu/${type}.png`;
+
+    img.className =
+      "captured-piece";
+
+    img.addEventListener("click", () => {
+
+      selectedCaptured = type;
+
+      selectedPiece = null;
+
+    });
+
+    blackDiv.appendChild(img);
+
+  }
+
+  // =========================
+  // 白持ち駒
+  // =========================
+
+  for(const type of gameState.captured.white){
+
+    const img =
+      document.createElement("img");
+
+    img.src =
+      `/static/dobutsu/${type}.png`;
+
+    img.className =
+      "captured-piece";
+
+    img.addEventListener("click", () => {
+
+      selectedCaptured = type;
+
+      selectedPiece = null;
+
+    });
+
+    whiteDiv.appendChild(img);
+
+  }
+
+}
+  
 function countStones(){
 
   let black = 0;
@@ -1581,6 +1683,8 @@ socket.on(
       "DOBUTSU UPDATE",
       data
     );
+
+    gameState = data;
 
     currentTurn =
       data.turn;
