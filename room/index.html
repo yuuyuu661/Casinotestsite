@@ -1493,6 +1493,9 @@ function updateCaptured(){
     img.className =
       "captured-piece";
 
+    img.style.transform =
+      "rotate(180deg)";
+
     img.addEventListener("click", () => {
 
       selectedCaptured = type;
