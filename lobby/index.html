@@ -1125,8 +1125,17 @@ document
       .getElementById("passwordModal")
       .classList.remove("show");
 
-    location.href =
-      `/room?game=${game}&room=${pendingJoinRoom.room_id}&session=${session}`;
+    if(game === "chinchiro"){
+
+      location.href =
+        `/room/chinchiro.html?room=${pendingJoinRoom.room_id}&session=${session}`;
+
+    }else{
+
+      location.href =
+        `/room?game=${game}&room=${pendingJoinRoom.room_id}&session=${session}`;
+
+}
 
   }
 
