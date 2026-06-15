@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>oasis カジノロビー</title>
+
+<style>
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  padding:0;
+
+  font-family:
+    "Hiragino Sans",
+    "Yu Gothic UI",
+    sans-serif;
+
+  background:
+    radial-gradient(circle at top,#111827 0%,#020617 45%,#000 100%);
+
+  color:#f8fafc;
+}
+
+/* =========================
+   全体
+========================= */
+
+.container{
+  width:100%;
+  max-width:1200px;
+  margin:auto;
+  padding:24px;
+}
+
+/* =========================
+   上部
+========================= */
+
+.top-bar{
+
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:16px;
+
+  margin-bottom:24px;
+
+  flex-wrap:wrap;
+}
+
+.back-btn{
+
+  background:#1e293b;
+  border:none;
+
+  color:#fff;
+
+  padding:12px 18px;
+
+  border-radius:12px;
+
+  cursor:pointer;
+
+  font-weight:700;
+
+  transition:0.2s;
+}
+
+.back-btn:hover{
+  background:#334155;
+}
+
+.balance{
+
+  color:#facc15;
+
+  font-size:1.05rem;
+  font-weight:800;
+}
+
+/* =========================
+   タイトル
+========================= */
+
+.title-box{
+  text-align:center;
+  margin-bottom:28px;
+}
+
+.game-title{
+
+  font-size:clamp(2rem,5vw,3.2rem);
+
+  font-weight:900;
+
+  margin-bottom:12px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #facc15,
+      #fde68a,
+      #facc15
+    );
+
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+
+
+/* =========================
+   操作エリア
+========================= */
+
+.action-area{
+
+  display:flex;
+  justify-content:flex-end;
+
+  margin-bottom:24px;
+}
+
+.create-btn{
+
+  background:
+    linear-gradient(
+      135deg,
+      #facc15,
+      #eab308
+    );
+
+  border:none;
+
+  color:#000;
+
+  font-weight:900;
+
+  padding:14px 24px;
+
+  border-radius:14px;
+
+  cursor:pointer;
+
+  font-size:1rem;
+
+  transition:0.2s;
+}
+
+.create-btn:hover{
+  transform:translateY(-2px);
+
+  box-shadow:
+    0 0 18px rgba(250,204,21,0.4);
+}
+
+/* =========================
+   ロビー一覧
+========================= */
+
+.room-list{
+
+  display:flex;
+  flex-direction:column;
+
+  gap:18px;
+}
+
+/* =========================
+   ロビー
+========================= */
+
+.room-card{
+
+  background:
+    rgba(15,23,42,0.82);
+
+  border:
+    1px solid rgba(255,255,255,0.08);
+
+  border-radius:20px;
+
+  padding:22px;
+
+  backdrop-filter:blur(8px);
+
+  transition:0.2s;
+}
+
+.room-card:hover{
+
+  transform:translateY(-2px);
+
+  border-color:#facc15;
+
+  box-shadow:
+    0 0 20px rgba(250,204,21,0.18);
+}
+
+.room-top{
+
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  gap:12px;
+
+  flex-wrap:wrap;
+
+  margin-bottom:16px;
+}
+
+.room-name{
+
+  font-size:1.2rem;
+  font-weight:900;
+}
+
+.room-status{
+
+  padding:8px 14px;
+
+  border-radius:999px;
+
+  font-size:0.9rem;
+  font-weight:800;
+}
+
+/* 待機中 */
+
+.waiting{
+  background:
+    rgba(34,197,94,0.18);
+
+  color:#86efac;
+
+  border:
+    1px solid rgba(34,197,94,0.4);
+}
+
+/* 対戦中 */
+
+.playing{
+  background:
+    rgba(239,68,68,0.18);
+
+  color:#fca5a5;
+
+  border:
+    1px solid rgba(239,68,68,0.4);
+}
+
+/* =========================
+   情報
+========================= */
+
+.room-info{
+
+  display:flex;
+  gap:20px;
+
+  flex-wrap:wrap;
+
+  margin-bottom:18px;
+
+  color:#cbd5e1;
+}
+
+.room-rate{
+
+  margin-top:12px;
+
+  display:inline-block;
+
+  padding:6px 12px;
+
+  border-radius:999px;
+
+  background:
+    rgba(250,204,21,0.12);
+
+  border:
+    1px solid rgba(250,204,21,0.35);
+
+  color:#facc15;
+
+  font-weight:800;
+
+  font-size:0.9rem;
+}
+
+.room-info span{
+  font-weight:700;
+}
+
+/* =========================
+   ボタン
+========================= */
+
+.room-buttons{
+
+  display:flex;
+  gap:12px;
+
+  flex-wrap:wrap;
+}
+
+.join-btn,
+.watch-btn{
+
+  border:none;
+
+  padding:12px 18px;
+
+  border-radius:12px;
+
+  cursor:pointer;
+
+  font-weight:800;
+
+  transition:0.2s;
+}
+
+.join-btn{
+
+  background:
+    linear-gradient(
+      135deg,
+      #22c55e,
+      #16a34a
+    );
+
+  color:#fff;
+}
+
+.join-btn:hover{
+  transform:translateY(-2px);
+}
+
+.watch-btn{
+
+  background:#334155;
+  color:#fff;
+}
+
+.watch-btn:hover{
+  background:#475569;
+}
+
+/* =========================
+   スマホ
+========================= */
+
+@media(max-width:700px){
+
+  .container{
+    padding:16px;
+  }
+
+  .room-top{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+}
+
+/* =========================
+   モーダル
+========================= */
+
+.modal-overlay{
+
+  position:fixed;
+  inset:0;
+
+  background:rgba(0,0,0,0.7);
+
+  display:none;
+
+  justify-content:center;
+  align-items:center;
+
+  z-index:9999;
+}
+
+.modal-overlay.show{
+  display:flex;
+}
+
+.modal-box{
+
+  width:100%;
+  max-width:420px;
+
+  background:#0f172a;
+
+  border:
+    1px solid rgba(255,255,255,0.08);
+
+  border-radius:20px;
+
+  padding:24px;
+}
+
+.modal-title{
+
+  font-size:1.4rem;
+  font-weight:900;
+
+  margin-bottom:24px;
+
+  color:#facc15;
+}
+
+.form-group{
+
+  display:flex;
+  flex-direction:column;
+
+  gap:10px;
+
+  margin-bottom:20px;
+}
+
+.form-group label{
+
+  font-weight:800;
+}
+
+.form-group select,
+.form-group input{
+
+  background:#020617;
+
+  border:
+    1px solid rgba(255,255,255,0.08);
+
+  border-radius:12px;
+
+  padding:14px;
+
+  color:#fff;
+
+  font-size:1rem;
+}
+
+.modal-buttons{
+
+  display:flex;
+  gap:12px;
+}
+
+.cancel-btn,
+.create-submit-btn{
+
+  flex:1;
+
+  border:none;
+
+  padding:14px;
+
+  border-radius:12px;
+
+  font-weight:900;
+
+  cursor:pointer;
+}
+
+.cancel-btn{
+
+  background:#334155;
+  color:#fff;
+}
+
+.create-submit-btn{
+
+  background:
+    linear-gradient(
+      135deg,
+      #facc15,
+      #eab308
+    );
+
+  color:#000;
+}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- 上部 -->
+  <div class="top-bar">
+
+    <button
+      class="back-btn"
+      id="backBtn"
+    >
+      ← トップへ戻る
+    </button>
+
+    <div
+      class="balance"
+      id="balance"
+    >
+      残高取得中...
+    </div>
+
+  </div>
+
+  <!-- タイトル -->
+  <div class="title-box">
+
+    <div
+      class="game-title"
+      id="gameTitle"
+    >
+      ⚫ オセロ ロビー
+    </div>
+
+  </div>
+
+  <!-- 作成 -->
+  <div class="action-area">
+
+    <button
+      class="create-btn"
+      id="createRoomBtn"
+    >
+      ＋ ロビー作成
+    </button>
+
+  </div>
+
+  <!-- ロビー一覧 -->
+  <div
+    class="room-list"
+    id="roomList"
+  >
+
+  </div>
+
+</div>
+
+
+<!-- =========================
+   ロビー作成モーダル
+========================= -->
+
+<div
+  class="modal-overlay"
+  id="createModal"
+>
+
+  <div class="modal-box">
+
+    <div
+      class="modal-title"
+      id="modalTitle"
+    >
+      ロビー作成
+    </div>
+
+    <!-- レート -->
+
+    <div class="form-group">
+
+      <label>
+        レート
+      </label>
+
+      <select id="rateSelect">
+
+        <option value="2000">
+          超低レート - 2000rrc
+        </option>
+
+        <option value="5000">
+          低レート - 5000rrc
+        </option>
+
+        <option value="10000">
+          中レート - 10000rrc
+        </option>
+
+        <option value="30000">
+          高レート - 30000rrc
+        </option>
+
+        <option value="50000">
+          超高レート - 50000rrc
+        </option>
+
+        <option value="100000">
+          絶頂レート - 100000rrc
+        </option>
+
+        <option value="300000">
+          超絶頂レート - 300000rrc
+        </option>
+
+      </select>
+
+    </div>
+
+    <!-- ロビー名 -->
+
+    <div class="form-group">
+
+      <label>
+        ロビー名
+      </label>
+
+      <input
+        type="text"
+        id="roomName"
+        placeholder="ロビー名を入力"
+        maxlength="30"
+      >
+
+    </div>
+
+    <!-- パスワード -->
+
+    <div class="form-group">
+
+      <label>
+        パスワード
+      </label>
+
+      <input
+        type="password"
+        id="roomPassword"
+        placeholder="未入力で公開部屋"
+      >
+
+    </div>
+
+    <!-- ボタン -->
+
+    <div class="modal-buttons">
+
+      <button
+        class="cancel-btn"
+        id="closeModalBtn"
+      >
+        キャンセル
+      </button>
+
+      <button
+        class="create-submit-btn"
+        id="submitRoomBtn"
+      >
+        作成
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- =========================
+   パスワード入力モーダル
+========================= -->
+
+<div
+  class="modal-overlay"
+  id="passwordModal"
+>
+
+  <div class="modal-box">
+
+    <div class="modal-title">
+      パスワード入力
+    </div>
+
+    <div class="form-group">
+
+      <label>
+        パスワード
+      </label>
+
+      <input
+        type="password"
+        id="joinPassword"
+        placeholder="パスワードを入力"
+      >
+
+    </div>
+
+    <div class="modal-buttons">
+
+      <button
+        class="cancel-btn"
+        id="closePasswordModalBtn"
+      >
+        キャンセル
+      </button>
+
+      <button
+        class="create-submit-btn"
+        id="submitPasswordBtn"
+      >
+        参加
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+let pendingJoinRoom = null;
+
+
+/* =========================
+   URLパラメータ
+========================= */
+
+const params =
+  new URLSearchParams(location.search);
+
+const game =
+  params.get("game") || "othello";
+
+const session =
+  params.get("session");
+
+/* =========================
+   API
+========================= */
+
+const API_BASE =
+  "https://oasisbot-production.up.railway.app";
+
+/* =========================
+   ユーザー情報取得
+========================= */
+
+async function loadMe(){
+
+  if(!session){
+
+    document.getElementById("balance")
+      .innerText =
+      "ログインしてください";
+
+    return;
+  }
+
+  try{
+
+    const res = await fetch(
+      `${API_BASE}/api/casino/me?session=${session}`
+    );
+
+    if(!res.ok){
+
+      document.getElementById("balance")
+        .innerText =
+        "認証失敗";
+
+      return;
+    }
+
+    const data = await res.json();
+
+    if(!data.ok){
+
+      document.getElementById("balance")
+        .innerText =
+        "セッション無効";
+
+      return;
+    }
+
+    document.getElementById("balance")
+      .innerText =
+      `残高：${data.balance.toLocaleString()} rrc`;
+
+  }
+
+  catch(err){
+
+    console.error(err);
+
+    document.getElementById("balance")
+      .innerText =
+      "通信エラー";
+
+  }
+
+}
+
+/* =========================
+   タイトル変更
+========================= */
+
+const gameTitle =
+  document.getElementById("gameTitle");
+
+const gameNames = {
+
+  othello : "⚫ オセロ ロビー",
+  dobutsu : "🦁 どうぶつしょうぎ ロビー",
+  poker   : "🃏 ポーカー ロビー",
+  daifugo : "👑 大富豪 ロビー",
+  chinchiro : "🎲 チンチロ ロビー"
+
+};
+
+gameTitle.innerText =
+  gameNames[game] || "🎮 ロビー";
+
+
+
+/* =========================
+   ロビー配列
+========================= */
+
+const rooms = [];
+
+/* =========================
+   ロビー取得
+========================= */
+
+async function loadRooms(){
+
+  try{
+
+    const res = await fetch(
+      `${API_BASE}/api/casino/rooms?game=${game}`
+    );
+
+    const data = await res.json();
+
+    if(!data.ok){
+      return;
+    }
+
+    rooms.length = 0;
+
+    data.rooms.forEach(r => {
+
+      rooms.push({
+        room_id: r.room_id,
+        room_name: r.room_name,
+        has_password: r.has_password,
+        current_players: r.current_players,
+        max_players: r.max_players,
+        status: r.status,
+        host_name: r.host_name,
+        rate_name: r.rate_name,
+        rate_amount: r.rate_amount
+      });
+
+    });
+
+    renderRooms();
+
+  }
+
+  catch(err){
+
+    console.error(err);
+
+  }
+
+}
+
+
+/* =========================
+   描画
+========================= */
+
+const roomList =
+  document.getElementById("roomList");
+
+function renderRooms(){
+
+  roomList.innerHTML = "";
+
+  rooms.forEach(room => {
+
+    const card =
+      document.createElement("div");
+
+    card.className = "room-card";
+
+    const statusText =
+      room.status === "waiting"
+      ? "待機中"
+      : "対戦中";
+
+    const statusClass =
+      room.status === "waiting"
+      ? "waiting"
+      : "playing";
+
+    card.innerHTML = `
+
+      <div class="room-top">
+
+        <div class="room-name">
+
+          ${room.has_password ? "🔒 " : ""}
+
+          ${room.room_name}
+
+        </div>
+
+        <div class="room-status ${statusClass}">
+          ${statusText}
+        </div>
+
+      </div>
+
+      <div class="room-info">
+
+        <div>
+          👤 ホスト：
+          <span>${room.host_name}</span>
+        </div>
+
+        <div>
+          🎮 人数：
+          <span>
+            ${room.current_players}/${room.max_players}
+          </span>
+        </div>
+
+        <div class="room-rate">
+          💰 ${room.rate_name}
+          (${Number(
+            room.rate_amount
+          ).toLocaleString()} rrc)
+        </div>
+
+      </div>
+
+      <div class="room-buttons">
+
+        <button
+          class="join-btn"
+          data-room="${room.room_id}"
+        >
+          参加
+       </button>
+
+        <button
+          class="watch-btn"
+          data-room="${room.room_id}"
+        >
+          観戦
+        </button>
+
+      </div>
+
+    `;
+
+    const joinBtn =
+      card.querySelector(".join-btn");
+
+    joinBtn.addEventListener("click", async () => {
+
+      try{
+        if(room.has_password){
+
+          pendingJoinRoom = room;
+
+          document
+            .getElementById("passwordModal")
+            .classList.add("show");
+
+          return;
+        }
+
+        const res = await fetch(
+          `${API_BASE}/api/casino/join-room`,
+          {
+            method:"POST",
+
+            headers:{
+              "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify({
+
+              room_id: room.room_id,
+              session: session
+
+            })
+
+          }
+        );
+
+        const data = await res.json();
+
+        if(!data.ok){
+
+          alert(data.error || "参加失敗");
+
+          document
+            .getElementById("joinPassword")
+            .value = "";
+
+          return;
+        }
+
+        location.href =
+          `/room?game=${game}&room=${room.room_id}&session=${session}`;
+
+      }
+
+      catch(err){
+
+        console.error(err);
+
+        alert("通信エラー");
+
+      }
+
+    });
+
+    const watchBtn =
+      card.querySelector(".watch-btn");
+
+    watchBtn.addEventListener("click", () => {
+
+      location.href =
+        `/room?game=${game}&room=${room.room_id}&watch=1&session=${session}`;
+
+    });
+
+    roomList.appendChild(card);
+
+  });
+
+}
+/* =========================
+   パスワードモーダル
+========================= */
+
+document
+.getElementById("closePasswordModalBtn")
+.addEventListener("click", () => {
+
+  document
+    .getElementById("passwordModal")
+    .classList.remove("show");
+
+});
+
+document
+.getElementById("submitPasswordBtn")
+.addEventListener("click", async () => {
+
+  if(!pendingJoinRoom) return;
+
+  const password =
+    document.getElementById("joinPassword").value;
+
+  try{
+
+    const res = await fetch(
+      `${API_BASE}/api/casino/join-room`,
+      {
+        method:"POST",
+
+        headers:{
+          "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify({
+
+          room_id: pendingJoinRoom.room_id,
+
+          session: session,
+
+          password: password
+
+        })
+
+      }
+    );
+
+    const data = await res.json();
+
+    if(!data.ok){
+
+      alert(data.error || "参加失敗");
+
+      return;
+    }
+
+    document
+      .getElementById("passwordModal")
+      .classList.remove("show");
+
+    location.href =
+      `/room?game=${game}&room=${pendingJoinRoom.room_id}&session=${session}`;
+
+  }
+
+  catch(err){
+
+    console.error(err);
+
+    alert("通信エラー");
+
+  }
+
+});
+
+let loadingRooms = false;
+
+async function safeLoadRooms(){
+
+  if(loadingRooms) return;
+
+  loadingRooms = true;
+
+  try{
+
+    await loadRooms();
+
+  }
+
+  catch(err){
+
+    console.error(err);
+
+  }
+
+  finally{
+
+    loadingRooms = false;
+
+  }
+
+}
+
+safeLoadRooms();
+
+setInterval(safeLoadRooms, 3000);
+
+/* =========================
+   ロビー作成
+========================= */
+
+document
+.getElementById("backBtn")
+.addEventListener("click", () => {
+
+  location.href =
+    `/?session=${session}`;
+
+});
+
+
+loadMe();
+/* =========================
+   モーダル
+========================= */
+
+const createModal =
+  document.getElementById("createModal");
+
+/* 開く */
+
+document
+.getElementById("createRoomBtn")
+.addEventListener("click", () => {
+
+  createModal.classList.add("show");
+
+});
+
+/* 閉じる */
+
+document
+.getElementById("closeModalBtn")
+.addEventListener("click", () => {
+
+  createModal.classList.remove("show");
+
+});
+
+/* =========================
+   ロビー作成送信
+========================= */
+
+document
+.getElementById("submitRoomBtn")
+.addEventListener("click", async () => {
+
+  const rate =
+    Number(
+      document.getElementById("rateSelect").value
+    );
+
+  const room_name =
+    document.getElementById("roomName").value.trim();
+
+  const password =
+    document.getElementById("roomPassword").value;
+
+  try{
+
+    const res = await fetch(
+      `${API_BASE}/api/casino/create-room`,
+      {
+        method:"POST",
+
+        headers:{
+          "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify({
+          session,
+          game,
+          rate,
+          room_name,
+          password
+        })
+
+      }
+    );
+
+    const data = await res.json();
+
+    if(!data.ok){
+
+      alert(data.error || "作成失敗");
+
+      return;
+    }
+
+    location.href =
+      `/room?game=${game}&room=${data.room_id}&session=${session}`;
+
+    createModal.classList.remove("show");
+
+  }
+
+  catch(err){
+
+    console.error(err);
+
+    alert("通信エラー");
+
+  }
+
+});
+
+/* =========================
+   モーダルタイトル
+========================= */
+
+const modalTitle =
+  document.getElementById("modalTitle");
+
+if(modalTitle){
+
+  modalTitle.innerText =
+    `${gameNames[game]} 作成`;
+
+}
+  
+</script>
+</body>
+</html>
