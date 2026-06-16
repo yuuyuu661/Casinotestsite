@@ -1018,7 +1018,7 @@ function renderRooms(){
         }
 
         location.href =
-          `/room?game=${game}&room=${room.room_id}&session=${session}`;
+          `/othello_room?room=${room.room_id}&session=${session}`;
 
       }
 
@@ -1038,7 +1038,7 @@ function renderRooms(){
     watchBtn.addEventListener("click", () => {
 
       location.href =
-        `/room?game=${game}&room=${room.room_id}&watch=1&session=${session}`;
+        `/othello_room?room=${room.room_id}&watch=1&session=${session}`;
 
     });
 
@@ -1247,7 +1247,7 @@ document
     }
 
     location.href =
-      `/room?game=${game}&room=${data.room_id}&session=${session}`;
+      `/othello_room?room=${data.room_id}&session=${session}`;
 
     createModal.classList.remove("show");
 
