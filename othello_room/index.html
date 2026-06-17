@@ -1639,8 +1639,16 @@ document
 
   await leaveRoom();
 
+  const gameType =
+    new URLSearchParams(location.search)
+      .get("game") || "othello";
+
+  const session =
+    new URLSearchParams(location.search)
+      .get("session");
+
   location.href =
-    `/lobby?game=${game}&session=${session}`;
+    `/lobby?game=${gameType}&session=${session}`;
 
 });
 
