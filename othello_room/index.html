@@ -846,7 +846,7 @@ function renderBoard(){
         }
 
         socket.emit(
-          "othello_move",
+          "othello:move",
           {
             room_id: roomId,
             x: x,
