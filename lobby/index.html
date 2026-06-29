@@ -888,8 +888,11 @@ const roomList =
 function renderRooms(){
 
   roomList.innerHTML = "";
+  
 
   rooms.forEach(room => {
+
+    console.log("ROOM =", room);
 
     const card =
       document.createElement("div");
