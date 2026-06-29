@@ -1209,6 +1209,8 @@ socket.on(
   "othello:update",
   (data) => {
 
+    console.log("UPDATE =", data);
+
     if(typeof data.board === "string"){
 
       data.board = JSON.parse(
