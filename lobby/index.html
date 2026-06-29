@@ -952,12 +952,25 @@ function renderRooms(){
 
       <div class="room-buttons">
 
-        <button
-          class="join-btn"
-          data-room="${room.room_id}"
-        >
-          参加
-       </button>
+        ${
+          room.status === "waiting"
+          ? `
+            <button
+              class="join-btn"
+              data-room="${room.room_id}"
+            >
+              参加
+            </button>
+          `
+          : `
+            <button
+              class="join-btn"
+              disabled
+            >
+              対戦中
+            </button>
+          `
+        }
 
         <button
           class="watch-btn"
