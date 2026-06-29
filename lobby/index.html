@@ -986,66 +986,71 @@ function renderRooms(){
     const joinBtn =
       card.querySelector(".join-btn");
 
-    joinBtn.addEventListener("click", async () => {
+    if(room.status === "waiting"){
 
-      try{
-        if(room.has_password){
+      joinBtn.addEventListener("click", async () => {
 
-          pendingJoinRoom = room;
+        try{
 
-          document
-            .getElementById("passwordModal")
-            .classList.add("show");
+          if(room.has_password){
 
-          return;
-        }
+            pendingJoinRoom = room;
 
-        const res = await fetch(
-          `${API_BASE}/api/casino/join-room`,
-          {
-            method:"POST",
+            document
+              .getElementById("passwordModal")
+              .classList.add("show");
 
-            headers:{
-              "Content-Type":"application/json"
-            },
-
-            body:JSON.stringify({
-
-              room_id: room.room_id,
-              session: session
-
-            })
-
+            return;
           }
-        );
 
-        const data = await res.json();
+          const res = await fetch(
+            `${API_BASE}/api/casino/join-room`,
+            {
+              method:"POST",
 
-        if(!data.ok){
+              headers:{
+                "Content-Type":"application/json"
+              },
 
-          alert(data.error || "参加失敗");
+              body:JSON.stringify({
 
-          document
-            .getElementById("joinPassword")
-            .value = "";
+                room_id: room.room_id,
+                session: session
 
-          return;
+              })
+
+            }
+          );
+
+          const data = await res.json();
+
+          if(!data.ok){
+
+            alert(data.error || "参加失敗");
+
+            document
+              .getElementById("joinPassword")
+              .value = "";
+
+            return;
+          }
+
+          location.href =
+            `/othello_room?room=${room.room_id}&session=${session}`;
+
         }
 
-        location.href =
-          `/othello_room?room=${room.room_id}&session=${session}`;
+        catch(err){
 
-      }
+          console.error(err);
 
-      catch(err){
+          alert("通信エラー");
 
-        console.error(err);
+        }
 
-        alert("通信エラー");
+      });
 
-      }
-
-    });
+    }
 
     const watchBtn =
       card.querySelector(".watch-btn");
