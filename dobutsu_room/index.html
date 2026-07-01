@@ -742,7 +742,7 @@ const params =
 const session =
   params.get("session");
 
-const gameType = "othello";
+const gameType = "dobutsu";
 
 const roomId =
   params.get("room");
@@ -784,7 +784,8 @@ const roomTitle =
   document.getElementById("roomTitle");
 
 roomTitle.innerText =
-  "⚫ オセロ対戦ルーム";
+  "🦁 どうぶつしょうぎ対戦ルーム";
+
 
 /* =========================
    盤面
@@ -859,99 +860,158 @@ function renderBoard(){
 
       cell.className = "cell";
 
-      if(
-        currentTurn &&
-        canPlace(x, y, currentTurn)
-      ){
+      // =========================
+      // 移動可能マス表示
+      // =========================
 
-        cell.style.background =
-          "rgba(34,197,94,0.25)";
+      if(selectedPiece){
 
-        cell.style.boxShadow =
-          "inset 0 0 12px rgba(34,197,94,0.35)";
+        const validMoves =
+          getValidMoves(
+            selectedPiece.piece,
+            selectedPiece.x,
+            selectedPiece.y
+          );
+
+        const canMove =
+          validMoves.some(move =>
+            move.x === x &&
+            move.y === y
+          );
+
+        if(canMove){
+
+          cell.style.background =
+            "rgba(239,68,68,0.25)";
+
+          cell.style.boxShadow =
+            "inset 0 0 12px rgba(239,68,68,0.35)";
+        }
+
       }
-
 
       cell.addEventListener("click", () => {
 
-        console.log("CLICK", x, y);
-
-        // =========================
-        // 自分のターン確認
-        // =========================
+        if(gameEnded){
+          return;
+        }
 
         if(myColor !== currentTurn){
           return;
         }
 
+        const piece =
+          grid[y][x];
+
         // =========================
-        // 置ける確認
+        // 自分の駒を選択
         // =========================
 
-        if(!canPlace(x, y, currentTurn)){
+        if(
+          piece &&
+          piece.owner === myColor
+        ){
+
+          selectedPiece = {
+            x,
+            y,
+            piece
+          };
+
+          selectedCaptured = null;
+
+          renderBoard();
+
+          return;
+
+        }
+
+        // =========================
+        // 持ち駒を置く
+        // =========================
+
+        if(selectedCaptured){
+
+          socket.emit(
+            "dobutsu_drop",
+            {
+              room_id: roomId,
+              piece_type: selectedCaptured,
+              x,
+              y
+            }
+          );
+
+          selectedCaptured = null;
+
+          return;
+
+        }
+
+        // =========================
+        // 駒未選択
+        // =========================
+
+        if(!selectedPiece){
+          return;
+        }
+
+        const validMoves =
+          getValidMoves(
+            selectedPiece.piece,
+            selectedPiece.x,
+            selectedPiece.y
+          );
+
+        const canMove =
+          validMoves.some(move =>
+            move.x === x &&
+            move.y === y
+          );
+
+        if(!canMove){
           return;
         }
 
         socket.emit(
-          "othello:move",
+          "dobutsu_move",
           {
             room_id: roomId,
-            x: x,
-            y: y,
-            user_id: myUserId
+
+            from_x: selectedPiece.x,
+            from_y: selectedPiece.y,
+
+            to_x: x,
+            to_y: y
           }
         );
 
+        selectedPiece = null;
+
       });
 
-
-
-
-      const value = grid[y][x];
+      const value =
+        grid[y][x];
 
       if(value){
 
-        // =========================
-        // オセロ
-        // =========================
+        const img =
+          document.createElement("img");
 
-        if(gameType === "othello"){
+        img.className =
+          "dobutsu-piece";
 
-          const stone =
-            document.createElement("div");
+        img.src =
+          `/static/dobutsu/${value.type}.png`;
 
-          stone.className =
-            `stone ${value}`;
+        if(value.owner === "white"){
 
-          cell.appendChild(stone);
-
-        }
-
-        // =========================
-        // どうぶつしょうぎ
-        // =========================
-
-        else if(gameType === "dobutsu"){
-
-          const piece =
-            document.createElement("img");
-
-          piece.className =
-            "dobutsu-piece";
-
-          piece.src =
-            `/static/dobutsu/${value.type}.png`;
-
-          if(value.owner === "white"){
-
-            piece.style.transform =
-              "rotate(180deg)";
-
-          }
-
-          cell.appendChild(piece);
+          img.style.transform =
+            "rotate(180deg)";
 
         }
+
+        cell.appendChild(img);
 
       }
 
@@ -961,305 +1021,95 @@ function renderBoard(){
 
   }
 
+  updateCaptured();
+
 }
 
-function canPlace(x, y, color){
+function getValidMoves(
+  piece,
+  x,
+  y
+){
 
-  console.log(
-    "CHECK",
-    x,
-    y,
-    grid[y][x]
+  let moves = [];
+
+  if(piece.type === "lion"){
+
+    moves = [
+      [-1,-1],[0,-1],[1,-1],
+      [-1,0],         [1,0],
+      [-1,1],[0,1],[1,1]
+    ];
+
+  }
+
+  else if(piece.type === "giraffe"){
+
+    moves = [
+      [0,-1],
+      [-1,0],[1,0],
+      [0,1]
+    ];
+
+  }
+
+  else if(piece.type === "elephant"){
+
+    moves = [
+      [-1,-1],[1,-1],
+      [-1,1],[1,1]
+    ];
+
+  }
+
+  else if(piece.type === "chick"){
+
+    moves =
+      piece.owner === "black"
+      ? [[0,-1]]
+      : [[0,1]];
+
+  }
+
+  else if(piece.type === "chicken"){
+
+    if(piece.owner === "black"){
+
+      moves = [
+        [-1,-1],[0,-1],[1,-1],
+        [-1,0],[1,0],
+        [0,1]
+      ];
+
+    }else{
+
+      moves = [
+        [0,-1],
+        [-1,0],[1,0],
+        [-1,1],[0,1],[1,1]
+      ];
+
+    }
+
+  }
+
+  return moves.map(([dx,dy])=>{
+
+    return{
+      x:x+dx,
+      y:y+dy
+    };
+
+  }).filter(move=>
+
+    move.x>=0 &&
+    move.x<BOARD_W &&
+    move.y>=0 &&
+    move.y<BOARD_H
+
   );
 
-  /* 既に石あるなら不可 */
-
-  if(grid[y][x]){
-    return false;
-  }
-
-  const enemy =
-    color === "black"
-    ? "white"
-    : "black";
-
-  const directions = [
-
-    [-1,-1],
-    [ 0,-1],
-    [ 1,-1],
-
-    [-1, 0],
-    [ 1, 0],
-
-    [-1, 1],
-    [ 0, 1],
-    [ 1, 1]
-
-  ];
-
-  for(const [dx,dy] of directions){
-
-    let nx = x + dx;
-    let ny = y + dy;
-
-    let foundEnemy = false;
-
-    while(
-      nx >= 0 &&
-      nx < BOARD_W &&
-      ny >= 0 &&
-      ny < BOARD_H
-    ){
-
-      const value = grid[ny][nx];
-
-      /* 相手石 */
-
-      if(value === enemy){
-
-        foundEnemy = true;
-
-      }
-
-      /* 自分石 */
-
-      else if(value === color){
-
-        if(foundEnemy){
-          return true;
-        }
-
-        break;
-
-      }
-
-      /* 空 */
-
-      else{
-        break;
-      }
-
-      nx += dx;
-      ny += dy;
-
-    }
-
-  }
-
-  return false;
-
 }
-
-function flipStones(x, y, color){
-
-  const enemy =
-    color === "black"
-    ? "white"
-    : "black";
-
-  const directions = [
-
-    [-1,-1],
-    [ 0,-1],
-    [ 1,-1],
-
-    [-1, 0],
-    [ 1, 0],
-
-    [-1, 1],
-    [ 0, 1],
-    [ 1, 1]
-
-  ];
-
-  for(const [dx,dy] of directions){
-
-    let nx = x + dx;
-    let ny = y + dy;
-
-    const targets = [];
-
-    while(
-      nx >= 0 &&
-      nx < BOARD_W &&
-      ny >= 0 &&
-      ny < BOARD_H
-    ){
-
-      const value = grid[ny][nx];
-
-      /* 相手石 */
-
-      if(value === enemy){
-
-        targets.push([nx, ny]);
-
-      }
-
-      /* 自分石 */
-
-      else if(value === color){
-
-        /* 挟めてる */
-
-        if(targets.length > 0){
-
-          for(const [tx, ty] of targets){
-
-            grid[ty][tx] = color;
-
-          }
-
-        }
-
-        break;
-
-      }
-
-      /* 空 */
-
-      else{
-        break;
-      }
-
-      nx += dx;
-      ny += dy;
-
-    }
-
-  }
-
-}
-
-function hasValidMove(color){
-
-  for(let y=0;y<BOARD_H;y++){
-
-    for(let x=0;x<BOARD_W;x++){
-
-      if(canPlace(x, y, color)){
-        return true;
-      }
-
-    }
-
-  }
-
-  return false;
-
-}
-
-
-function updateCaptured(){
-
-  const blackDiv =
-    document.getElementById(
-      "captured-black"
-    );
-
-  const whiteDiv =
-    document.getElementById(
-      "captured-white"
-    );
-
-  blackDiv.innerHTML = "";
-  whiteDiv.innerHTML = "";
-
-  if(!gameState?.captured){
-    return;
-  }
-
-  // =========================
-  // 黒持ち駒
-  // =========================
-
-  for(const type of gameState.captured.black){
-
-    const img =
-      document.createElement("img");
-
-    img.src =
-      `/static/dobutsu/${type}.png`;
-
-    img.className =
-      "captured-piece";
-
-    img.addEventListener("click", () => {
-
-      selectedCaptured = type;
-      selectedPiece = null;
-
-    });
-
-    blackDiv.appendChild(img);
-
-  }
-
-  // =========================
-  // 白持ち駒
-  // =========================
-
-  for(const type of gameState.captured.white){
-
-    const img =
-      document.createElement("img");
-
-    img.src =
-      `/static/dobutsu/${type}.png`;
-
-    img.className =
-      "captured-piece";
-
-    img.style.transform =
-      "rotate(180deg)";
-
-    img.addEventListener("click", () => {
-
-      selectedCaptured = type;
-      selectedPiece = null;
-
-    });
-
-    whiteDiv.appendChild(img);
-
-  }
-
-}
-
-
-
-
-function countStones(){
-
-  let black = 0;
-  let white = 0;
-
-  for(let y=0;y<BOARD_H;y++){
-
-    for(let x=0;x<BOARD_W;x++){
-
-      if(grid[y][x] === "black"){
-        black++;
-      }
-
-      else if(grid[y][x] === "white"){
-        white++;
-      }
-
-    }
-
-  }
-
-  return {
-    black,
-    white
-  };
-
-}
-
-renderBoard();
-
 
 
 
@@ -1303,57 +1153,32 @@ socket.on("connect", () => {
 
 });
 
-socket.on(
-  "othello:finish",
-  (data) => {
 
-    let resultText = "";
 
-    if(data.winner === "black"){
 
-      resultText =
-        `⚫ 黒の勝利！\n\n⚫ ${data.black} - ${data.white} ⚪`;
 
-    }else if(data.winner === "white"){
-
-      resultText =
-        `⚪ 白の勝利！\n\n⚫ ${data.black} - ${data.white} ⚪`;
-
-    }else{
-
-      resultText =
-        `🤝 引き分け！\n\n⚫ ${data.black} - ${data.white} ⚪`;
-
-    }
-
-    alert(resultText);
-
-  }
-);
-
-/* 盤面更新 */
+// =========================
+// どうぶつしょうぎ更新
+// =========================
 
 socket.on(
-  "othello:update",
+  "dobutsu:update",
   (data) => {
 
-    console.log("UPDATE =", data);
+    console.log(
+      "DOBUTSU UPDATE",
+      data
+    );
 
-    if(typeof data.board === "string"){
-
-      data.board = JSON.parse(
-        data.board
-      );
-
-    }
+    gameState = data;
 
     currentTurn =
-      data.current_turn;
+      data.turn;
 
     turnDisplay.innerText =
       currentTurn === "black"
-      ? "⚫ 黒のターン"
-      : "⚪ 白のターン";
+        ? "🦁 先手のターン"
+        : "🐘 後手のターン";
 
     for(let y=0;y<BOARD_H;y++){
 
@@ -1366,16 +1191,39 @@ socket.on(
 
     }
 
-    renderBoard();
+    
+
+    updateCaptured();
 
     placeSound.volume = 0.35;
 
     placeSound.currentTime = 0;
+
     placeSound.play();
 
   }
 );
   
+
+// =========================
+// どうぶつ終了
+// =========================
+
+socket.on(
+  "dobutsu:finish",
+  (data) => {
+
+    gameEnded = true;
+
+    const text =
+      data.winner === "black"
+        ? "🦁 先手の勝利！"
+        : "🐘 後手の勝利！";
+
+    alert(text);
+
+  }
+);
 /* =========================
    ルーム情報取得
 ========================= */
