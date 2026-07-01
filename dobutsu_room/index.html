@@ -1,0 +1,1727 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>oasis 対戦ルーム</title>
+
+<style>
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  padding:0;
+
+  font-family:
+    "Hiragino Sans",
+    "Yu Gothic UI",
+    sans-serif;
+
+  background:
+    radial-gradient(circle at top,#111827 0%,#020617 45%,#000 100%);
+
+  color:#f8fafc;
+}
+
+/* =========================
+   全体
+========================= */
+
+.container{
+  width:100%;
+  max-width:1400px;
+  margin:auto;
+  padding:24px;
+}
+
+/* =========================
+   上部
+========================= */
+
+.top-bar{
+
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  gap:16px;
+
+  flex-wrap:wrap;
+
+  margin-bottom:24px;
+}
+
+.back-btn{
+
+  background:#1e293b;
+  border:none;
+
+  color:#fff;
+
+  padding:12px 18px;
+
+  border-radius:12px;
+
+  cursor:pointer;
+
+  font-weight:700;
+
+  transition:0.2s;
+}
+
+.back-btn:hover{
+  background:#334155;
+}
+
+.balance{
+
+  color:#facc15;
+
+  font-size:1rem;
+  font-weight:800;
+}
+
+/* =========================
+   タイトル
+========================= */
+
+.title-area{
+  text-align:center;
+  margin-bottom:28px;
+}
+
+.room-title{
+
+  font-size:clamp(2rem,5vw,3rem);
+
+  font-weight:900;
+
+  margin-bottom:10px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #facc15,
+      #fde68a,
+      #facc15
+    );
+
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.room-status{
+
+  display:inline-block;
+
+  padding:10px 18px;
+
+  border-radius:999px;
+
+  background:
+    rgba(34,197,94,0.18);
+
+  border:
+    1px solid rgba(34,197,94,0.4);
+
+  color:#86efac;
+
+  font-weight:800;
+}
+
+/* =========================
+   メイン
+========================= */
+
+.main-layout{
+
+  display:grid;
+
+  grid-template-columns:
+    280px 1fr 320px;
+
+  gap:24px;
+}
+
+/* =========================
+   共通BOX
+========================= */
+
+.panel{
+
+  background:
+    rgba(15,23,42,0.82);
+
+  border:
+    1px solid rgba(255,255,255,0.08);
+
+  border-radius:20px;
+
+  padding:20px;
+
+  backdrop-filter:blur(8px);
+}
+
+.panel-title{
+
+  font-size:1.2rem;
+  font-weight:900;
+
+  margin-bottom:18px;
+
+  color:#facc15;
+}
+
+/* =========================
+   プレイヤー
+========================= */
+
+.player-card{
+
+  background:
+    rgba(255,255,255,0.04);
+
+  border-radius:14px;
+
+  padding:16px;
+
+  margin-bottom:14px;
+}
+
+.player-name{
+
+  font-size:1.1rem;
+  font-weight:900;
+
+  margin-bottom:10px;
+}
+
+.player-info{
+  color:#cbd5e1;
+  line-height:1.8;
+}
+
+/* =========================
+   盤面
+========================= */
+
+.board-area{
+
+  display:flex;
+
+  flex-direction:column;
+
+  justify-content:center;
+  align-items:center;
+
+  width:100%;
+}
+
+.board{
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(8,70px);
+
+  grid-template-rows:
+    repeat(8,70px);
+
+  background:#14532d;
+
+  border:
+    6px solid #78350f;
+
+  border-radius:10px;
+
+  overflow:hidden;
+
+  box-shadow:
+    0 0 25px rgba(0,0,0,0.4);
+}
+
+/* =========================
+   どうぶつしょうぎ盤面
+========================= */
+
+.board.dobutsu{
+
+  grid-template-columns:
+    repeat(3,90px);
+
+  grid-template-rows:
+    repeat(4,90px);
+
+  background-image:
+    url("/static/dobutsu/background.jpg");
+
+  background-size:cover;
+  background-position:center;
+
+  border:
+    6px solid #92400e;
+
+}
+
+.cell{
+
+  width:70px;
+  height:70px;
+
+  border:
+    1px solid rgba(255,255,255,0.15);
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
+
+  cursor:pointer;
+
+  transition:0.15s;
+}
+
+.cell:hover{
+  background:
+    rgba(255,255,255,0.08);
+}
+
+/* 石 */
+
+.stone{
+
+  width:52px;
+  height:52px;
+
+  border-radius:50%;
+}
+
+.dobutsu-piece{
+
+  width:58px;
+  height:58px;
+
+  object-fit:contain;
+
+  pointer-events:none;
+
+}
+
+.black{
+  background:#000;
+
+  box-shadow:
+    inset -5px -5px 10px rgba(255,255,255,0.08);
+}
+
+.white{
+  background:#fff;
+
+  box-shadow:
+    inset -5px -5px 10px rgba(0,0,0,0.12);
+}
+
+/* =========================
+   チャット
+========================= */
+
+.chat-box{
+
+  height:500px;
+
+  overflow-y:auto;
+
+  display:flex;
+  flex-direction:column;
+
+  gap:12px;
+
+  margin-bottom:16px;
+}
+
+.chat-message{
+
+  background:
+    rgba(255,255,255,0.05);
+
+  border-radius:12px;
+
+  padding:12px;
+}
+
+.chat-user{
+
+  font-weight:900;
+  margin-bottom:6px;
+
+  color:#facc15;
+}
+
+.chat-text{
+  color:#e2e8f0;
+}
+
+/* =========================
+   入力
+========================= */
+
+.chat-input-area{
+
+  display:flex;
+  gap:10px;
+}
+
+.chat-input{
+
+  flex:1;
+
+  background:#0f172a;
+
+  border:
+    1px solid rgba(255,255,255,0.08);
+
+  border-radius:12px;
+
+  padding:12px;
+
+  color:#fff;
+}
+
+.send-btn{
+
+  background:
+    linear-gradient(
+      135deg,
+      #facc15,
+      #eab308
+    );
+
+  border:none;
+
+  color:#000;
+
+  font-weight:900;
+
+  padding:12px 18px;
+
+  border-radius:12px;
+
+  cursor:pointer;
+}
+
+
+.janken-modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.75);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:9999;
+}
+
+.janken-modal.show{
+  display:flex;
+}
+
+.janken-box{
+  width:90%;
+  max-width:520px;
+  background:#0f172a;
+  border:1px solid rgba(250,204,21,0.45);
+  border-radius:22px;
+  padding:24px;
+  text-align:center;
+}
+
+.janken-title{
+  font-size:1.4rem;
+  font-weight:900;
+  color:#facc15;
+  margin-bottom:10px;
+}
+
+.janken-desc{
+  color:#cbd5e1;
+  margin-bottom:20px;
+}
+
+.janken-buttons{
+  display:flex;
+  gap:14px;
+  justify-content:center;
+}
+
+.janken-btn{
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:16px;
+  padding:8px;
+  cursor:pointer;
+}
+
+.janken-btn img{
+  width:110px;
+  height:150px;
+  object-fit:cover;
+  border-radius:12px;
+}
+
+.captured-area{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:8px;
+  width:100%;
+  min-height:72px;
+  margin-top:12px;
+}
+
+.captured-piece{
+  width:48px;
+  height:48px;
+  cursor:pointer;
+  transition:0.15s;
+}
+
+.captured-piece:hover{
+  transform:scale(1.08);
+}
+
+#jankenResult{
+  margin-top:18px;
+  font-weight:900;
+  color:#facc15;
+}
+/* =========================
+   スマホ
+========================= */
+
+@media(max-width:1200px){
+
+  .main-layout{
+    grid-template-columns:1fr;
+  }
+
+  .board{
+    grid-template-columns:
+      repeat(8,42px);
+
+    grid-template-rows:
+      repeat(8,42px);
+  }
+
+  .cell{
+    width:42px;
+    height:42px;
+  }
+
+  .stone{
+    width:30px;
+    height:30px;
+  }
+  .board.dobutsu{
+
+    grid-template-columns:
+      repeat(3,72px);
+
+    grid-template-rows:
+      repeat(4,72px);
+
+  }
+
+}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- 上部 -->
+  <div class="top-bar">
+
+    <button
+      class="back-btn"
+      id="backLobbyBtn"
+    >
+      ← ロビーへ戻る
+    </button>
+
+    <div
+      class="balance"
+      id="balanceDisplay"
+    >
+      残高：---
+</div>
+
+  </div>
+
+  <!-- タイトル -->
+  <div class="title-area">
+
+    <div
+      class="room-title"
+      id="roomTitle"
+    >
+      🎮 対戦ルーム
+    </div>
+
+    <div class="room-status">
+      🟢 対戦中
+    </div>
+
+    <div
+      id="roomIdDisplay"
+      style="
+        margin-top:10px;
+        color:#cbd5e1;
+        font-weight:700;
+        font-size:0.95rem;
+      "
+    >
+      Room ID : ---
+    </div>
+
+    <div
+      id="turnDisplay"
+      style="
+        margin-top:14px;
+        font-weight:900;
+        font-size:1.1rem;
+        color:#facc15;
+      "
+    >
+      対戦開始待機中...
+    </div>
+
+  </div>
+
+  <!-- メイン -->
+  <div class="main-layout">
+
+    <!-- 左 -->
+    <div class="panel">
+
+      <div class="panel-title">
+        👥 プレイヤー
+      </div>
+
+      <div id="playerList"></div>
+
+    </div>
+
+    <!-- 中央 -->
+    <div class="panel board-area">
+
+      <!-- 後手持ち駒 -->
+      <div
+        id="captured-white"
+        class="captured-area"
+      ></div>
+
+      <!-- 盤面 -->
+      <div
+        class="board"
+        id="board"
+      ></div>
+
+      <!-- 先手持ち駒 -->
+      <div
+        id="captured-black"
+        class="captured-area"
+      ></div>
+
+    </div>
+
+
+    <!-- 右 -->
+    <div class="panel">
+
+      <div class="panel-title">
+        💬 ルームチャット
+      </div>
+
+      <div
+        class="chat-box"
+        id="chatBox"
+      >
+
+      </div>
+
+      <div class="chat-input-area">
+
+        <input
+          type="text"
+          class="chat-input"
+          id="chatInput"
+          placeholder="メッセージを入力"
+        >
+
+        <button
+          class="send-btn"
+          id="sendBtn"
+        >
+          送信
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
+<!-- =========================
+     じゃんけんモーダル
+========================= -->
+
+<div
+  id="jankenModal"
+  class="janken-modal"
+>
+
+  <div class="janken-box">
+
+    <div class="janken-title">
+      先攻を決めるじゃんけん
+    </div>
+
+    <div class="janken-desc">
+      好きな手を選んでください
+    </div>
+
+    <div class="janken-buttons">
+
+      <button
+        class="janken-btn"
+        data-hand="gu"
+      >
+        <img src="/images/gu5.jpg">
+      </button>
+
+      <button
+        class="janken-btn"
+        data-hand="choki"
+      >
+        <img src="/images/cyo5.jpg">
+      </button>
+
+      <button
+        class="janken-btn"
+        data-hand="pa"
+      >
+        <img src="/images/pa5.jpg">
+      </button>
+
+    </div>
+
+    <div id="jankenResult"></div>
+
+  </div>
+
+</div>
+
+<script>
+
+
+/* =========================
+   URL取得
+========================= */
+
+const params =
+  new URLSearchParams(location.search);
+
+const session =
+  params.get("session");
+
+const gameType = "othello";
+
+const roomId =
+  params.get("room");
+
+const roomIdDisplay =
+  document.getElementById(
+    "roomIdDisplay"
+  );
+
+roomIdDisplay.innerText =
+  `Room ID : ${roomId}`;
+
+/* =========================
+   自分情報
+========================= */
+
+let myUserId = null;
+let myColor = null;
+let myUserName = null;
+  
+
+/* =========================
+   API
+========================= */
+
+const API_BASE = "https://api.oasis.red";
+
+/* =========================
+   タイトル変更
+========================= */
+
+const roomTitle =
+  document.getElementById("roomTitle");
+
+roomTitle.innerText =
+  "⚫ オセロ対戦ルーム";
+
+/* =========================
+   盤面
+========================= */
+
+const board =
+  document.getElementById("board");
+
+if(gameType === "dobutsu"){
+
+  board.classList.add("dobutsu");
+
+}
+
+const BOARD_W =
+  gameType === "dobutsu"
+    ? 3
+    : 8;
+
+const BOARD_H =
+  gameType === "dobutsu"
+    ? 4
+    : 8;
+
+let currentTurn = null;
+  
+const turnDisplay =
+  document.getElementById("turnDisplay");
+
+/* 初期盤面 */
+
+const grid = [];
+
+for(let y=0;y<BOARD_H;y++){
+
+  grid[y] = [];
+
+  for(let x=0;x<BOARD_W;x++){
+
+    grid[y][x] = null;
+
+  }
+
+}
+
+/* =========================
+   オセロ初期配置
+========================= */
+
+if(gameType === "othello"){
+
+  grid[3][3] = "white";
+  grid[4][4] = "white";
+
+  grid[3][4] = "black";
+  grid[4][3] = "black";
+
+}
+
+/* 描画 */
+
+function renderBoard(){
+
+  board.innerHTML = "";
+
+  for(let y=0;y<BOARD_H;y++){
+
+    for(let x=0;x<BOARD_W;x++){
+
+      const cell =
+        document.createElement("div");
+
+      cell.className = "cell";
+
+      if(
+        currentTurn &&
+        canPlace(x, y, currentTurn)
+      ){
+
+        cell.style.background =
+          "rgba(34,197,94,0.25)";
+
+        cell.style.boxShadow =
+          "inset 0 0 12px rgba(34,197,94,0.35)";
+      }
+
+
+      cell.addEventListener("click", () => {
+
+        console.log("CLICK", x, y);
+
+        // =========================
+        // 自分のターン確認
+        // =========================
+
+        if(myColor !== currentTurn){
+          return;
+        }
+
+        // =========================
+        // 置ける確認
+        // =========================
+
+        if(!canPlace(x, y, currentTurn)){
+          return;
+        }
+
+        socket.emit(
+          "othello:move",
+          {
+            room_id: roomId,
+            x: x,
+            y: y,
+            user_id: myUserId
+          }
+        );
+
+      });
+
+
+
+
+      const value = grid[y][x];
+
+      if(value){
+
+        // =========================
+        // オセロ
+        // =========================
+
+        if(gameType === "othello"){
+
+          const stone =
+            document.createElement("div");
+
+          stone.className =
+            `stone ${value}`;
+
+          cell.appendChild(stone);
+
+        }
+
+        // =========================
+        // どうぶつしょうぎ
+        // =========================
+
+        else if(gameType === "dobutsu"){
+
+          const piece =
+            document.createElement("img");
+
+          piece.className =
+            "dobutsu-piece";
+
+          piece.src =
+            `/static/dobutsu/${value.type}.png`;
+
+          if(value.owner === "white"){
+
+            piece.style.transform =
+              "rotate(180deg)";
+
+          }
+
+          cell.appendChild(piece);
+
+        }
+
+      }
+
+      board.appendChild(cell);
+
+    }
+
+  }
+
+}
+
+function canPlace(x, y, color){
+
+  console.log(
+    "CHECK",
+    x,
+    y,
+    grid[y][x]
+  );
+
+  /* 既に石あるなら不可 */
+
+  if(grid[y][x]){
+    return false;
+  }
+
+  const enemy =
+    color === "black"
+    ? "white"
+    : "black";
+
+  const directions = [
+
+    [-1,-1],
+    [ 0,-1],
+    [ 1,-1],
+
+    [-1, 0],
+    [ 1, 0],
+
+    [-1, 1],
+    [ 0, 1],
+    [ 1, 1]
+
+  ];
+
+  for(const [dx,dy] of directions){
+
+    let nx = x + dx;
+    let ny = y + dy;
+
+    let foundEnemy = false;
+
+    while(
+      nx >= 0 &&
+      nx < BOARD_W &&
+      ny >= 0 &&
+      ny < BOARD_H
+    ){
+
+      const value = grid[ny][nx];
+
+      /* 相手石 */
+
+      if(value === enemy){
+
+        foundEnemy = true;
+
+      }
+
+      /* 自分石 */
+
+      else if(value === color){
+
+        if(foundEnemy){
+          return true;
+        }
+
+        break;
+
+      }
+
+      /* 空 */
+
+      else{
+        break;
+      }
+
+      nx += dx;
+      ny += dy;
+
+    }
+
+  }
+
+  return false;
+
+}
+
+function flipStones(x, y, color){
+
+  const enemy =
+    color === "black"
+    ? "white"
+    : "black";
+
+  const directions = [
+
+    [-1,-1],
+    [ 0,-1],
+    [ 1,-1],
+
+    [-1, 0],
+    [ 1, 0],
+
+    [-1, 1],
+    [ 0, 1],
+    [ 1, 1]
+
+  ];
+
+  for(const [dx,dy] of directions){
+
+    let nx = x + dx;
+    let ny = y + dy;
+
+    const targets = [];
+
+    while(
+      nx >= 0 &&
+      nx < BOARD_W &&
+      ny >= 0 &&
+      ny < BOARD_H
+    ){
+
+      const value = grid[ny][nx];
+
+      /* 相手石 */
+
+      if(value === enemy){
+
+        targets.push([nx, ny]);
+
+      }
+
+      /* 自分石 */
+
+      else if(value === color){
+
+        /* 挟めてる */
+
+        if(targets.length > 0){
+
+          for(const [tx, ty] of targets){
+
+            grid[ty][tx] = color;
+
+          }
+
+        }
+
+        break;
+
+      }
+
+      /* 空 */
+
+      else{
+        break;
+      }
+
+      nx += dx;
+      ny += dy;
+
+    }
+
+  }
+
+}
+
+function hasValidMove(color){
+
+  for(let y=0;y<BOARD_H;y++){
+
+    for(let x=0;x<BOARD_W;x++){
+
+      if(canPlace(x, y, color)){
+        return true;
+      }
+
+    }
+
+  }
+
+  return false;
+
+}
+function countStones(){
+
+  let black = 0;
+  let white = 0;
+
+  for(let y=0;y<BOARD_H;y++){
+
+    for(let x=0;x<BOARD_W;x++){
+
+      if(grid[y][x] === "black"){
+        black++;
+      }
+
+      else if(grid[y][x] === "white"){
+        white++;
+      }
+
+    }
+
+  }
+
+  return {
+    black,
+    white
+  };
+
+}
+
+renderBoard();
+
+
+
+
+
+/* =========================
+   Socket.IO
+========================= */
+
+const placeSound = new Audio(
+  "/static/sounds/nyu3.mp3"
+);
+
+const socket = io(
+  API_BASE,
+  {
+    auth: {
+
+      room_id: roomId,
+
+      session: session,
+      game: gameType
+      
+
+    }
+  }
+);
+
+/* 接続完了 */
+
+socket.on("connect", () => {
+
+  console.log("SOCKET CONNECTED");
+
+  socket.emit(
+    "join_room",
+    {
+      room_id: roomId,
+      game: gameType
+    }
+  );
+
+});
+
+socket.on(
+  "othello:finish",
+  (data) => {
+
+    let resultText = "";
+
+    if(data.winner === "black"){
+
+      resultText =
+        `⚫ 黒の勝利！\n\n⚫ ${data.black} - ${data.white} ⚪`;
+
+    }else if(data.winner === "white"){
+
+      resultText =
+        `⚪ 白の勝利！\n\n⚫ ${data.black} - ${data.white} ⚪`;
+
+    }else{
+
+      resultText =
+        `🤝 引き分け！\n\n⚫ ${data.black} - ${data.white} ⚪`;
+
+    }
+
+    alert(resultText);
+
+  }
+);
+
+/* 盤面更新 */
+
+socket.on(
+  "othello:update",
+  (data) => {
+
+    console.log("UPDATE =", data);
+
+    if(typeof data.board === "string"){
+
+      data.board = JSON.parse(
+        data.board
+      );
+
+    }
+
+    currentTurn =
+      data.current_turn;
+
+    turnDisplay.innerText =
+      currentTurn === "black"
+      ? "⚫ 黒のターン"
+      : "⚪ 白のターン";
+
+    for(let y=0;y<BOARD_H;y++){
+
+      for(let x=0;x<BOARD_W;x++){
+
+        grid[y][x] =
+          data.board[y][x];
+
+      }
+
+    }
+
+    renderBoard();
+
+    placeSound.volume = 0.35;
+
+    placeSound.currentTime = 0;
+    placeSound.play();
+
+  }
+);
+  
+/* =========================
+   ルーム情報取得
+========================= */
+
+async function loadRoomInfo(){
+
+  try{
+
+    const res = await fetch(
+      `${API_BASE}/api/casino/room-info?room_id=${roomId}`
+    );
+
+    const data = await res.json();
+
+    if(!data.ok){
+      return;
+    }
+
+    // =========================
+    // 自分の色判定
+    // =========================
+
+    if(myUserId === data.black_user_id){
+
+      myColor = "black";
+
+    }
+
+    else if(myUserId === data.white_user_id){
+
+      myColor = "white";
+
+    }
+
+    else{
+
+      myColor = null;
+
+    }
+
+    renderPlayers(
+      data.players,
+      data.black_user_id,
+      data.white_user_id
+    );
+
+  }
+
+  catch(err){
+
+    console.error(err);
+
+  }
+
+}
+
+/* =========================
+   プレイヤー描画
+========================= */
+
+function renderPlayers(
+  players,
+  blackUserId,
+  whiteUserId
+){
+
+  const playerList =
+    document.getElementById("playerList");
+
+  playerList.innerHTML = "";
+
+  players.forEach((player) => {
+
+    let color = "👤";
+    let role = "観戦";
+
+    if(player.user_id === blackUserId){
+
+      role = "先手";
+
+    }
+
+    else if(player.user_id === whiteUserId){
+
+      role = "後手";
+
+    }
+
+    const card =
+      document.createElement("div");
+
+    card.className = "player-card";
+
+    card.innerHTML = `
+
+      <div class="player-name">
+        ${color} ${role}：${player.user_name}
+      </div>
+
+      <div class="player-info">
+        接続中
+      </div>
+
+    `;
+
+    playerList.appendChild(card);
+
+  });
+
+}
+
+/* =========================
+   自分情報取得
+========================= */
+
+async function loadMe(){
+
+  try{
+
+    const res = await fetch(
+      `${API_BASE}/api/casino/me?session=${session}`
+    );
+
+    const data = await res.json();
+
+    if(!data.ok){
+      return;
+    }
+
+    myUserId = data.user_id;
+
+    myUserName = data.user_name;
+
+    /* 残高表示 */
+
+    const balanceDisplay =
+      document.getElementById(
+        "balanceDisplay"
+      );
+
+    balanceDisplay.innerText =
+      `残高：${Number(
+        data.balance
+      ).toLocaleString()} rrc`;
+
+  }
+
+  catch(err){
+
+    console.error(err);
+
+  }
+
+}
+
+(async () => {
+
+  await loadMe();
+  await loadRoomInfo();
+
+})();
+
+
+
+/* =========================
+   自動更新
+========================= */
+
+setInterval(() => {
+
+  loadRoomInfo();
+
+}, 1000);
+  
+setInterval(() => {
+
+  loadMe();
+
+}, 5000);
+
+const jankenModal =
+  document.getElementById("jankenModal");
+
+const jankenResult =
+  document.getElementById("jankenResult");
+
+socket.on("janken:start", () => {
+
+  jankenResult.innerText =
+    "好きな手を選んでください";
+
+  jankenModal.classList.add("show");
+
+});
+
+document
+.querySelectorAll(".janken-btn")
+.forEach(btn => {
+
+  btn.addEventListener("click", () => {
+
+    const hand =
+      btn.dataset.hand;
+
+    socket.emit(
+      "janken_select",
+      {
+        room_id: roomId,
+        user_id: myUserId,
+        hand: hand,
+        game: gameType
+      }
+    );
+
+    jankenResult.innerText =
+      "相手の選択を待っています...";
+
+  });
+
+});
+
+socket.on("janken:draw", () => {
+
+  jankenResult.innerText =
+    "あいこ！もう一度選んでください";
+
+});
+
+socket.on("janken:result", (data) => {
+
+  if(data.black_user_id === myUserId){
+
+    jankenResult.innerText =
+      "じゃんけん勝利！あなたが先攻です ⚫";
+
+  }else{
+
+    jankenResult.innerText =
+      "じゃんけん敗北！あなたは後攻です ⚪";
+
+  }
+
+  setTimeout(() => {
+
+    jankenModal.classList.remove("show");
+
+  }, 1800);
+
+});
+
+/* =========================
+   チャット
+========================= */
+
+const chatBox =
+  document.getElementById("chatBox");
+
+const chatInput =
+  document.getElementById("chatInput");
+
+const sendBtn =
+  document.getElementById("sendBtn");
+
+/* 送信 */
+
+function sendChat(){
+
+  const message =
+    chatInput.value.trim();
+
+  if(!message){
+    return;
+  }
+
+  socket.emit(
+    "chat_message",
+    {
+      room_id: roomId,
+      user_name: myUserName,
+      message: message,
+      game: gameType
+    }
+  );
+
+  chatInput.value = "";
+
+}
+
+/* ボタン */
+
+sendBtn.addEventListener(
+  "click",
+  sendChat
+);
+
+/* Enter送信 */
+
+chatInput.addEventListener(
+  "keydown",
+  (e) => {
+
+    if(e.key === "Enter"){
+
+      sendChat();
+
+    }
+
+  }
+);
+
+/* 受信 */
+
+socket.on(
+  "chat_message",
+  (data) => {
+
+    const msg =
+      document.createElement("div");
+
+    msg.className =
+      "chat-message";
+
+    msg.innerHTML = `
+
+      <div class="chat-user">
+        ${data.user_name}
+      </div>
+
+      <div class="chat-text">
+        ${data.message}
+      </div>
+
+    `;
+
+    chatBox.appendChild(msg);
+
+    /* 自動スクロール */
+
+    chatBox.scrollTop =
+      chatBox.scrollHeight;
+
+  }
+);
+
+/* =========================
+   退出処理
+========================= */
+
+async function leaveRoom(){
+
+  try{
+
+    await fetch(
+      `${API_BASE}/api/casino/leave-room`,
+      {
+        method:"POST",
+
+        headers:{
+          "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify({
+
+          room_id: roomId,
+
+          session: session
+
+        })
+
+      }
+    );
+
+  }
+
+  catch(err){
+
+    console.error(err);
+
+  }
+
+}
+
+/* =========================
+   ロビーへ戻る
+========================= */
+
+document
+.getElementById("backLobbyBtn")
+.addEventListener("click", async () => {
+
+  await leaveRoom();
+
+  const gameType =
+    new URLSearchParams(location.search)
+      .get("game") || "othello";
+
+  const session =
+    new URLSearchParams(location.search)
+      .get("session");
+
+  location.href =
+    `/lobby?game=${gameType}&session=${session}`;
+
+});
+
+/* =========================
+   ブラウザ閉じる
+========================= */
+
+window.addEventListener(
+  "beforeunload",
+  () => {
+
+    navigator.sendBeacon(
+
+      `${API_BASE}/api/casino/leave-room`,
+
+      JSON.stringify({
+
+        room_id: roomId,
+
+        session: session
+
+      })
+
+    );
+
+  }
+);
+
+
+</script>
+
+
+</body>
+</html>
