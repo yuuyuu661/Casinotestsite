@@ -1529,13 +1529,17 @@ socket.on("janken:result", (data) => {
 
   if(data.black_user_id === myUserId){
 
-    jankenResult.innerText =
-      "じゃんけん勝利！あなたが先攻です ⚫";
-
-  }else{
+    myColor = "black";
 
     jankenResult.innerText =
-      "じゃんけん敗北！あなたは後攻です ⚪";
+      "じゃんけん勝利！あなたが先攻です 🦁";
+
+  }else if(data.white_user_id === myUserId){
+
+    myColor = "white";
+
+    jankenResult.innerText =
+      "じゃんけん敗北！あなたは後攻です 🐘";
 
   }
 
@@ -1689,16 +1693,12 @@ document
 
   await leaveRoom();
 
-  const gameType =
-    new URLSearchParams(location.search)
-      .get("game") || "othello";
-
   const session =
     new URLSearchParams(location.search)
       .get("session");
 
   location.href =
-    `/lobby?game=${gameType}&session=${session}`;
+    `/lobby?game=dobutsu&session=${session}`;
 
 });
 
