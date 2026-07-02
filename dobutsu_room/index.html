@@ -1111,6 +1111,77 @@ function getValidMoves(
 
 }
 
+  function updateCaptured(){
+
+  const blackDiv =
+    document.getElementById("captured-black");
+
+  const whiteDiv =
+    document.getElementById("captured-white");
+
+  blackDiv.innerHTML = "";
+  whiteDiv.innerHTML = "";
+
+  if(!gameState){
+    return;
+  }
+
+  if(!gameState.captured){
+    return;
+  }
+
+  for(const piece of gameState.captured.black){
+
+    const img =
+      document.createElement("img");
+
+    img.src =
+      `/static/dobutsu/${piece}.png`;
+
+    img.className =
+      "captured-piece";
+
+    img.onclick = () => {
+
+      selectedCaptured = piece;
+      selectedPiece = null;
+
+      renderBoard();
+
+    };
+
+    blackDiv.appendChild(img);
+
+  }
+
+  for(const piece of gameState.captured.white){
+
+    const img =
+      document.createElement("img");
+
+    img.src =
+      `/static/dobutsu/${piece}.png`;
+
+    img.className =
+      "captured-piece";
+
+    img.style.transform =
+      "rotate(180deg)";
+
+    img.onclick = () => {
+
+      selectedCaptured = piece;
+      selectedPiece = null;
+
+      renderBoard();
+
+    };
+
+    whiteDiv.appendChild(img);
+
+  }
+
+}
 
 
 
@@ -1192,6 +1263,8 @@ socket.on(
     }
 
     
+
+    renderBoard();
 
     updateCaptured();
 
