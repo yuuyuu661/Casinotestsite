@@ -936,6 +936,7 @@ function renderBoard(){
             "dobutsu_drop",
             {
               room_id: roomId,
+              user_id: myUserId,
               piece_type: selectedCaptured,
               x,
               y
@@ -977,10 +978,9 @@ function renderBoard(){
           "dobutsu_move",
           {
             room_id: roomId,
-
+            user_id: myUserId,
             from_x: selectedPiece.x,
             from_y: selectedPiece.y,
-
             to_x: x,
             to_y: y
           }
