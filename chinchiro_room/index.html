@@ -6,29 +6,403 @@
 <title>チンチロ</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:radial-gradient(circle at top,#1e293b,#020617 52%,#000);color:#f8fafc;font-family:"Hiragino Sans","Yu Gothic UI",sans-serif}
-.container{width:100%;max-width:1120px;margin:auto;padding:20px}.top-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px}.back-btn,.secondary-btn{background:#1e293b;border:1px solid rgba(255,255,255,.08);color:#fff;padding:11px 16px;border-radius:8px;font-weight:800;cursor:pointer}.title{text-align:center;font-size:clamp(2rem,5vw,3.4rem);font-weight:900;margin:12px 0 24px;color:#facc15}.info-area{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:22px}.info-box{background:#0f172a;border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:16px;text-align:center}.label{color:#94a3b8;font-size:.88rem;font-weight:800;margin-bottom:8px}.value{font-size:1.25rem;font-weight:900}.dice-wrapper{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin:28px 0}.dice{width:130px;height:130px;border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,.5)}.dice.rolling{animation:diceShake .12s linear infinite}@keyframes diceShake{0%{transform:rotate(-8deg) scale(1.05)}50%{transform:rotate(8deg) scale(1.1)}100%{transform:rotate(-8deg) scale(1.05)}}.result-area{text-align:center;margin:22px 0}.result-text{font-size:clamp(1.5rem,4vw,2.4rem);font-weight:900;margin-bottom:10px}.sub-text{color:#cbd5e1;font-size:1rem;line-height:1.7}.button-area{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:24px 0}button{border:none;border-radius:8px;padding:14px 22px;font-size:1rem;font-weight:900;cursor:pointer}button:disabled{opacity:.45;cursor:not-allowed}.ready-btn{background:#22c55e;color:#fff}.start-btn{background:#facc15;color:#111827}.roll-btn{background:#dc2626;color:#fff}.panel{background:rgba(15,23,42,.82);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:18px;margin-top:18px}.panel-title{font-size:1.25rem;font-weight:900;color:#facc15;margin-bottom:14px}.player-list,.history-list{display:grid;gap:10px}.player-card,.history-row{background:rgba(255,255,255,.04);border-radius:8px;padding:12px 14px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}.player-name{font-weight:900}.status{color:#cbd5e1}.me{border:1px solid rgba(250,204,21,.5)}.positive{color:#86efac;font-weight:900}.negative{color:#fca5a5;font-weight:900}.neutral{color:#cbd5e1;font-weight:900}@media(max-width:700px){.container{padding:14px}.dice{width:88px;height:88px}}
+body{
+  margin:0;
+  background:radial-gradient(circle at top,#1e293b,#020617 52%,#000);
+  color:#f8fafc;
+  font-family:"Hiragino Sans","Yu Gothic UI",sans-serif;
+}
+.container{width:100%;max-width:1380px;margin:auto;padding:20px}
+.top-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.back-btn{
+  background:#1e293b;border:1px solid rgba(255,255,255,.08);color:#fff;
+  padding:11px 16px;border-radius:8px;font-weight:800;cursor:pointer
+}
+.balance{color:#facc15;font-size:1.05rem;font-weight:900}
+.title{text-align:center;font-size:clamp(2rem,5vw,3.4rem);font-weight:900;margin:10px 0 22px;color:#facc15}
+.info-area{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:18px}
+.info-box{background:#0f172a;border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:15px;text-align:center}
+.label{color:#94a3b8;font-size:.88rem;font-weight:800;margin-bottom:8px}
+.value{font-size:1.22rem;font-weight:900}
+.game-layout{display:grid;grid-template-columns:minmax(280px,.9fr) minmax(360px,1.15fr) minmax(280px,.9fr);gap:16px;align-items:start}
+.panel{background:rgba(15,23,42,.82);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:16px}
+.panel-title{font-size:1.18rem;font-weight:900;color:#facc15;margin-bottom:12px}
+.rule-table{width:100%;border-collapse:collapse;overflow:hidden;border-radius:8px;font-size:.92rem}
+.rule-table th,.rule-table td{border:1px solid rgba(255,255,255,.16);padding:8px;text-align:center;vertical-align:middle}
+.rule-table th{background:#020617;color:#f8fafc}
+.rule-name{font-weight:900;color:#111827}
+.rule-red{background:#ef4444;color:#fff}
+.rule-orange{background:#f59e0b}
+.rule-yellow{background:#fde047}
+.rule-green{background:#8bd34b}
+.rule-blue{background:#38bdf8}
+.rule-purple{background:#7c3aed;color:#fff}
+.rule-dice{font-weight:900;letter-spacing:.08em}
+.rule-note{color:#cbd5e1;line-height:1.6;margin-top:10px;font-size:.9rem}
+.play-panel{text-align:center}
+.dice-wrapper{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin:22px 0}
+.dice{width:132px;height:132px;border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.dice.rolling{animation:diceShake .12s linear infinite}
+@keyframes diceShake{0%{transform:rotate(-8deg) scale(1.05)}50%{transform:rotate(8deg) scale(1.1)}100%{transform:rotate(-8deg) scale(1.05)}}
+.result-area{margin:18px 0}
+.result-text{font-size:clamp(1.45rem,4vw,2.25rem);font-weight:900;margin-bottom:10px}
+.sub-text{color:#cbd5e1;font-size:1rem;line-height:1.7}
+.button-area{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:22px 0 4px}
+button{border:none;border-radius:8px;padding:14px 22px;font-size:1rem;font-weight:900;cursor:pointer}
+button:disabled{opacity:.45;cursor:not-allowed}
+.ready-btn{background:#22c55e;color:#fff}
+.start-btn{background:#facc15;color:#111827}
+.roll-btn{background:#dc2626;color:#fff}
+.player-list,.history-list{display:grid;gap:10px}
+.player-card,.history-row{background:rgba(255,255,255,.04);border-radius:8px;padding:12px 14px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.player-name{font-weight:900}
+.status{color:#cbd5e1}
+.me{border:1px solid rgba(250,204,21,.5)}
+.positive{color:#86efac;font-weight:900}
+.negative{color:#fca5a5;font-weight:900}
+.neutral{color:#cbd5e1;font-weight:900}
+.players-panel{margin-top:16px}
+@media(max-width:1050px){.game-layout{grid-template-columns:1fr}.dice{width:110px;height:110px}}
+@media(max-width:700px){.container{padding:14px}.dice{width:88px;height:88px}.rule-table{font-size:.82rem}}
 </style>
 </head>
 <body>
 <main class="container">
-  <div class="top-bar"><button class="back-btn" id="backBtn">ロビーへ戻る</button><button class="secondary-btn" id="reloadBtn">再読み込み</button></div>
+  <div class="top-bar">
+    <button class="back-btn" id="backBtn">ロビーへ戻る</button>
+    <div class="balance" id="balanceText">残高取得中...</div>
+  </div>
+
   <h1 class="title">チンチロ</h1>
-  <section class="info-area"><div class="info-box"><div class="label">レート</div><div class="value" id="rateText">取得中...</div></div><div class="info-box"><div class="label">状態</div><div class="value" id="phaseText">待機中</div></div><div class="info-box"><div class="label">現在の番</div><div class="value" id="turnText">-</div></div></section>
-  <div class="dice-wrapper"><img id="dice1" class="dice" src="/static/chinchiro/dice/1.png" alt="dice 1"><img id="dice2" class="dice" src="/static/chinchiro/dice/1.png" alt="dice 2"><img id="dice3" class="dice" src="/static/chinchiro/dice/1.png" alt="dice 3"></div>
-  <section class="result-area"><div id="resultText" class="result-text">参加者を待っています</div><div id="subText" class="sub-text">ホストが開始すると親決めから始まります。</div></section>
-  <div class="button-area"><button id="readyBtn" class="ready-btn">準備完了</button><button id="startBtn" class="start-btn">ゲーム開始</button><button id="rollBtn" class="roll-btn">サイコロを振る</button></div>
-  <section class="panel"><div class="panel-title">参加プレイヤー</div><div class="player-list" id="playerList"></div></section>
-  <section class="panel"><div class="panel-title">ロール履歴</div><div class="history-list" id="historyList"></div></section>
+
+  <section class="info-area">
+    <div class="info-box">
+      <div class="label">レート</div>
+      <div class="value" id="rateText">取得中...</div>
+    </div>
+    <div class="info-box">
+      <div class="label">状態</div>
+      <div class="value" id="phaseText">待機中</div>
+    </div>
+    <div class="info-box">
+      <div class="label">現在の番</div>
+      <div class="value" id="turnText">-</div>
+    </div>
+  </section>
+
+  <section class="game-layout">
+    <aside class="panel">
+      <div class="panel-title">役と配当</div>
+      <table class="rule-table">
+        <thead>
+          <tr><th>名称</th><th>出目</th><th>配当</th><th>備考</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="rule-name rule-red">ピンゾロ</td><td class="rule-dice">1・1・1</td><td>5倍もらう</td><td>即勝ち</td></tr>
+          <tr><td class="rule-name rule-orange">ゾロ目</td><td class="rule-dice">2・2・2<br>3・3・3<br>4・4・4<br>5・5・5<br>6・6・6</td><td>3倍もらう</td><td></td></tr>
+          <tr><td class="rule-name rule-yellow">シゴロ</td><td class="rule-dice">4・5・6</td><td>2倍もらう</td><td>即勝ち</td></tr>
+          <tr><td class="rule-name rule-green">通常の目</td><td class="rule-dice">1から6の目</td><td>出た分もらう</td><td></td></tr>
+          <tr><td class="rule-name rule-blue">役なし</td><td class="rule-dice">例: 1・3・5</td><td>出た分払う</td><td>即負け</td></tr>
+          <tr><td class="rule-name rule-purple">ヒフミ</td><td class="rule-dice">1・2・3</td><td>2倍払う</td><td>即負け</td></tr>
+        </tbody>
+      </table>
+      <div class="rule-note">役なしは最大3回まで振れます。親決めでも同じく、役なしなら2回まで振り直しできます。</div>
+    </aside>
+
+    <section class="panel play-panel">
+      <div class="dice-wrapper">
+        <img id="dice1" class="dice" src="/static/chinchiro/dice/1.png" alt="dice 1">
+        <img id="dice2" class="dice" src="/static/chinchiro/dice/1.png" alt="dice 2">
+        <img id="dice3" class="dice" src="/static/chinchiro/dice/1.png" alt="dice 3">
+      </div>
+
+      <section class="result-area">
+        <div id="resultText" class="result-text">参加者を待っています</div>
+        <div id="subText" class="sub-text">ホストが開始すると親決めから始まります。</div>
+      </section>
+
+      <div class="button-area">
+        <button id="readyBtn" class="ready-btn">準備完了</button>
+        <button id="startBtn" class="start-btn">ゲーム開始</button>
+        <button id="rollBtn" class="roll-btn">サイコロを振る</button>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <div class="panel-title">ロール履歴</div>
+      <div class="history-list" id="historyList"></div>
+    </aside>
+  </section>
+
+  <section class="panel players-panel">
+    <div class="panel-title">参加プレイヤー</div>
+    <div class="player-list" id="playerList"></div>
+  </section>
 </main>
+
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 <script>
-const params=new URLSearchParams(location.search);const roomId=params.get("room");const session=params.get("session");const isWatch=params.get("watch")==="1";const API_BASE="https://api.oasis.red";const diceImages=["/static/chinchiro/dice/1.png","/static/chinchiro/dice/2.png","/static/chinchiro/dice/3.png","/static/chinchiro/dice/4.png","/static/chinchiro/dice/5.png","/static/chinchiro/dice/6.png"];
-let myUserId=null;let roomInfo=null;let gameState=null;const diceEls=[document.getElementById("dice1"),document.getElementById("dice2"),document.getElementById("dice3")];const rateText=document.getElementById("rateText");const phaseText=document.getElementById("phaseText");const turnText=document.getElementById("turnText");const resultText=document.getElementById("resultText");const subText=document.getElementById("subText");const playerList=document.getElementById("playerList");const historyList=document.getElementById("historyList");const readyBtn=document.getElementById("readyBtn");const startBtn=document.getElementById("startBtn");const rollBtn=document.getElementById("rollBtn");
-const phaseLabels={waiting:"待機中",dealer_select:"親決め",playing:"勝負中",finished:"終了"};function formatRrc(value){return `${Number(value||0).toLocaleString()} rrc`}function currentPlayer(){if(!gameState)return null;return (gameState.players||[]).find(player=>String(player.user_id)===String(gameState.current_turn_user_id))}function roleFor(userId){return gameState?.current_roles?.[userId]||null}function deltaClass(value){if(value>0)return "positive";if(value<0)return "negative";return "neutral"}function setDice(values){if(!values)return;values.forEach((value,index)=>{diceEls[index].src=diceImages[value-1]})}function animateDice(){diceEls.forEach(dice=>{dice.classList.add("rolling");const timer=setInterval(()=>{dice.src=diceImages[Math.floor(Math.random()*6)]},80);dice.dataset.timer=timer})}function stopAnimation(values){diceEls.forEach((dice,index)=>{clearInterval(Number(dice.dataset.timer));dice.classList.remove("rolling");if(values)dice.src=diceImages[values[index]-1]})}
-function render(){if(!roomInfo)return;const room=roomInfo.room;const players=gameState?.players||roomInfo.players||[];const turnPlayer=currentPlayer();const lastRoll=gameState?.roll_history?.[gameState.roll_history.length-1];rateText.textContent=formatRrc(room.rate_amount);phaseText.textContent=phaseLabels[gameState?.phase]||"待機中";turnText.textContent=turnPlayer?turnPlayer.user_name:"-";if(lastRoll){setDice(lastRoll.dice);resultText.textContent=`${lastRoll.user_name}: ${lastRoll.role.name}`;subText.textContent=`出目 ${lastRoll.dice.join("・")}`}if(gameState?.phase==="waiting"){resultText.textContent="参加者を待っています";subText.textContent="全員が準備できたらホストが開始できます。"}else if(gameState?.phase==="dealer_select"){resultText.textContent="親決め中";subText.textContent=turnPlayer?`${turnPlayer.user_name} が振る番です。`:""}else if(gameState?.phase==="playing"){resultText.textContent="勝負中";subText.textContent=turnPlayer?`${turnPlayer.user_name} が振る番です。役なしは最大3回まで振れます。`:""}else if(gameState?.phase==="finished"){resultText.textContent="勝負終了";subText.textContent="結果が残高へ反映されました。"}playerList.innerHTML="";players.forEach(player=>{const userId=player.user_id;const role=roleFor(userId);const delta=gameState?.total_results?.[userId]||0;const card=document.createElement("div");card.className=`player-card ${String(userId)===String(myUserId)?"me":""}`;card.innerHTML=`<div><div class="player-name">${player.user_name}${String(userId)===String(gameState?.dealer)?" / 親":""}</div><div class="status">${player.ready?"準備完了":"準備待ち"}${role?` / ${role.role.name}`:""}</div></div><div class="${deltaClass(delta)}">${delta>=0?"+":""}${formatRrc(delta)}</div>`;playerList.appendChild(card)});historyList.innerHTML="";(gameState?.roll_history||[]).slice().reverse().forEach(item=>{const row=document.createElement("div");row.className="history-row";row.innerHTML=`<span>${item.user_name}</span><strong>${item.dice.join("・")} / ${item.role.name}</strong>`;historyList.appendChild(row)});const isHost=String(room.host_user_id)===String(myUserId);const myTurn=String(gameState?.current_turn_user_id)===String(myUserId);readyBtn.disabled=isWatch||!myUserId||gameState?.phase!=="waiting";startBtn.disabled=isWatch||!isHost||gameState?.phase!=="waiting"||players.length<2;rollBtn.disabled=isWatch||!myTurn||!["dealer_select","playing"].includes(gameState?.phase)}
-async function loadMe(){if(!session)return;const res=await fetch(`${API_BASE}/api/casino/me?session=${session}`);if(!res.ok)return;const data=await res.json();if(data.ok)myUserId=data.user_id}async function loadRoomInfo(){const res=await fetch(`${API_BASE}/api/casino/room-info?room_id=${roomId}`);const data=await res.json();if(!data.ok){resultText.textContent="部屋情報を取得できませんでした";return}roomInfo=data;gameState=data.chinchiro_game||{phase:"waiting",players:data.players,host_user_id:data.host_user_id,total_results:{}};render()}
-const socket=io(API_BASE,{auth:{room_id:roomId,session,game:"chinchiro"}});socket.on("connect",()=>{socket.emit("join_room",{room_id:roomId,game:"chinchiro"})});socket.on("casino:user_joined",loadRoomInfo);socket.on("chinchiro:update",data=>{gameState=data;render()});socket.on("chinchiro:message",data=>{subText.textContent=data.message});socket.on("chinchiro:error",data=>{alert(data.message||"チンチロでエラーが発生しました")});socket.on("chinchiro:finished",data=>{gameState=data;render()});readyBtn.addEventListener("click",()=>{socket.emit("chinchiro_ready",{room_id:roomId,user_id:myUserId})});startBtn.addEventListener("click",()=>{socket.emit("chinchiro_start",{room_id:roomId,user_id:myUserId})});rollBtn.addEventListener("click",()=>{rollBtn.disabled=true;animateDice();socket.emit("chinchiro_roll",{room_id:roomId,user_id:myUserId},response=>{setTimeout(()=>{stopAnimation(response?.dice);render()},700)})});document.getElementById("backBtn").addEventListener("click",()=>{location.href=`/lobby?game=chinchiro${session?`&session=${session}`:""}`});document.getElementById("reloadBtn").addEventListener("click",loadRoomInfo);(async function init(){await loadMe();await loadRoomInfo()})();
+const params = new URLSearchParams(location.search);
+const roomId = params.get("room");
+const session = params.get("session");
+const isWatch = params.get("watch") === "1";
+const API_BASE = "https://api.oasis.red";
+const diceImages = [
+  "/static/chinchiro/dice/1.png",
+  "/static/chinchiro/dice/2.png",
+  "/static/chinchiro/dice/3.png",
+  "/static/chinchiro/dice/4.png",
+  "/static/chinchiro/dice/5.png",
+  "/static/chinchiro/dice/6.png"
+];
+
+let myUserId = null;
+let roomInfo = null;
+let gameState = null;
+
+const diceEls = [
+  document.getElementById("dice1"),
+  document.getElementById("dice2"),
+  document.getElementById("dice3")
+];
+const balanceText = document.getElementById("balanceText");
+const rateText = document.getElementById("rateText");
+const phaseText = document.getElementById("phaseText");
+const turnText = document.getElementById("turnText");
+const resultText = document.getElementById("resultText");
+const subText = document.getElementById("subText");
+const playerList = document.getElementById("playerList");
+const historyList = document.getElementById("historyList");
+const readyBtn = document.getElementById("readyBtn");
+const startBtn = document.getElementById("startBtn");
+const rollBtn = document.getElementById("rollBtn");
+
+const phaseLabels = {
+  waiting: "待機中",
+  dealer_select: "親決め",
+  playing: "勝負中",
+  finished: "終了"
+};
+
+function formatRrc(value){
+  return `${Number(value || 0).toLocaleString()} rrc`;
+}
+
+function currentPlayer(){
+  if(!gameState) return null;
+  return (gameState.players || []).find(
+    player => String(player.user_id) === String(gameState.current_turn_user_id)
+  );
+}
+
+function roleFor(userId){
+  return gameState?.current_roles?.[userId] || null;
+}
+
+function deltaClass(value){
+  if(value > 0) return "positive";
+  if(value < 0) return "negative";
+  return "neutral";
+}
+
+function setDice(values){
+  if(!values) return;
+  values.forEach((value, index) => {
+    diceEls[index].src = diceImages[value - 1];
+  });
+}
+
+function animateDice(){
+  diceEls.forEach(dice => {
+    dice.classList.add("rolling");
+    const timer = setInterval(() => {
+      dice.src = diceImages[Math.floor(Math.random() * 6)];
+    }, 80);
+    dice.dataset.timer = timer;
+  });
+}
+
+function stopAnimation(values){
+  diceEls.forEach((dice, index) => {
+    clearInterval(Number(dice.dataset.timer));
+    dice.classList.remove("rolling");
+    if(values) dice.src = diceImages[values[index] - 1];
+  });
+}
+
+function render(){
+  if(!roomInfo) return;
+
+  const room = roomInfo.room;
+  const players = gameState?.players || roomInfo.players || [];
+  const turnPlayer = currentPlayer();
+  const lastRoll = gameState?.roll_history?.[gameState.roll_history.length - 1];
+
+  rateText.textContent = formatRrc(room.rate_amount);
+  phaseText.textContent = phaseLabels[gameState?.phase] || "待機中";
+  turnText.textContent = turnPlayer ? turnPlayer.user_name : "-";
+
+  if(lastRoll){
+    setDice(lastRoll.dice);
+    resultText.textContent = `${lastRoll.user_name}: ${lastRoll.role.name}`;
+    subText.textContent = `出目 ${lastRoll.dice.join("・")}`;
+  }
+
+  if(gameState?.phase === "waiting"){
+    resultText.textContent = "参加者を待っています";
+    subText.textContent = "全員が準備できたらホストが開始できます。";
+  }else if(gameState?.phase === "dealer_select"){
+    resultText.textContent = "親決め中";
+    subText.textContent = turnPlayer ? `${turnPlayer.user_name} が振る番です。役なしは最大3回まで振れます。` : "";
+  }else if(gameState?.phase === "playing"){
+    resultText.textContent = "勝負中";
+    subText.textContent = turnPlayer ? `${turnPlayer.user_name} が振る番です。役なしは最大3回まで振れます。` : "";
+  }else if(gameState?.phase === "finished"){
+    resultText.textContent = "勝負終了";
+    subText.textContent = "結果が残高へ反映されました。";
+  }
+
+  playerList.innerHTML = "";
+  players.forEach(player => {
+    const userId = player.user_id;
+    const role = roleFor(userId);
+    const delta = gameState?.total_results?.[userId] || 0;
+    const card = document.createElement("div");
+    card.className = `player-card ${String(userId) === String(myUserId) ? "me" : ""}`;
+    card.innerHTML = `
+      <div>
+        <div class="player-name">${player.user_name}${String(userId) === String(gameState?.dealer) ? " / 親" : ""}</div>
+        <div class="status">${player.ready ? "準備完了" : "準備待ち"}${role ? ` / ${role.role.name}` : ""}</div>
+      </div>
+      <div class="${deltaClass(delta)}">${delta >= 0 ? "+" : ""}${formatRrc(delta)}</div>
+    `;
+    playerList.appendChild(card);
+  });
+
+  historyList.innerHTML = "";
+  (gameState?.roll_history || []).slice().reverse().forEach(item => {
+    const row = document.createElement("div");
+    row.className = "history-row";
+    row.innerHTML = `
+      <span>${item.user_name}</span>
+      <strong>${item.dice.join("・")} / ${item.role.name}</strong>
+    `;
+    historyList.appendChild(row);
+  });
+
+  const isHost = String(room.host_user_id) === String(myUserId);
+  const myTurn = String(gameState?.current_turn_user_id) === String(myUserId);
+  readyBtn.disabled = isWatch || !myUserId || gameState?.phase !== "waiting";
+  startBtn.disabled = isWatch || !isHost || gameState?.phase !== "waiting" || players.length < 2;
+  rollBtn.disabled = isWatch || !myTurn || !["dealer_select","playing"].includes(gameState?.phase);
+}
+
+async function loadMe(){
+  if(!session){
+    balanceText.textContent = "ログインしてください";
+    return;
+  }
+  const res = await fetch(`${API_BASE}/api/casino/me?session=${session}`);
+  if(!res.ok){
+    balanceText.textContent = "残高取得失敗";
+    return;
+  }
+  const data = await res.json();
+  if(data.ok){
+    myUserId = data.user_id;
+    balanceText.textContent = `残高: ${formatRrc(data.balance)}`;
+  }
+}
+
+async function loadRoomInfo(){
+  const res = await fetch(`${API_BASE}/api/casino/room-info?room_id=${roomId}`);
+  const data = await res.json();
+  if(!data.ok){
+    resultText.textContent = "部屋情報を取得できませんでした";
+    return;
+  }
+  roomInfo = data;
+  gameState = data.chinchiro_game || {
+    phase: "waiting",
+    players: data.players,
+    host_user_id: data.host_user_id,
+    total_results: {}
+  };
+  render();
+}
+
+const socket = io(API_BASE, {
+  auth: {
+    room_id: roomId,
+    session,
+    game: "chinchiro"
+  }
+});
+
+socket.on("connect", () => {
+  socket.emit("join_room", {
+    room_id: roomId,
+    game: "chinchiro"
+  });
+});
+
+socket.on("casino:user_joined", loadRoomInfo);
+
+socket.on("chinchiro:update", data => {
+  gameState = data;
+  render();
+});
+
+socket.on("chinchiro:message", data => {
+  subText.textContent = data.message;
+});
+
+socket.on("chinchiro:error", data => {
+  alert(data.message || "チンチロでエラーが発生しました");
+});
+
+socket.on("chinchiro:finished", async data => {
+  gameState = data;
+  render();
+  await loadMe();
+});
+
+readyBtn.addEventListener("click", () => {
+  socket.emit("chinchiro_ready", {
+    room_id: roomId,
+    user_id: myUserId
+  });
+});
+
+startBtn.addEventListener("click", () => {
+  socket.emit("chinchiro_start", {
+    room_id: roomId,
+    user_id: myUserId
+  });
+});
+
+rollBtn.addEventListener("click", () => {
+  rollBtn.disabled = true;
+  animateDice();
+  socket.emit("chinchiro_roll", {
+    room_id: roomId,
+    user_id: myUserId
+  }, response => {
+    setTimeout(() => {
+      stopAnimation(response?.dice);
+      render();
+    }, 700);
+  });
+});
+
+document.getElementById("backBtn").addEventListener("click", () => {
+  location.href = `/lobby?game=chinchiro${session ? `&session=${session}` : ""}`;
+});
+
+(async function init(){
+  await loadMe();
+  await loadRoomInfo();
+})();
 </script>
 </body>
 </html>
