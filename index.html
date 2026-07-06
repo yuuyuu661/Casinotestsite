@@ -2,12 +2,10 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-
-<title>oasisカジノサイト</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Oasis Casino</title>
 
 <style>
-
 *{
   box-sizing:border-box;
 }
@@ -15,108 +13,115 @@
 body{
   margin:0;
   padding:0;
-  font-family:
-    "Hiragino Sans",
-    "Yu Gothic UI",
-    sans-serif;
-
-  background:
-    radial-gradient(circle at top,#111827 0%,#020617 45%,#000 100%);
-
+  font-family:"Hiragino Sans","Yu Gothic UI",sans-serif;
+  background:radial-gradient(circle at top,#111827 0%,#020617 45%,#000 100%);
   color:#f8fafc;
 }
 
-/* =========================
-   全体
-========================= */
-
 .container{
   width:100%;
-  max-width:1200px;
+  max-width:1180px;
   margin:auto;
   padding:24px;
 }
 
-/* =========================
-   タイトル
-========================= */
-
-.title-box{
-  text-align:center;
-  margin-bottom:28px;
+.hero{
+  display:grid;
+  grid-template-columns:minmax(0,1.25fr) minmax(280px,0.75fr);
+  gap:24px;
+  align-items:center;
+  min-height:440px;
 }
 
-.main-title{
-  font-size:clamp(2rem,5vw,3.5rem);
+.eyebrow{
+  color:#facc15;
+  font-size:0.95rem;
   font-weight:900;
-  letter-spacing:0.08em;
-
-  background:linear-gradient(
-    90deg,
-    #facc15,
-    #fde68a,
-    #facc15
-  );
-
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
-
+  letter-spacing:0.12em;
   margin-bottom:12px;
 }
 
-.balance{
-  font-size:1.2rem;
-  font-weight:700;
-  color:#facc15;
+.main-title{
+  font-size:clamp(2.4rem,6vw,4.8rem);
+  font-weight:900;
+  line-height:1.05;
+  margin:0 0 18px;
+  background:linear-gradient(90deg,#facc15,#fde68a,#facc15);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
 }
 
 .description{
-  margin-top:18px;
   color:#cbd5e1;
-  line-height:1.8;
+  line-height:1.9;
   font-size:1rem;
+  max-width:720px;
 }
 
-/* =========================
-   カテゴリー
-========================= */
+.balance-panel{
+  background:rgba(15,23,42,0.78);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:8px;
+  padding:22px;
+}
+
+.balance-label{
+  color:#94a3b8;
+  font-weight:800;
+  margin-bottom:8px;
+}
+
+.balance{
+  color:#facc15;
+  font-size:1.5rem;
+  font-weight:900;
+}
+
+.quick-notes{
+  display:grid;
+  gap:10px;
+  margin-top:18px;
+}
+
+.quick-note{
+  background:rgba(255,255,255,0.04);
+  border-radius:8px;
+  padding:12px 14px;
+  color:#cbd5e1;
+  line-height:1.6;
+}
+
+.section{
+  margin-top:28px;
+}
+
+.section-title{
+  color:#facc15;
+  font-size:1.45rem;
+  font-weight:900;
+  margin:0 0 14px;
+}
 
 .category{
-  margin-top:24px;
-
+  margin-top:18px;
   background:rgba(15,23,42,0.75);
-
   border:1px solid rgba(255,255,255,0.08);
-
-  border-radius:18px;
-
+  border-radius:8px;
   overflow:hidden;
-
-  backdrop-filter:blur(8px);
 }
-
-/* =========================
-   開閉ボタン
-========================= */
 
 .category-header{
   width:100%;
-  padding:20px;
-
+  padding:18px 20px;
   background:transparent;
   border:none;
-
   color:#fff;
-  font-size:1.2rem;
-  font-weight:800;
-
+  font-size:1.1rem;
+  font-weight:900;
   cursor:pointer;
-
   display:flex;
   justify-content:space-between;
   align-items:center;
-
-  transition:0.2s;
 }
 
 .category-header:hover{
@@ -125,105 +130,90 @@ body{
 
 .arrow{
   transition:0.25s;
-  font-size:1.2rem;
 }
 
 .category.open .arrow{
   transform:rotate(180deg);
 }
 
-/* =========================
-   中身
-========================= */
-
 .category-content{
   max-height:0;
   overflow:hidden;
-
   transition:max-height 0.35s ease;
 }
 
 .category.open .category-content{
-  max-height:1000px;
+  max-height:1400px;
 }
 
-/* =========================
-   ゲーム一覧
-========================= */
-
-.game-grid{
+.game-grid,
+.guide-grid{
   display:grid;
-
-  grid-template-columns:
-    repeat(auto-fit,minmax(220px,1fr));
-
-  gap:16px;
-
+  grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+  gap:14px;
   padding:0 20px 20px;
 }
 
+.guide-grid{
+  padding:0;
+}
+
+.game-card,
+.guide-card{
+  background:linear-gradient(145deg,rgba(30,41,59,0.95),rgba(15,23,42,0.95));
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:8px;
+  padding:20px;
+}
+
 .game-card{
-
-  background:
-    linear-gradient(
-      145deg,
-      rgba(30,41,59,0.95),
-      rgba(15,23,42,0.95)
-    );
-
-  border:
-    1px solid rgba(255,255,255,0.06);
-
-  border-radius:16px;
-
-  padding:22px;
-
   cursor:pointer;
-
   transition:0.2s;
 }
 
 .game-card:hover{
-  transform:translateY(-4px);
+  transform:translateY(-3px);
   border-color:#facc15;
-  box-shadow:0 0 18px rgba(250,204,21,0.25);
+  box-shadow:0 0 18px rgba(250,204,21,0.22);
 }
 
-.game-title{
-  font-size:1.15rem;
-  font-weight:800;
+.game-title,
+.guide-title{
+  font-size:1.1rem;
+  font-weight:900;
   margin-bottom:10px;
 }
 
-.game-desc{
+.game-desc,
+.guide-desc{
   color:#cbd5e1;
-  line-height:1.7;
+  line-height:1.75;
   font-size:0.95rem;
 }
 
-/* =========================
-   ランキング
-========================= */
-
-.ranking-box{
-  margin-top:30px;
-
-  background:rgba(15,23,42,0.78);
-
-  border-radius:18px;
-
-  border:1px solid rgba(255,255,255,0.08);
-
-  padding:24px;
+.tag-row{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:14px;
 }
 
-.ranking-title{
-  font-size:1.4rem;
-  font-weight:900;
-
-  margin-bottom:20px;
-
+.tag{
   color:#facc15;
+  background:rgba(250,204,21,0.1);
+  border:1px solid rgba(250,204,21,0.25);
+  border-radius:999px;
+  padding:5px 9px;
+  font-size:0.8rem;
+  font-weight:800;
+}
+
+.ranking-box{
+  margin-top:28px;
+  background:rgba(15,23,42,0.78);
+  border-radius:8px;
+  border:1px solid rgba(255,255,255,0.08);
+  padding:22px;
 }
 
 .ranking-list{
@@ -233,22 +223,13 @@ body{
 }
 
 .rank-row{
-
   display:flex;
   justify-content:space-between;
   align-items:center;
-
+  gap:12px;
   background:rgba(255,255,255,0.04);
-
-  border-radius:12px;
-
-  padding:14px 18px;
-
-  transition:0.2s;
-}
-
-.rank-row:hover{
-  background:rgba(255,255,255,0.08);
+  border-radius:8px;
+  padding:14px 16px;
 }
 
 .rank-left{
@@ -258,386 +239,251 @@ body{
 }
 
 .rank-no{
-  width:34px;
-  height:34px;
-
+  width:32px;
+  height:32px;
   border-radius:50%;
-
   background:#facc15;
-
   color:#000;
-
   display:flex;
   align-items:center;
   justify-content:center;
-
   font-weight:900;
 }
 
 .rank-name{
-  font-weight:700;
+  font-weight:800;
 }
 
 .rank-balance{
   color:#facc15;
-  font-weight:800;
+  font-weight:900;
 }
 
-/* =========================
-   スマホ
-========================= */
+.notice{
+  margin-top:28px;
+  color:#cbd5e1;
+  line-height:1.8;
+  background:rgba(15,23,42,0.62);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:8px;
+  padding:18px;
+}
 
-@media(max-width:700px){
-
+@media(max-width:780px){
   .container{
     padding:16px;
   }
 
-  .game-grid{
+  .hero{
+    grid-template-columns:1fr;
+    min-height:auto;
+    padding-top:16px;
+  }
+
+  .game-grid,
+  .guide-grid{
     grid-template-columns:1fr;
   }
 
+  .rank-row{
+    align-items:flex-start;
+    flex-direction:column;
+  }
 }
-
 </style>
 </head>
+
 <body>
-
-<div class="container">
-
-  <!-- タイトル -->
-  <div class="title-box">
-
-    <div class="main-title">
-      🎰 oasisカジノサイト
-    </div>
-
-    <div
-      class="balance"
-      id="balance"
-    >
-      残高取得中...
-</div>
-
-    <div class="description">
-      oasisカジノへようこそ。<br>
-      様々なゲームで遊び、勝利してrrcを増やそう！
-    </div>
-
-  </div>
-
-  <!-- 対戦系 -->
-  <div class="category">
-
-    <button class="category-header">
-      🎮 対戦系カテゴリー
-      <span class="arrow">▼</span>
-    </button>
-
-    <div class="category-content">
-
-      <div class="game-grid">
-
-        <div
-          class="game-card"
-          id="pokerCard"
-        >
-          <div class="game-title">🃏 ポーカー</div>
-          <div class="game-desc">
-            駆け引きと心理戦。<br>
-            最強の手札で勝利を掴め。
-          </div>
-        </div>
-
-        <div
-          class="game-card"
-          id="othelloCard"
-        >
-          <div class="game-title">⚫ オセロ</div>
-          <div class="game-desc">
-            シンプルながら奥深い頭脳戦。
-          </div>
-        </div>
-        <div
-          class="game-card"
-          id="dobutsuCard"
-        >
-          <div class="game-title">🦁 どうぶつしょうぎ</div>
-
-          <div class="game-desc">
-            小さな盤面で繰り広げられる
-            本格どうぶつ将棋バトル。
-          </div>
-        </div>
-
-        <div
-          class="game-card"
-          id="chinchiroCard"
-        >
-          <div class="game-title">🎲 チンチロ</div>
-          <div class="game-desc">
-            運と度胸のダイス勝負。
-          </div>
-        </div>
-
-                <div
-                  class="game-card"
-                  id="daifugoCard"
-                >
-          <div class="game-title">👑 大富豪</div>
-          <div class="game-desc">
-            手札を制し、頂点を目指せ。
-          </div>
-        </div>
-
+<main class="container">
+  <section class="hero">
+    <div>
+      <div class="eyebrow">OASIS GAME FLOOR</div>
+      <h1 class="main-title">Oasis Casino</h1>
+      <div class="description">
+        rrc を使って、対戦ゲームやソロゲームを気軽に遊べるカジノ風ゲームフロアです。
+        ルームを作って友だちと勝負したり、空いている部屋に参加したり、自分のペースで遊べます。
       </div>
-
     </div>
-  </div>
 
-  <!-- ソロ -->
-  <div class="category">
-
-    <button class="category-header">
-      🎰 ソロプレイカテゴリー
-      <span class="arrow">▼</span>
-    </button>
-
-    <div class="category-content">
-
-      <div class="game-grid">
-
-                <div
-                  class="game-card"
-                  id="blackjackCard"
-                >
-          <div class="game-title">🂡 ブラックジャック</div>
-          <div class="game-desc">
-            21を目指す王道カードゲーム。
-          </div>
-        </div>
-
-                <div
-                  class="game-card"
-                  id="slotCard"
-                >
-          <div class="game-title">🎰 スロット</div>
-          <div class="game-desc">
-            リールを回して大当たりを狙え。
-          </div>
-        </div>
-
+    <aside class="balance-panel">
+      <div class="balance-label">現在の所持 rrc</div>
+      <div class="balance" id="balance">残高を取得中...</div>
+      <div class="quick-notes">
+        <div class="quick-note">ログイン済みの場合、ここに残高が表示されます。</div>
+        <div class="quick-note">ゲームを選ぶとロビーに移動し、参加できる部屋を探せます。</div>
       </div>
+    </aside>
+  </section>
 
+  <section class="section">
+    <h2 class="section-title">ゲーム一覧</h2>
+
+    <div class="category open">
+      <button class="category-header">
+        対戦ゲーム
+        <span class="arrow">▼</span>
+      </button>
+
+      <div class="category-content">
+        <div class="game-grid">
+          <div class="game-card" id="pokerCard">
+            <div class="game-title">ポーカー</div>
+            <div class="game-desc">読み合いと勝負勘が光るカードゲーム。強い役を作り、相手より上を目指します。</div>
+            <div class="tag-row"><span class="tag">カード</span><span class="tag">心理戦</span></div>
+          </div>
+
+          <div class="game-card" id="othelloCard">
+            <div class="game-title">オセロ</div>
+            <div class="game-desc">シンプルなルールで奥が深い定番対戦。終盤の一手で大きく流れが変わります。</div>
+            <div class="tag-row"><span class="tag">頭脳戦</span><span class="tag">2人対戦</span></div>
+          </div>
+
+          <div class="game-card" id="dobutsuCard">
+            <div class="game-title">どうぶつしょうぎ</div>
+            <div class="game-desc">小さな盤面で短く濃い勝負が楽しめる将棋系ゲーム。先読みが勝利の鍵です。</div>
+            <div class="tag-row"><span class="tag">戦略</span><span class="tag">短時間</span></div>
+          </div>
+
+          <div class="game-card" id="chinchiroCard">
+            <div class="game-title">チンチロ</div>
+            <div class="game-desc">サイコロの出目で勝負する運と度胸のゲーム。出目の瞬間が一番盛り上がります。</div>
+            <div class="tag-row"><span class="tag">サイコロ</span><span class="tag">運勝負</span></div>
+          </div>
+
+          <div class="game-card" id="daifugoCard">
+            <div class="game-title">大富豪</div>
+            <div class="game-desc">手札をうまく出し切るカードゲーム。革命や階級の駆け引きが勝負を動かします。</div>
+            <div class="tag-row"><span class="tag">カード</span><span class="tag">複数人</span></div>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
 
-  <!-- ランキング -->
-  <div class="ranking-box">
+    <div class="category open">
+      <button class="category-header">
+        ソロゲーム
+        <span class="arrow">▼</span>
+      </button>
 
-    <div class="ranking-title">
-      🏆 所持rrcランキング TOP50
+      <div class="category-content">
+        <div class="game-grid">
+          <div class="game-card" id="blackjackCard">
+            <div class="game-title">ブラックジャック</div>
+            <div class="game-desc">21 に近づける定番カードゲーム。引くか止めるか、判断力が試されます。</div>
+            <div class="tag-row"><span class="tag">カード</span><span class="tag">ソロ</span></div>
+          </div>
+
+          <div class="game-card" id="slotCard">
+            <div class="game-title">スロット</div>
+            <div class="game-desc">リールを回して当たりを狙うシンプルなゲーム。短い時間でも遊びやすいです。</div>
+            <div class="tag-row"><span class="tag">運試し</span><span class="tag">手軽</span></div>
+          </div>
+        </div>
+      </div>
     </div>
+  </section>
 
+  <section class="section">
+    <h2 class="section-title">遊び方</h2>
+    <div class="guide-grid">
+      <div class="guide-card">
+        <div class="guide-title">1. ゲームを選ぶ</div>
+        <div class="guide-desc">トップページから遊びたいゲームを選ぶと、そのゲームのロビーへ移動します。</div>
+      </div>
+      <div class="guide-card">
+        <div class="guide-title">2. 部屋に入る</div>
+        <div class="guide-desc">待機中の部屋に参加するか、自分でレートを決めて新しい部屋を作れます。</div>
+      </div>
+      <div class="guide-card">
+        <div class="guide-title">3. rrc を増やす</div>
+        <div class="guide-desc">勝負に勝つと rrc が増えます。無理のないレートで楽しく遊びましょう。</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ranking-box">
+    <h2 class="section-title">所持 rrc ランキング</h2>
     <div class="ranking-list">
-
       <div class="rank-row">
-        <div class="rank-left">
-          <div class="rank-no">1</div>
-          <div class="rank-name">ゅゅ</div>
-        </div>
-
-        <div class="rank-balance">
-          999,999 rrc
-        </div>
+        <div class="rank-left"><div class="rank-no">1</div><div class="rank-name">ゆうゆう</div></div>
+        <div class="rank-balance">999,999 rrc</div>
       </div>
-
       <div class="rank-row">
-        <div class="rank-left">
-          <div class="rank-no">2</div>
-          <div class="rank-name">ゲロ</div>
-        </div>
-
-        <div class="rank-balance">
-          850,000 rrc
-        </div>
+        <div class="rank-left"><div class="rank-no">2</div><div class="rank-name">ゲスト</div></div>
+        <div class="rank-balance">850,000 rrc</div>
       </div>
-
       <div class="rank-row">
-        <div class="rank-left">
-          <div class="rank-no">3</div>
-          <div class="rank-name">しょあ</div>
-        </div>
-
-        <div class="rank-balance">
-          720,000 rrc
-        </div>
+        <div class="rank-left"><div class="rank-no">3</div><div class="rank-name">しょうぶ師</div></div>
+        <div class="rank-balance">720,000 rrc</div>
       </div>
-
     </div>
+  </section>
 
-  </div>
-
-</div>
+  <section class="notice">
+    <strong>注意:</strong>
+    このサイトはゲームとして楽しむためのページです。実際のお金を賭ける目的では使わず、参加者同士が気持ちよく遊べる範囲で利用してください。
+  </section>
+</main>
 
 <script>
-
 const categories = document.querySelectorAll(".category");
 
 categories.forEach(category => {
-
   const header = category.querySelector(".category-header");
 
   header.addEventListener("click", () => {
-
     category.classList.toggle("open");
-
   });
-
 });
 
-/* =========================
-   session取得
-========================= */
-
-const params =
-  new URLSearchParams(location.search);
-
-const session =
-  params.get("session");
-
-/* =========================
-   ユーザー情報取得
-========================= */
+const params = new URLSearchParams(location.search);
+const session = params.get("session");
 
 async function loadMe(){
-
-  // sessionない
   if(!session){
-
-    document.getElementById("balance")
-      .innerText =
-      "ログインしてください";
-
+    document.getElementById("balance").innerText = "ログインしてください";
     return;
   }
 
   try{
-
     const API_BASE = "https://api.oasis.red";
-
-    const res = await fetch(
-     `${API_BASE}/api/casino/me?session=${session}`
-    );
+    const res = await fetch(`${API_BASE}/api/casino/me?session=${session}`);
 
     if(!res.ok){
-
-      document.getElementById("balance")
-        .innerText =
-        "認証失敗";
-
+      document.getElementById("balance").innerText = "認証に失敗しました";
       return;
     }
 
     const data = await res.json();
 
     if(!data.ok){
-
-      document.getElementById("balance")
-        .innerText =
-        "セッション無効";
-
+      document.getElementById("balance").innerText = "セッションが無効です";
       return;
     }
 
-    document.getElementById("balance")
-      .innerText =
-      `残高：${data.balance.toLocaleString()} rrc`;
-
+    document.getElementById("balance").innerText =
+      `${data.balance.toLocaleString()} rrc`;
   }
-
   catch(err){
-
     console.error(err);
-
-    document.getElementById("balance")
-      .innerText =
-      "通信エラー";
-
+    document.getElementById("balance").innerText = "通信エラー";
   }
-
 }
 
-/* =========================
-   ゲーム遷移
-========================= */
+function goLobby(game){
+  const query = session ? `?game=${game}&session=${session}` : `?game=${game}`;
+  location.href = `/lobby${query}`;
+}
 
-document
-.getElementById("pokerCard")
-.addEventListener("click", () => {
-
-  location.href =
-    `/lobby?game=poker&session=${session}`;
-
-});
-
-document
-.getElementById("othelloCard")
-.addEventListener("click", () => {
-
-  location.href =
-    `/lobby?game=othello&session=${session}`;
-
-});
-
-document
-.getElementById("dobutsuCard")
-.addEventListener("click", () => {
-
-  location.href =
-    `/lobby?game=dobutsu&session=${session}`;
-
-});
-
-document
-.getElementById("chinchiroCard")
-.addEventListener("click", () => {
-
-  location.href =
-    `/lobby?game=chinchiro&session=${session}`;
-
-});
-
-document
-.getElementById("daifugoCard")
-.addEventListener("click", () => {
-
-  location.href =
-    `/lobby?game=daifugo&session=${session}`;
-
-});
-
-document
-.getElementById("blackjackCard")
-.addEventListener("click", () => {
-
-  location.href =
-    `/lobby?game=blackjack&session=${session}`;
-
-});
-
-document
-.getElementById("slotCard")
-.addEventListener("click", () => {
-
-  location.href =
-    `/lobby?game=slot&session=${session}`;
-
-});
+document.getElementById("pokerCard").addEventListener("click", () => goLobby("poker"));
+document.getElementById("othelloCard").addEventListener("click", () => goLobby("othello"));
+document.getElementById("dobutsuCard").addEventListener("click", () => goLobby("dobutsu"));
+document.getElementById("chinchiroCard").addEventListener("click", () => goLobby("chinchiro"));
+document.getElementById("daifugoCard").addEventListener("click", () => goLobby("daifugo"));
+document.getElementById("blackjackCard").addEventListener("click", () => goLobby("blackjack"));
+document.getElementById("slotCard").addEventListener("click", () => goLobby("slot"));
 
 loadMe();
-
 </script>
-
 </body>
 </html>
