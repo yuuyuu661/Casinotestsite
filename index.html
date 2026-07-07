@@ -402,19 +402,11 @@ body{
   </section>
 
   <section class="ranking-box">
-    <h2 class="section-title">所持 rrc ランキング</h2>
-    <div class="ranking-list">
+    <h2 class="section-title">賞金ランキング</h2>
+    <div class="ranking-list" id="prizeRanking">
       <div class="rank-row">
-        <div class="rank-left"><div class="rank-no">1</div><div class="rank-name">ゆうゆう</div></div>
-        <div class="rank-balance">999,999 rrc</div>
-      </div>
-      <div class="rank-row">
-        <div class="rank-left"><div class="rank-no">2</div><div class="rank-name">ゲスト</div></div>
-        <div class="rank-balance">850,000 rrc</div>
-      </div>
-      <div class="rank-row">
-        <div class="rank-left"><div class="rank-no">3</div><div class="rank-name">しょうぶ師</div></div>
-        <div class="rank-balance">720,000 rrc</div>
+        <div class="rank-left"><div class="rank-no">-</div><div class="rank-name">読み込み中...</div></div>
+        <div class="rank-balance">-</div>
       </div>
     </div>
   </section>
@@ -470,6 +462,51 @@ async function loadMe(){
   }
 }
 
+async function loadPrizeRanking(){
+  const list = document.getElementById("prizeRanking");
+  if(!session){
+    list.innerHTML = `
+      <div class="rank-row">
+        <div class="rank-left"><div class="rank-no">-</div><div class="rank-name">ログインしてください</div></div>
+        <div class="rank-balance">-</div>
+      </div>
+    `;
+    return;
+  }
+
+  try{
+    const API_BASE = "https://api.oasis.red";
+    const res = await fetch(`${API_BASE}/api/casino/prize-ranking?session=${session}`);
+    const data = await res.json();
+
+    if(!data.ok || !data.ranking.length){
+      list.innerHTML = `
+        <div class="rank-row">
+          <div class="rank-left"><div class="rank-no">-</div><div class="rank-name">まだ賞金記録がありません</div></div>
+          <div class="rank-balance">0 rrc</div>
+        </div>
+      `;
+      return;
+    }
+
+    list.innerHTML = data.ranking.map((row, index) => `
+      <div class="rank-row">
+        <div class="rank-left"><div class="rank-no">${index + 1}</div><div class="rank-name">${row.user_name}</div></div>
+        <div class="rank-balance">${Number(row.total_prize).toLocaleString()} rrc</div>
+      </div>
+    `).join("");
+  }
+  catch(err){
+    console.error(err);
+    list.innerHTML = `
+      <div class="rank-row">
+        <div class="rank-left"><div class="rank-no">-</div><div class="rank-name">ランキング取得失敗</div></div>
+        <div class="rank-balance">-</div>
+      </div>
+    `;
+  }
+}
+
 function goLobby(game){
   const query = session ? `?game=${game}&session=${session}` : `?game=${game}`;
   location.href = `/lobby${query}`;
@@ -484,6 +521,7 @@ document.getElementById("blackjackCard").addEventListener("click", () => goLobby
 document.getElementById("slotCard").addEventListener("click", () => goLobby("slot"));
 
 loadMe();
+loadPrizeRanking();
 </script>
 </body>
 </html>

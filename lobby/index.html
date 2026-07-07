@@ -838,7 +838,7 @@ async function loadRooms(){
   try{
 
     const res = await fetch(
-      `${API_BASE}/api/casino/rooms?game=${game}`
+      `${API_BASE}/api/casino/rooms?game=${game}${session ? `&session=${session}` : ""}`
     );
 
     const data = await res.json();
@@ -858,6 +858,7 @@ async function loadRooms(){
         current_players: r.current_players,
         max_players: r.max_players,
         status: r.status,
+        is_member: r.is_member,
         host_name: r.host_name,
         rate_name: r.rate_name,
         rate_amount: r.rate_amount
@@ -953,13 +954,13 @@ function renderRooms(){
       <div class="room-buttons">
 
         ${
-          room.status === "waiting"
+          room.status === "waiting" || room.is_member
           ? `
             <button
               class="join-btn"
               data-room="${room.room_id}"
             >
-              参加
+              ${room.status === "waiting" ? "参加" : "再入室"}
             </button>
           `
           : `
@@ -986,7 +987,7 @@ function renderRooms(){
     const joinBtn =
       card.querySelector(".join-btn");
 
-    if(room.status === "waiting"){
+    if(room.status === "waiting" || room.is_member){
 
       joinBtn.addEventListener("click", async () => {
 
@@ -1128,7 +1129,7 @@ document
       .classList.remove("show");
 
     location.href =
-      `/othello_room?room=${pendingJoinRoom.room_id}&session=${session}`;
+      `/${game}_room?room=${pendingJoinRoom.room_id}&session=${session}`;
 
   }
 

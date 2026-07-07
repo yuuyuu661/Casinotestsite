@@ -159,6 +159,8 @@ const diceImages = [
 let myUserId = null;
 let roomInfo = null;
 let gameState = null;
+let visibleRollHistory = [];
+let historyDelayTimer = null;
 
 const diceEls = [
   document.getElementById("dice1"),
@@ -199,6 +201,15 @@ function roleFor(userId){
   return gameState?.current_roles?.[userId] || null;
 }
 
+function scheduleHistoryRender(nextHistory){
+  const history = Array.isArray(nextHistory) ? nextHistory.slice() : [];
+  if(historyDelayTimer) clearTimeout(historyDelayTimer);
+  historyDelayTimer = setTimeout(() => {
+    visibleRollHistory = history;
+    render();
+  }, 5000);
+}
+
 function deltaClass(value){
   if(value > 0) return "positive";
   if(value < 0) return "negative";
@@ -236,7 +247,7 @@ function render(){
   const room = roomInfo.room;
   const players = gameState?.players || roomInfo.players || [];
   const turnPlayer = currentPlayer();
-  const lastRoll = gameState?.roll_history?.[gameState.roll_history.length - 1];
+  const lastRoll = visibleRollHistory[visibleRollHistory.length - 1];
 
   rateText.textContent = formatRrc(room.rate_amount);
   phaseText.textContent = phaseLabels[gameState?.phase] || "待機中";
@@ -280,7 +291,7 @@ function render(){
   });
 
   historyList.innerHTML = "";
-  (gameState?.roll_history || []).slice().reverse().forEach(item => {
+  visibleRollHistory.slice().reverse().forEach(item => {
     const row = document.createElement("div");
     row.className = "history-row";
     row.innerHTML = `
@@ -350,6 +361,7 @@ socket.on("casino:user_joined", loadRoomInfo);
 
 socket.on("chinchiro:update", data => {
   gameState = data;
+  scheduleHistoryRender(data.roll_history);
   render();
 });
 
@@ -363,6 +375,7 @@ socket.on("chinchiro:error", data => {
 
 socket.on("chinchiro:finished", async data => {
   gameState = data;
+  scheduleHistoryRender(data.roll_history);
   render();
   await loadMe();
 });
