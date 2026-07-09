@@ -402,7 +402,7 @@ body{
   </section>
 
   <section class="ranking-box">
-    <h2 class="section-title">賞金ランキング</h2>
+    <h2 class="section-title">カジノ収支ランキング</h2>
     <div class="ranking-list" id="prizeRanking">
       <div class="rank-row">
         <div class="rank-left"><div class="rank-no">-</div><div class="rank-name">読み込み中...</div></div>
@@ -482,7 +482,7 @@ async function loadPrizeRanking(){
     if(!data.ok || !data.ranking.length){
       list.innerHTML = `
         <div class="rank-row">
-          <div class="rank-left"><div class="rank-no">-</div><div class="rank-name">まだ賞金記録がありません</div></div>
+        <div class="rank-left"><div class="rank-no">-</div><div class="rank-name">まだ収支記録がありません</div></div>
           <div class="rank-balance">0 rrc</div>
         </div>
       `;
@@ -492,7 +492,7 @@ async function loadPrizeRanking(){
     list.innerHTML = data.ranking.map((row, index) => `
       <div class="rank-row">
         <div class="rank-left"><div class="rank-no">${index + 1}</div><div class="rank-name">${row.user_name}</div></div>
-        <div class="rank-balance">${Number(row.total_prize).toLocaleString()} rrc</div>
+        <div class="rank-balance">${Number(row.total_prize) >= 0 ? "+" : ""}${Number(row.total_prize).toLocaleString()} rrc</div>
       </div>
     `).join("");
   }
