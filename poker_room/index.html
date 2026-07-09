@@ -25,6 +25,7 @@ button,input{font:inherit}button{border:0;border-radius:8px;padding:11px 15px;fo
 .waiting-actions{display:flex;justify-content:center;gap:10px;margin-top:16px}.ready{background:#16a34a;color:#fff}.start{background:var(--gold);color:#111827}
 .players{display:grid;gap:8px}.player{padding:10px;background:#0f172a;border-radius:7px;border:1px solid transparent}.player.turn{border-color:var(--gold)}.player.folded{opacity:.55}.player.winner{border-color:#22c55e}.player-top{display:flex;justify-content:space-between;gap:8px;font-weight:900}.player-meta{margin-top:5px;color:#cbd5e1;font-size:.86rem}.showdown-cards{display:flex;gap:4px;margin-top:7px}.showdown-cards .card{width:45px;height:65px}
 .message{min-height:28px;margin-top:10px;color:#fde68a;font-weight:800}
+.result-overlay{position:fixed;inset:0;z-index:20;display:none;place-items:center;padding:18px;background:rgba(2,6,23,.82);backdrop-filter:blur(5px)}.result-overlay.show{display:grid}.result-card{width:min(620px,100%);padding:26px;border:2px solid var(--gold);border-radius:8px;background:#0f172a;box-shadow:0 22px 70px #000}.result-title{text-align:center;color:var(--gold);font-size:2rem;font-weight:1000}.result-summary{text-align:center;margin:8px 0 20px;font-size:1.2rem;font-weight:900}.result-list{display:grid;gap:8px}.result-row{display:grid;grid-template-columns:80px 1fr auto;align-items:center;gap:10px;padding:12px;border:1px solid var(--line);border-radius:7px;background:#111827}.result-row.winner{border-color:#22c55e;background:#052e1a}.result-badge{font-weight:1000}.result-row.winner .result-badge{color:#4ade80}.result-row.loser .result-badge{color:#f87171}.result-net{font-weight:1000}.result-net.positive{color:#4ade80}.result-net.negative{color:#f87171}.result-close{display:block;width:100%;margin-top:18px;background:var(--gold);color:#111827;font-weight:1000}
 @media(max-width:1100px){.layout{grid-template-columns:1fr}.table-panel{order:-1}.info{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:620px){.page{padding:9px}.table-panel{padding:22px 7px;border-radius:28px}.card,.card-slot,.card-back{width:56px;height:82px}.community,.hole{gap:4px;min-height:90px}.actions button{padding:10px}.amount{width:105px}}
 </style>
@@ -101,6 +102,14 @@ button,input{font:inherit}button{border:0;border-radius:8px;padding:11px 15px;fo
     </aside>
   </section>
 </main>
+<div id="resultOverlay" class="result-overlay" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
+  <div class="result-card">
+    <div id="resultTitle" class="result-title">RESULT</div>
+    <div id="resultSummary" class="result-summary"></div>
+    <div id="resultList" class="result-list"></div>
+    <button id="resultClose" class="result-close">結果を確認</button>
+  </div>
+</div>
 
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 <script>
@@ -111,6 +120,7 @@ const API_BASE = "https://api.oasis.red";
 let me = null;
 let roomInfo = null;
 let game = null;
+let resultShown = false;
 
 const phases = {waiting:"待機中",preflop:"プリフロップ",flop:"フロップ",turn:"ターン",river:"リバー",finished:"ショーダウン"};
 const suitNames = {s:"spades",h:"hearts",d:"diamonds",c:"clubs"};
@@ -150,7 +160,32 @@ async function loadState(){
   if(!session)return;
   const response=await fetch(`${API_BASE}/api/casino/poker/state?room_id=${roomId}&session=${session}`);
   if(!response.ok)return;
-  const data=await response.json();game=data.game;render();
+  const data=await response.json();
+  const justFinished=data.game?.finished&&!game?.finished;
+  game=data.game;
+  if(justFinished)await loadMe();
+  render();
+}
+
+function renderResult(){
+  if(!game?.finished||resultShown)return;
+  resultShown=true;
+  const winnerIds=new Set((game.winners||[]).map(String));
+  const winners=game.players.filter(player=>winnerIds.has(String(player.user_id)));
+  document.getElementById("resultSummary").textContent=winners.length>1
+    ? `引き分け: ${winners.map(player=>player.user_name).join(" / ")}`
+    : `勝者: ${winners[0]?.user_name||"-"}`;
+  const list=document.getElementById("resultList");list.innerHTML="";
+  [...game.players].sort((a,b)=>winnerIds.has(String(b.user_id))-winnerIds.has(String(a.user_id))).forEach(player=>{
+    const won=winnerIds.has(String(player.user_id));
+    const net=Number(game.net_results?.[String(player.user_id)]||0);
+    const row=document.createElement("div");row.className=`result-row ${won?"winner":"loser"}`;
+    const badge=document.createElement("span");badge.className="result-badge";badge.textContent=won?"WINNER":"LOSER";
+    const name=document.createElement("strong");name.textContent=player.user_name;
+    const amount=document.createElement("span");amount.className=`result-net ${net>0?"positive":net<0?"negative":""}`;amount.textContent=`${net>0?"+":""}${formatRrc(net)}`;
+    row.append(badge,name,amount);list.appendChild(row);
+  });
+  document.getElementById("resultOverlay").classList.add("show");
 }
 
 function render(){
@@ -196,6 +231,7 @@ function render(){
     if(show){const hand=document.createElement("div");hand.className="showdown-cards";show.cards.forEach(c=>hand.appendChild(cardElement(c)));const label=document.createElement("span");label.textContent=show.hand_name;label.style.marginLeft="5px";hand.appendChild(label);card.appendChild(hand)}
     players.appendChild(card);
   });
+  renderResult();
 }
 
 const socket=io(API_BASE,{auth:{room_id:roomId,session,game:"poker"}});
@@ -216,6 +252,7 @@ document.getElementById("raiseBtn").addEventListener("click",()=>emit("poker_act
 document.querySelectorAll(".tab").forEach(button=>button.addEventListener("click",()=>{document.querySelectorAll(".tab,.tab-content").forEach(item=>item.classList.remove("active"));button.classList.add("active");document.getElementById(button.dataset.tab).classList.add("active")}));
 function sendChat(){const input=document.getElementById("chatInput");const message=input.value.trim();if(!message||!me)return;socket.emit("chat_message",{room_id:roomId,user_name:me.user_name,message,game:"poker"});input.value=""}
 document.getElementById("sendBtn").addEventListener("click",sendChat);
+document.getElementById("resultClose").addEventListener("click",()=>document.getElementById("resultOverlay").classList.remove("show"));
 document.getElementById("chatInput").addEventListener("keydown",event=>{if(event.key==="Enter")sendChat()});
 socket.on("chat_message",data=>{const row=document.createElement("div");row.className="chat-message";const user=document.createElement("div");user.className="chat-user";user.textContent=data.user_name;const text=document.createElement("div");text.textContent=data.message;row.append(user,text);document.getElementById("chatBox").appendChild(row)});
 
