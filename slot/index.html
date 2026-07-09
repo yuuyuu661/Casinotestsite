@@ -29,12 +29,12 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .machine.bonus .bonus-banner{display:block}
 .reels{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;background:#020617;padding:10px;border-radius:8px}
 .reel{min-width:0}
-.reel-window{height:276px;overflow:hidden;background:#f8fafc;border:3px solid #374151;border-radius:6px}
+.reel-window{height:456px;overflow:hidden;background:#f8fafc;border:3px solid #374151;border-radius:6px}
 .symbol{height:90px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid #d1d5db}
 .symbol img{width:76px;height:76px;object-fit:contain}
 .symbol.win{background:#fef08a;box-shadow:inset 0 0 18px #f59e0b}
-.reel-strip.spinning{animation:reelMove .18s linear infinite}
-@keyframes reelMove{from{transform:translateY(-90px)}to{transform:translateY(0)}}
+.reel-strip.spinning{animation:reelMove .65s linear infinite;will-change:transform}
+@keyframes reelMove{from{transform:translateY(-540px)}to{transform:translateY(0)}}
 .stop-btn{width:100%;margin-top:9px;padding:11px 4px;background:#ef4444;color:#fff}
 .controls{display:flex;align-items:end;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:18px}
 .control{display:grid;gap:6px;text-align:left;color:#cbd5e1;font-weight:800}
@@ -48,7 +48,7 @@ select{min-width:150px;padding:12px;background:#0f172a;color:#fff;border:1px sol
 .coin{position:fixed;top:-50px;width:34px;height:34px;pointer-events:none;z-index:20;animation:fall 1.5s linear forwards}
 @keyframes fall{to{top:105vh;transform:rotate(540deg);opacity:0}}
 @media(max-width:1050px){.layout{grid-template-columns:1fr}.machine{order:-1}.side-pay{order:2}.side-stat{order:3}}
-@media(max-width:700px){.page{padding:10px}.machine{padding:10px;border-width:3px}.reels{gap:3px;padding:5px}.reel-window{height:198px}.symbol{height:64px}.symbol img{width:54px;height:54px}.reel-strip.spinning{animation-name:reelMoveMobile}@keyframes reelMoveMobile{from{transform:translateY(-64px)}to{transform:translateY(0)}}.stop-btn{font-size:.75rem;padding:10px 2px}.wallet{width:100%;justify-content:space-between}}
+@media(max-width:700px){.page{padding:10px}.machine{padding:10px;border-width:3px}.reels{gap:3px;padding:5px}.reel-window{height:326px}.symbol{height:64px}.symbol img{width:54px;height:54px}.reel-strip.spinning{animation-name:reelMoveMobile}@keyframes reelMoveMobile{from{transform:translateY(-384px)}to{transform:translateY(0)}}.stop-btn{font-size:.75rem;padding:10px 2px}.wallet{width:100%;justify-content:space-between}}
 </style>
 </head>
 <body>
@@ -118,8 +118,8 @@ const API_BASE = "https://api.oasis.red";
 const session = new URLSearchParams(location.search).get("session");
 const symbols = ["seven","gem","bell","grape","lemon","slime","orb"];
 const payouts = {
-  seven:[100,500,2500],gem:[30,100,500],bell:[15,50,200],
-  grape:[8,25,100],lemon:[5,15,50],slime:[3,8,25]
+  seven:[20,100,500],gem:[5,20,100],bell:[2,8,30],
+  grape:[1,5,20],lemon:[1,3,8],slime:[0,1,5]
 };
 const labels = {seven:"SEVEN",gem:"GEM",bell:"BELL",grape:"GRAPE",lemon:"LEMON",slime:"SLIME"};
 const sounds = ["bgmNormal","bgmBonus","startSound","stopSound","win3Sound","win4Sound","win5Sound"]
@@ -165,7 +165,8 @@ function buildReels(){
     windowEl.className = "reel-window";
     const strip = document.createElement("div");
     strip.className = "reel-strip";
-    for(let row = 0; row < 4; row++) strip.appendChild(symbolNode(randomSymbol(), freeSpins > 0));
+    const pattern = Array.from({length:6}, () => randomSymbol());
+    [...pattern, ...pattern].forEach(symbol => strip.appendChild(symbolNode(symbol, freeSpins > 0)));
     windowEl.appendChild(strip);
     const stop = document.createElement("button");
     stop.className = "stop-btn";
@@ -188,7 +189,8 @@ function updateStatus(){
 function startReels(){
   [...reelsEl.querySelectorAll(".reel-strip")].forEach(strip => {
     strip.innerHTML = "";
-    for(let row = 0; row < 4; row++) strip.appendChild(symbolNode(randomSymbol(), freeSpins > 0));
+    const pattern = Array.from({length:6}, () => randomSymbol());
+    [...pattern, ...pattern].forEach(symbol => strip.appendChild(symbolNode(symbol, freeSpins > 0)));
     strip.classList.add("spinning");
   });
   [...reelsEl.querySelectorAll(".stop-btn")].forEach(button => button.disabled = false);
@@ -206,9 +208,11 @@ function stopReel(column){
   const strip = reel.querySelector(".reel-strip");
   strip.classList.remove("spinning");
   strip.innerHTML = "";
+  strip.appendChild(symbolNode(randomSymbol(), spinResult.bonus));
   for(let row = 0; row < 3; row++){
     strip.appendChild(symbolNode(spinResult.grid[row][column], spinResult.bonus));
   }
+  strip.appendChild(symbolNode(randomSymbol(), spinResult.bonus));
   reel.querySelector(".stop-btn").disabled = true;
   playSound("stopSound");
   if(stopped.every(Boolean)) finishSpin();
@@ -231,8 +235,9 @@ function setBgm(bonus){
 
 function highlightWins(wins){
   wins.forEach(win => {
-    for(let column = 0; column < win.count; column++){
-      reelsEl.children[column].querySelectorAll(".symbol")[win.row]?.classList.add("win");
+    for(let offset = 0; offset < win.count; offset++){
+      const column = win.start_column + offset;
+      reelsEl.children[column].querySelectorAll(".symbol")[win.row + 1]?.classList.add("win");
     }
   });
 }
@@ -347,7 +352,7 @@ async function init(){
 document.getElementById("paytableBody").innerHTML = Object.entries(payouts).map(([symbol, values]) => `
   <tr>
     <td class="symbol-name"><img class="mini-symbol" src="${imageFor(symbol)}" alt="">${labels[symbol]}</td>
-    ${values.map(value => `<td>x${value}</td>`).join("")}
+    ${values.map(value => `<td>${value ? `x${value}` : "-"}</td>`).join("")}
   </tr>
 `).join("");
 
