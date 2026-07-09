@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>OASIS SLOT</title>
+<link rel="icon" href="data:,">
 <style>
 *{box-sizing:border-box}
 :root{--gold:#facc15;--red:#dc2626;--panel:#111827;--line:rgba(255,255,255,.12)}
@@ -235,9 +236,14 @@ function setBgm(bonus){
 
 function highlightWins(wins){
   wins.forEach(win => {
+    const startColumn = Number.isInteger(win.start_column)
+      ? win.start_column
+      : 0;
     for(let offset = 0; offset < win.count; offset++){
-      const column = win.start_column + offset;
-      reelsEl.children[column].querySelectorAll(".symbol")[win.row + 1]?.classList.add("win");
+      const column = startColumn + offset;
+      const reel = reelsEl.children[column];
+      if(!reel) continue;
+      reel.querySelectorAll(".symbol")[win.row + 1]?.classList.add("win");
     }
   });
 }
