@@ -179,6 +179,8 @@ const diceImages = [
   "/static/chinchiro/dice/5.png",
   "/static/chinchiro/dice/6.png"
 ];
+const diceRollSound = new Audio("/static/chinchiro/sounds/dice_roll.mp3");
+diceRollSound.preload = "auto";
 
 let myUserId = null;
 let myUserName = "";
@@ -260,6 +262,10 @@ function setDice(values){
 }
 
 function animateDice(){
+  if(diceRollSound.paused || diceRollSound.ended){
+    diceRollSound.currentTime = 0;
+    diceRollSound.play().catch(() => {});
+  }
   diceEls.forEach(dice => {
     clearInterval(Number(dice.dataset.timer));
     dice.classList.add("rolling");
