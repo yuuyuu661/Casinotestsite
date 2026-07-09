@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>テキサスホールデム</title>
+<link rel="icon" href="data:,">
+<style>
+*{box-sizing:border-box}
+:root{--gold:#facc15;--panel:#111827;--line:rgba(255,255,255,.12);--green:#166534}
+body{margin:0;min-height:100vh;background:#020617;color:#f8fafc;font-family:"Yu Gothic UI","Hiragino Sans",sans-serif}
+button,input{font:inherit}button{border:0;border-radius:8px;padding:11px 15px;font-weight:900;cursor:pointer}button:disabled{opacity:.4;cursor:not-allowed}
+.page{width:min(1500px,100%);margin:auto;padding:16px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.back{background:#1f2937;color:#fff;border:1px solid var(--line)}.balance{color:var(--gold);font-weight:900}
+.title{text-align:center;color:var(--gold);font-size:clamp(1.9rem,4vw,3.1rem);margin:10px 0 16px}
+.info{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}.info-box{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px;text-align:center}.label{color:#94a3b8;font-size:.8rem}.value{font-weight:900;margin-top:4px}
+.layout{display:grid;grid-template-columns:minmax(270px,.8fr) minmax(580px,1.7fr) minmax(260px,.8fr);gap:14px;align-items:start}.panel{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px}
+.tabs{display:flex;gap:8px;margin-bottom:12px}.tab{flex:1;background:#1e293b;color:#cbd5e1}.tab.active{background:var(--gold);color:#111827}.tab-content{display:none}.tab-content.active{display:block}
+.rank-list{display:grid;gap:6px}.rank{display:flex;gap:9px;align-items:center;padding:8px;background:#0f172a;border-radius:6px}.rank-no{width:24px;height:24px;display:grid;place-items:center;background:#1d4ed8;border-radius:50%;font-weight:900}.rank strong{color:#fde047}
+.chat-box{height:430px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin-bottom:10px}.chat-message{padding:9px;background:#0f172a;border-radius:6px}.chat-user{color:var(--gold);font-weight:900}.chat-input-row{display:flex;gap:7px}.chat-input{min-width:0;flex:1;padding:10px;background:#020617;color:#fff;border:1px solid var(--line);border-radius:6px}.send{background:#2563eb;color:#fff}
+.table-panel{background:#052e16;border:5px solid #854d0e;border-radius:42% / 18%;padding:28px 18px;min-height:530px;box-shadow:inset 0 0 45px rgba(0,0,0,.45);text-align:center}
+.phase{font-weight:900;color:#fde047;margin-bottom:12px}.community,.hole{display:flex;justify-content:center;gap:8px;min-height:132px;align-items:center}.card{width:82px;height:120px;object-fit:contain;border-radius:6px;filter:drop-shadow(0 5px 5px rgba(0,0,0,.35))}.card-slot{width:82px;height:120px;border:2px dashed rgba(255,255,255,.25);border-radius:6px}.card-back{width:82px;height:120px;border:4px solid #fff;border-radius:6px;background:repeating-linear-gradient(45deg,#1d4ed8 0 8px,#172554 8px 16px);box-shadow:0 5px 8px rgba(0,0,0,.35)}
+.pot{font-size:1.25rem;font-weight:900;margin:14px}.pot span{color:var(--gold)}.my-hand{margin-top:18px}.my-hand-title{font-weight:900;margin-bottom:8px}
+.actions{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:15px}.fold{background:#991b1b;color:#fff}.check,.call{background:#2563eb;color:#fff}.bet,.raise{background:#d97706;color:#fff}.amount{width:125px;padding:10px;background:#0f172a;color:#fff;border:1px solid var(--line);border-radius:8px}
+.waiting-actions{display:flex;justify-content:center;gap:10px;margin-top:16px}.ready{background:#16a34a;color:#fff}.start{background:var(--gold);color:#111827}
+.players{display:grid;gap:8px}.player{padding:10px;background:#0f172a;border-radius:7px;border:1px solid transparent}.player.turn{border-color:var(--gold)}.player.folded{opacity:.55}.player.winner{border-color:#22c55e}.player-top{display:flex;justify-content:space-between;gap:8px;font-weight:900}.player-meta{margin-top:5px;color:#cbd5e1;font-size:.86rem}.showdown-cards{display:flex;gap:4px;margin-top:7px}.showdown-cards .card{width:45px;height:65px}
+.message{min-height:28px;margin-top:10px;color:#fde68a;font-weight:800}
+@media(max-width:1100px){.layout{grid-template-columns:1fr}.table-panel{order:-1}.info{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:620px){.page{padding:9px}.table-panel{padding:22px 7px;border-radius:28px}.card,.card-slot,.card-back{width:56px;height:82px}.community,.hole{gap:4px;min-height:90px}.actions button{padding:10px}.amount{width:105px}}
+</style>
+</head>
+<body>
+<main class="page">
+  <header class="topbar">
+    <button id="backBtn" class="back">ロビーへ戻る</button>
+    <div id="balanceText" class="balance">残高取得中...</div>
+  </header>
+  <h1 class="title">TEXAS HOLD'EM</h1>
+  <section class="info">
+    <div class="info-box"><div class="label">アンティ / 最小ベット</div><div id="rateText" class="value">-</div></div>
+    <div class="info-box"><div class="label">フェーズ</div><div id="phaseText" class="value">待機中</div></div>
+    <div class="info-box"><div class="label">現在の番</div><div id="turnText" class="value">-</div></div>
+    <div class="info-box"><div class="label">現在のベット</div><div id="currentBetText" class="value">0 rrc</div></div>
+  </section>
+
+  <section class="layout">
+    <aside class="panel">
+      <div class="tabs">
+        <button class="tab active" data-tab="rankTab">役の強さ</button>
+        <button class="tab" data-tab="chatTab">チャット</button>
+      </div>
+      <div id="rankTab" class="tab-content active">
+        <div class="rank-list">
+          <div class="rank"><span class="rank-no">1</span><strong>ロイヤルフラッシュ</strong></div>
+          <div class="rank"><span class="rank-no">2</span><strong>ストレートフラッシュ</strong></div>
+          <div class="rank"><span class="rank-no">3</span><strong>フォーカード</strong></div>
+          <div class="rank"><span class="rank-no">4</span><strong>フルハウス</strong></div>
+          <div class="rank"><span class="rank-no">5</span><strong>フラッシュ</strong></div>
+          <div class="rank"><span class="rank-no">6</span><strong>ストレート</strong></div>
+          <div class="rank"><span class="rank-no">7</span><strong>スリーカード</strong></div>
+          <div class="rank"><span class="rank-no">8</span><strong>ツーペア</strong></div>
+          <div class="rank"><span class="rank-no">9</span><strong>ワンペア</strong></div>
+          <div class="rank"><span class="rank-no">10</span><strong>ハイカード</strong></div>
+        </div>
+      </div>
+      <div id="chatTab" class="tab-content">
+        <div id="chatBox" class="chat-box"></div>
+        <div class="chat-input-row">
+          <input id="chatInput" class="chat-input" maxlength="200" placeholder="メッセージ">
+          <button id="sendBtn" class="send">送信</button>
+        </div>
+      </div>
+    </aside>
+
+    <section class="panel table-panel">
+      <div id="tablePhase" class="phase">参加者を待っています</div>
+      <div id="community" class="community"></div>
+      <div class="pot">POT <span id="potText">0 rrc</span></div>
+      <div class="my-hand">
+        <div class="my-hand-title">YOUR HAND</div>
+        <div id="holeCards" class="hole"></div>
+      </div>
+      <div id="waitingActions" class="waiting-actions">
+        <button id="readyBtn" class="ready">準備完了</button>
+        <button id="startBtn" class="start">ゲーム開始</button>
+      </div>
+      <div id="actions" class="actions" style="display:none">
+        <button id="foldBtn" class="fold">フォールド</button>
+        <button id="checkBtn" class="check">チェック</button>
+        <button id="callBtn" class="call">コール</button>
+        <input id="amountInput" class="amount" type="number" min="1" step="1">
+        <button id="betBtn" class="bet">ベット</button>
+        <button id="raiseBtn" class="raise">レイズ</button>
+      </div>
+      <div id="message" class="message"></div>
+    </section>
+
+    <aside class="panel">
+      <div style="color:var(--gold);font-weight:900;margin-bottom:10px">プレイヤー</div>
+      <div id="players" class="players"></div>
+    </aside>
+  </section>
+</main>
+
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script>
+const params = new URLSearchParams(location.search);
+const roomId = params.get("room");
+const session = params.get("session");
+const API_BASE = "https://api.oasis.red";
+let me = null;
+let roomInfo = null;
+let game = null;
+
+const phases = {waiting:"待機中",preflop:"プリフロップ",flop:"フロップ",turn:"ターン",river:"リバー",finished:"ショーダウン"};
+const suitNames = {s:"spades",h:"hearts",d:"diamonds",c:"clubs"};
+const errorMessages = {
+  not_your_turn:"あなたの番ではありません",cannot_check:"コールかフォールドを選んでください",
+  nothing_to_call:"現在コールするベットはありません",invalid_bet:"ベット額を確認してください",
+  invalid_raise:"レイズ額を確認してください",insufficient_balance:"残高が不足しています"
+};
+
+function formatRrc(value){return `${Number(value||0).toLocaleString()} rrc`}
+function cardPath(card){
+  const rank = card[0] === "T" ? "10" : card[0];
+  return `/static/poker/cards/${suitNames[card[1]]}_${rank}.png`;
+}
+function cardElement(card){
+  const image=document.createElement("img");image.className="card";image.src=cardPath(card);image.alt=card;return image;
+}
+function renderCards(container,cards,total){
+  container.innerHTML="";
+  cards.forEach(card=>container.appendChild(cardElement(card)));
+  for(let i=cards.length;i<total;i++){const slot=document.createElement("div");slot.className="card-slot";container.appendChild(slot)}
+}
+
+async function loadMe(){
+  if(!session)return;
+  const response=await fetch(`${API_BASE}/api/casino/me?session=${session}`);
+  if(!response.ok)return;
+  me=await response.json();
+  document.getElementById("balanceText").textContent=`残高 ${formatRrc(me.balance)}`;
+}
+async function loadRoom(){
+  const response=await fetch(`${API_BASE}/api/casino/room-info?room_id=${roomId}`);
+  roomInfo=await response.json();
+  if(roomInfo.ok)document.getElementById("rateText").textContent=formatRrc(roomInfo.room.rate_amount);
+}
+async function loadState(){
+  if(!session)return;
+  const response=await fetch(`${API_BASE}/api/casino/poker/state?room_id=${roomId}&session=${session}`);
+  if(!response.ok)return;
+  const data=await response.json();game=data.game;render();
+}
+
+function render(){
+  if(!game||!roomInfo||!me)return;
+  const activePhase=["preflop","flop","turn","river"].includes(game.phase);
+  const myPlayer=game.players.find(player=>String(player.user_id)===String(me.user_id));
+  const current=game.players.find(player=>String(player.user_id)===String(game.current_turn_user_id));
+  const toCall=Math.max(0,Number(game.current_bet)-(myPlayer?.street_bet||0));
+  document.getElementById("phaseText").textContent=phases[game.phase]||game.phase;
+  document.getElementById("turnText").textContent=current?.user_name||"-";
+  document.getElementById("currentBetText").textContent=formatRrc(game.current_bet);
+  document.getElementById("potText").textContent=formatRrc(game.pot);
+  document.getElementById("tablePhase").textContent=game.phase==="waiting"?"参加者を待っています":game.phase==="finished"?"ゲーム終了":`${phases[game.phase]} / ${current?.user_name||"-"} の番`;
+  renderCards(document.getElementById("community"),game.community_cards||[],5);
+  renderCards(document.getElementById("holeCards"),game.my_hole_cards||[],2);
+
+  const waiting=game.phase==="waiting";
+  document.getElementById("waitingActions").style.display=waiting?"flex":"none";
+  document.getElementById("actions").style.display=activePhase?"flex":"none";
+  const isHost=String(game.host_user_id)===String(me.user_id);
+  const isMyTurn=String(game.current_turn_user_id)===String(me.user_id);
+  document.getElementById("readyBtn").disabled=!waiting||myPlayer?.ready;
+  document.getElementById("startBtn").disabled=!waiting||!isHost||game.players.length<2||!game.players.every(player=>player.ready);
+  ["foldBtn","checkBtn","callBtn","betBtn","raiseBtn","amountInput"].forEach(id=>document.getElementById(id).disabled=!isMyTurn||myPlayer?.folded);
+  document.getElementById("checkBtn").disabled=!isMyTurn||toCall>0;
+  document.getElementById("callBtn").disabled=!isMyTurn||toCall===0;
+  document.getElementById("callBtn").textContent=toCall?`コール ${formatRrc(toCall)}`:"コール";
+  document.getElementById("betBtn").style.display=game.current_bet===0?"inline-block":"none";
+  document.getElementById("raiseBtn").style.display=game.current_bet>0?"inline-block":"none";
+  const amount=document.getElementById("amountInput");amount.min=game.minimum_raise;amount.step=game.minimum_raise;if(!amount.value)amount.value=game.minimum_raise;
+
+  const showdownMap=new Map((game.showdown||[]).map(row=>[String(row.user_id),row]));
+  const players=document.getElementById("players");players.innerHTML="";
+  game.players.forEach(player=>{
+    const card=document.createElement("div");
+    card.className=`player ${String(player.user_id)===String(game.current_turn_user_id)?"turn":""} ${player.folded?"folded":""} ${(game.winners||[]).includes(String(player.user_id))?"winner":""}`;
+    const top=document.createElement("div");top.className="player-top";
+    const name=document.createElement("span");name.textContent=`${player.user_name}${String(player.user_id)===String(game.host_user_id)?" / HOST":""}`;
+    const bet=document.createElement("span");bet.textContent=formatRrc(player.street_bet);top.append(name,bet);
+    const meta=document.createElement("div");meta.className="player-meta";meta.textContent=player.folded?"フォールド":player.last_action||(player.ready?"準備完了":"準備待ち");
+    card.append(top,meta);
+    const show=showdownMap.get(String(player.user_id));
+    if(show){const hand=document.createElement("div");hand.className="showdown-cards";show.cards.forEach(c=>hand.appendChild(cardElement(c)));const label=document.createElement("span");label.textContent=show.hand_name;label.style.marginLeft="5px";hand.appendChild(label);card.appendChild(hand)}
+    players.appendChild(card);
+  });
+}
+
+const socket=io(API_BASE,{auth:{room_id:roomId,session,game:"poker"}});
+socket.on("connect",()=>socket.emit("join_room",{room_id:roomId,game:"poker"}));
+socket.on("poker:update",loadState);
+socket.on("casino:user_joined",async()=>{await loadRoom();await loadState()});
+socket.on("casino:room_deleted",()=>location.href=`/lobby?game=poker&session=${session}`);
+
+function emit(event,payload={}){socket.emit(event,{room_id:roomId,session,...payload},response=>{if(response&&!response.ok)document.getElementById("message").textContent=errorMessages[response.error]||"操作できませんでした"})}
+document.getElementById("readyBtn").addEventListener("click",()=>emit("poker_ready"));
+document.getElementById("startBtn").addEventListener("click",()=>emit("poker_start"));
+document.getElementById("foldBtn").addEventListener("click",()=>emit("poker_action",{action:"fold"}));
+document.getElementById("checkBtn").addEventListener("click",()=>emit("poker_action",{action:"check"}));
+document.getElementById("callBtn").addEventListener("click",()=>emit("poker_action",{action:"call"}));
+document.getElementById("betBtn").addEventListener("click",()=>emit("poker_action",{action:"bet",amount:Number(document.getElementById("amountInput").value)}));
+document.getElementById("raiseBtn").addEventListener("click",()=>emit("poker_action",{action:"raise",amount:Number(document.getElementById("amountInput").value)}));
+
+document.querySelectorAll(".tab").forEach(button=>button.addEventListener("click",()=>{document.querySelectorAll(".tab,.tab-content").forEach(item=>item.classList.remove("active"));button.classList.add("active");document.getElementById(button.dataset.tab).classList.add("active")}));
+function sendChat(){const input=document.getElementById("chatInput");const message=input.value.trim();if(!message||!me)return;socket.emit("chat_message",{room_id:roomId,user_name:me.user_name,message,game:"poker"});input.value=""}
+document.getElementById("sendBtn").addEventListener("click",sendChat);
+document.getElementById("chatInput").addEventListener("keydown",event=>{if(event.key==="Enter")sendChat()});
+socket.on("chat_message",data=>{const row=document.createElement("div");row.className="chat-message";const user=document.createElement("div");user.className="chat-user";user.textContent=data.user_name;const text=document.createElement("div");text.textContent=data.message;row.append(user,text);document.getElementById("chatBox").appendChild(row)});
+
+async function leaveRoom(){if(!session)return;await fetch(`${API_BASE}/api/casino/leave-room`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({room_id:roomId,session})}).catch(()=>{})}
+document.getElementById("backBtn").addEventListener("click",async()=>{await leaveRoom();location.href=`/lobby?game=poker&session=${session}`});
+window.addEventListener("beforeunload",()=>{if(session)navigator.sendBeacon(`${API_BASE}/api/casino/leave-room`,new Blob([JSON.stringify({room_id:roomId,session})],{type:"application/json"}))});
+
+(async()=>{await loadMe();await loadRoom();await loadState()})();
+</script>
+</body>
+</html>
