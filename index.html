@@ -518,7 +518,9 @@ document.getElementById("dobutsuCard").addEventListener("click", () => goLobby("
 document.getElementById("chinchiroCard").addEventListener("click", () => goLobby("chinchiro"));
 document.getElementById("daifugoCard").addEventListener("click", () => goLobby("daifugo"));
 document.getElementById("blackjackCard").addEventListener("click", () => goLobby("blackjack"));
-document.getElementById("slotCard").addEventListener("click", () => goLobby("slot"));
+document.getElementById("slotCard").addEventListener("click", () => {
+  location.href = `/slot/${session ? `?session=${session}` : ""}`;
+});
 
 loadMe();
 loadPrizeRanking();
