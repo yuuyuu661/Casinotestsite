@@ -39,6 +39,18 @@ body{
 .rule-purple{background:#7c3aed;color:#fff}
 .rule-dice{font-weight:900;letter-spacing:.08em}
 .rule-note{color:#cbd5e1;line-height:1.6;margin-top:10px;font-size:.9rem}
+.panel-tabs{display:flex;gap:8px;margin-bottom:14px}
+.tab-btn{flex:1;padding:10px 12px;background:#1e293b;color:#cbd5e1}
+.tab-btn.active{background:#facc15;color:#111827}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.chat-box{height:420px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+.chat-message{background:rgba(255,255,255,.05);border-radius:8px;padding:10px 12px}
+.chat-user{font-weight:900;color:#facc15;margin-bottom:4px}
+.chat-text{color:#e2e8f0;overflow-wrap:anywhere}
+.chat-input-area{display:flex;gap:8px}
+.chat-input{min-width:0;flex:1;background:#0f172a;border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:11px;color:#fff}
+.send-btn{background:#2563eb;color:#fff;padding:11px 14px}
 .play-panel{text-align:center}
 .dice-wrapper{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin:22px 0}
 .dice{width:132px;height:132px;border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
@@ -92,21 +104,33 @@ button:disabled{opacity:.45;cursor:not-allowed}
 
   <section class="game-layout">
     <aside class="panel">
-      <div class="panel-title">役と配当</div>
-      <table class="rule-table">
-        <thead>
-          <tr><th>名称</th><th>出目</th><th>配当</th><th>備考</th></tr>
-        </thead>
-        <tbody>
-          <tr><td class="rule-name rule-red">ピンゾロ</td><td class="rule-dice">1・1・1</td><td>5倍もらう</td><td>即勝ち</td></tr>
-          <tr><td class="rule-name rule-orange">ゾロ目</td><td class="rule-dice">2・2・2<br>3・3・3<br>4・4・4<br>5・5・5<br>6・6・6</td><td>3倍もらう</td><td></td></tr>
-          <tr><td class="rule-name rule-yellow">シゴロ</td><td class="rule-dice">4・5・6</td><td>2倍もらう</td><td>即勝ち</td></tr>
-          <tr><td class="rule-name rule-green">通常の目</td><td class="rule-dice">1から6の目</td><td>出た分もらう</td><td></td></tr>
-          <tr><td class="rule-name rule-blue">役なし</td><td class="rule-dice">例: 1・3・5</td><td>出た分払う</td><td>即負け</td></tr>
-          <tr><td class="rule-name rule-purple">ヒフミ</td><td class="rule-dice">1・2・3</td><td>2倍払う</td><td>即負け</td></tr>
-        </tbody>
-      </table>
-      <div class="rule-note">役なしは最大3回まで振れます。親決めでも同じく、役なしなら2回まで振り直しできます。</div>
+      <div class="panel-tabs">
+        <button class="tab-btn active" data-tab="rulesTab">役と配当</button>
+        <button class="tab-btn" data-tab="chatTab">チャット</button>
+      </div>
+      <div id="rulesTab" class="tab-content active">
+        <table class="rule-table">
+          <thead>
+            <tr><th>名称</th><th>出目</th><th>配当</th><th>備考</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="rule-name rule-red">ピンゾロ</td><td class="rule-dice">1・1・1</td><td>5倍もらう</td><td>即勝ち</td></tr>
+            <tr><td class="rule-name rule-orange">ゾロ目</td><td class="rule-dice">2・2・2<br>3・3・3<br>4・4・4<br>5・5・5<br>6・6・6</td><td>3倍もらう</td><td></td></tr>
+            <tr><td class="rule-name rule-yellow">シゴロ</td><td class="rule-dice">4・5・6</td><td>2倍もらう</td><td>即勝ち</td></tr>
+            <tr><td class="rule-name rule-green">通常の目</td><td class="rule-dice">1から6の目</td><td>出た分もらう</td><td></td></tr>
+            <tr><td class="rule-name rule-blue">役なし</td><td class="rule-dice">例: 1・3・5</td><td>出た分払う</td><td>即負け</td></tr>
+            <tr><td class="rule-name rule-purple">ヒフミ</td><td class="rule-dice">1・2・3</td><td>2倍払う</td><td>即負け</td></tr>
+          </tbody>
+        </table>
+        <div class="rule-note">役なしは最大3回まで振れます。親決めでも同じく、役なしなら2回まで振り直しできます。</div>
+      </div>
+      <div id="chatTab" class="tab-content">
+        <div id="chatBox" class="chat-box"></div>
+        <div class="chat-input-area">
+          <input id="chatInput" class="chat-input" type="text" maxlength="200" placeholder="メッセージを入力">
+          <button id="sendBtn" class="send-btn">送信</button>
+        </div>
+      </div>
     </aside>
 
     <section class="panel play-panel">
@@ -157,10 +181,11 @@ const diceImages = [
 ];
 
 let myUserId = null;
+let myUserName = "";
 let roomInfo = null;
 let gameState = null;
 let visibleRollHistory = [];
-let historyDelayTimer = null;
+let rollRevealTimer = null;
 
 const diceEls = [
   document.getElementById("dice1"),
@@ -178,6 +203,9 @@ const historyList = document.getElementById("historyList");
 const readyBtn = document.getElementById("readyBtn");
 const startBtn = document.getElementById("startBtn");
 const rollBtn = document.getElementById("rollBtn");
+const chatBox = document.getElementById("chatBox");
+const chatInput = document.getElementById("chatInput");
+const sendBtn = document.getElementById("sendBtn");
 
 const phaseLabels = {
   waiting: "待機中",
@@ -201,13 +229,21 @@ function roleFor(userId){
   return gameState?.current_roles?.[userId] || null;
 }
 
-function scheduleHistoryRender(nextHistory){
+function revealNewRoll(nextHistory){
   const history = Array.isArray(nextHistory) ? nextHistory.slice() : [];
-  if(historyDelayTimer) clearTimeout(historyDelayTimer);
-  historyDelayTimer = setTimeout(() => {
+  if(history.length <= visibleRollHistory.length){
+    render();
+    return;
+  }
+
+  const lastRoll = history[history.length - 1];
+  if(rollRevealTimer) clearTimeout(rollRevealTimer);
+  animateDice();
+  rollRevealTimer = setTimeout(() => {
+    stopAnimation(lastRoll?.dice);
     visibleRollHistory = history;
     render();
-  }, 5000);
+  }, 900);
 }
 
 function deltaClass(value){
@@ -225,6 +261,7 @@ function setDice(values){
 
 function animateDice(){
   diceEls.forEach(dice => {
+    clearInterval(Number(dice.dataset.timer));
     dice.classList.add("rolling");
     const timer = setInterval(() => {
       dice.src = diceImages[Math.floor(Math.random() * 6)];
@@ -321,6 +358,7 @@ async function loadMe(){
   const data = await res.json();
   if(data.ok){
     myUserId = data.user_id;
+    myUserName = data.user_name;
     balanceText.textContent = `残高: ${formatRrc(data.balance)}`;
   }
 }
@@ -339,6 +377,9 @@ async function loadRoomInfo(){
     host_user_id: data.host_user_id,
     total_results: {}
   };
+  visibleRollHistory = Array.isArray(gameState.roll_history)
+    ? gameState.roll_history.slice()
+    : [];
   render();
 }
 
@@ -361,8 +402,7 @@ socket.on("casino:user_joined", loadRoomInfo);
 
 socket.on("chinchiro:update", data => {
   gameState = data;
-  scheduleHistoryRender(data.roll_history);
-  render();
+  revealNewRoll(data.roll_history);
 });
 
 socket.on("chinchiro:message", data => {
@@ -375,8 +415,7 @@ socket.on("chinchiro:error", data => {
 
 socket.on("chinchiro:finished", async data => {
   gameState = data;
-  scheduleHistoryRender(data.roll_history);
-  render();
+  revealNewRoll(data.roll_history);
   await loadMe();
 });
 
@@ -400,16 +439,72 @@ rollBtn.addEventListener("click", () => {
   socket.emit("chinchiro_roll", {
     room_id: roomId,
     user_id: myUserId
-  }, response => {
-    setTimeout(() => {
-      stopAnimation(response?.dice);
-      render();
-    }, 700);
   });
 });
 
-document.getElementById("backBtn").addEventListener("click", () => {
+document.querySelectorAll(".tab-btn").forEach(button => {
+  button.addEventListener("click", () => {
+    document.querySelectorAll(".tab-btn").forEach(item => item.classList.remove("active"));
+    document.querySelectorAll(".tab-content").forEach(item => item.classList.remove("active"));
+    button.classList.add("active");
+    document.getElementById(button.dataset.tab).classList.add("active");
+  });
+});
+
+function sendChat(){
+  const message = chatInput.value.trim();
+  if(!message || !myUserName) return;
+  socket.emit("chat_message", {
+    room_id: roomId,
+    user_name: myUserName,
+    message,
+    game: "chinchiro"
+  });
+  chatInput.value = "";
+}
+
+sendBtn.addEventListener("click", sendChat);
+chatInput.addEventListener("keydown", event => {
+  if(event.key === "Enter") sendChat();
+});
+
+socket.on("chat_message", data => {
+  const message = document.createElement("div");
+  message.className = "chat-message";
+  const user = document.createElement("div");
+  user.className = "chat-user";
+  user.textContent = data.user_name || "ゲスト";
+  const text = document.createElement("div");
+  text.className = "chat-text";
+  text.textContent = data.message || "";
+  message.append(user, text);
+  chatBox.appendChild(message);
+  chatBox.scrollTop = chatBox.scrollHeight;
+});
+
+function leaveRoom(){
+  if(!session || isWatch) return Promise.resolve();
+  return fetch(`${API_BASE}/api/casino/leave-room`, {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({room_id: roomId, session})
+  }).catch(console.error);
+}
+
+document.getElementById("backBtn").addEventListener("click", async () => {
+  await leaveRoom();
   location.href = `/lobby?game=chinchiro${session ? `&session=${session}` : ""}`;
+});
+
+window.addEventListener("beforeunload", () => {
+  if(!session || isWatch) return;
+  navigator.sendBeacon(
+    `${API_BASE}/api/casino/leave-room`,
+    new Blob(
+      [JSON.stringify({room_id: roomId, session})],
+      {type: "application/json"}
+    )
+  );
 });
 
 (async function init(){

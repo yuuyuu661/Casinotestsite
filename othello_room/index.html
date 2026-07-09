@@ -1665,13 +1665,13 @@ window.addEventListener(
 
       `${API_BASE}/api/casino/leave-room`,
 
-      JSON.stringify({
-
-        room_id: roomId,
-
-        session: session
-
-      })
+      new Blob(
+        [JSON.stringify({
+          room_id: roomId,
+          session: session
+        })],
+        {type:"application/json"}
+      )
 
     );
 

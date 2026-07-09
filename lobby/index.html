@@ -203,6 +203,16 @@ body{
     0 0 20px rgba(250,204,21,0.18);
 }
 
+.delete-btn{
+  margin-left:auto;
+  background:#7f1d1d;
+  color:#fecaca;
+}
+
+.delete-btn:hover{
+  background:#991b1b;
+}
+
 .room-top{
 
   display:flex;
@@ -980,6 +990,13 @@ function renderRooms(){
           観戦
         </button>
 
+        <button
+          class="delete-btn"
+          data-room="${room.room_id}"
+        >
+          削除
+        </button>
+
       </div>
 
     `;
@@ -1060,6 +1077,46 @@ function renderRooms(){
 
       location.href =
         `/${game}_room?room=${room.room_id}&watch=1&session=${session}`;
+
+    });
+
+    const deleteBtn = card.querySelector(".delete-btn");
+
+    deleteBtn.addEventListener("click", async () => {
+
+      const password = prompt("削除パスワードを入力してください");
+
+      if(password === null) return;
+
+      try{
+
+        const res = await fetch(
+          `${API_BASE}/api/casino/delete-room`,
+          {
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({
+              room_id:room.room_id,
+              password:password
+            })
+          }
+        );
+
+        const data = await res.json();
+
+        if(!res.ok || !data.ok){
+          alert(data.detail || data.error || "削除できませんでした");
+          return;
+        }
+
+        await safeLoadRooms();
+
+      }catch(err){
+
+        console.error(err);
+        alert("通信エラー");
+
+      }
 
     });
 
