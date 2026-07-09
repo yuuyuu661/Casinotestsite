@@ -631,6 +631,23 @@ body{
       </select>
     </div>
 
+    <div class="form-group" id="daifugoRulesGroup" style="display:none">
+      <label>カスタムルール</label>
+      <div id="daifugoRuleOptions" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:10px;border:1px solid #334155;border-radius:7px">
+        <label><input type="checkbox" data-rule="joker_two"> ジョーカー2枚</label>
+        <label><input type="checkbox" data-rule="revolution" checked> 革命</label>
+        <label><input type="checkbox" data-rule="stairs" checked> 階段</label>
+        <label><input type="checkbox" data-rule="eight_cut" checked> 8切り</label>
+        <label><input type="checkbox" data-rule="suit_lock" checked> しばり</label>
+        <label><input type="checkbox" data-rule="number_lock"> 数しば</label>
+        <label><input type="checkbox" data-rule="spade_three" checked> スペ3返し</label>
+        <label><input type="checkbox" data-rule="five_skip"> 5スキップ</label>
+        <label><input type="checkbox" data-rule="nine_reverse"> 9リバース</label>
+        <label><input type="checkbox" data-rule="jack_back" checked> Jバック</label>
+        <label><input type="checkbox" data-rule="foul_finish" checked> 反則上がり</label>
+      </div>
+    </div>
+
     <!-- ロビー名 -->
 
     <div class="form-group">
@@ -757,8 +774,13 @@ const game =
 const session =
   params.get("session");
 
-if(game === "poker"){
+if(game === "poker" || game === "daifugo"){
   document.getElementById("maxPlayersGroup").style.display = "block";
+}
+if(game === "daifugo"){
+  const select=document.getElementById("maxPlayersSelect");
+  select.innerHTML='<option value="3">3人</option><option value="4">4人</option><option value="5" selected>5人</option>';
+  document.getElementById("daifugoRulesGroup").style.display = "block";
 }
 
 /* =========================
@@ -886,7 +908,8 @@ async function loadRooms(){
         is_member: r.is_member,
         host_name: r.host_name,
         rate_name: r.rate_name,
-        rate_amount: r.rate_amount
+        rate_amount: r.rate_amount,
+        custom_rules: r.custom_rules || {}
       });
 
     });
@@ -973,6 +996,14 @@ function renderRooms(){
             room.rate_amount
           ).toLocaleString()} rrc)
         </div>
+
+        ${game === "daifugo" ? `<div style="grid-column:1/-1;color:#cbd5e1;font-size:.85rem">
+          ルール：${Object.entries(room.custom_rules).filter(([,enabled])=>enabled).map(([key])=>({
+            joker_two:"Joker2枚",revolution:"革命",stairs:"階段",eight_cut:"8切り",suit_lock:"しばり",
+            number_lock:"数しば",spade_three:"スペ3返し",five_skip:"5スキップ",
+            nine_reverse:"9リバース",jack_back:"Jバック",foul_finish:"反則上がり"
+          })[key]).filter(Boolean).join(" / ") || "基本ルールのみ"}
+        </div>` : ""}
 
       </div>
 
@@ -1307,6 +1338,10 @@ document
 
   const password =
     document.getElementById("roomPassword").value;
+  const rules = game === "daifugo"
+    ? Object.fromEntries([...document.querySelectorAll("#daifugoRuleOptions [data-rule]")]
+        .map(input => [input.dataset.rule, input.checked]))
+    : {};
 
   try{
 
@@ -1323,11 +1358,12 @@ document
           session,
           game,
           rate,
-          max_players: game === "poker"
+          max_players: game === "poker" || game === "daifugo"
             ? Number(document.getElementById("maxPlayersSelect").value)
             : 2,
           room_name,
-          password
+          password,
+          rules
         })
 
       }
