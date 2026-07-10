@@ -400,7 +400,8 @@ const socket = io(API_BASE, {
 socket.on("connect", () => {
   socket.emit("join_room", {
     room_id: roomId,
-    game: "chinchiro"
+    game: "chinchiro",
+    watch: isWatch
   });
 });
 

@@ -354,6 +354,7 @@ async function spin(){
   }catch(error){
     [...reelsEl.querySelectorAll(".reel-strip")].forEach(strip => strip.classList.remove("spinning"));
     [...reelsEl.querySelectorAll(".stop-btn")].forEach(button => button.disabled = true);
+    buildReels();
     resultEl.className = "result error";
     resultEl.textContent = error.message === "Insufficient balance" ? "残高が不足しています" : error.message;
     spinning = false;

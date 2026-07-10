@@ -194,6 +194,7 @@ function render(){
   const myPlayer=game.players.find(player=>String(player.user_id)===String(me.user_id));
   const current=game.players.find(player=>String(player.user_id)===String(game.current_turn_user_id));
   const toCall=Math.max(0,Number(game.current_bet)-(myPlayer?.street_bet||0));
+  const riverBettingLocked=game.phase==="river";
   document.getElementById("phaseText").textContent=phases[game.phase]||game.phase;
   document.getElementById("turnText").textContent=current?.user_name||"-";
   document.getElementById("currentBetText").textContent=formatRrc(game.current_bet);
@@ -213,8 +214,8 @@ function render(){
   document.getElementById("checkBtn").disabled=!isMyTurn||toCall>0;
   document.getElementById("callBtn").disabled=!isMyTurn||toCall===0;
   document.getElementById("callBtn").textContent=toCall?`コール ${formatRrc(toCall)}`:"コール";
-  document.getElementById("betBtn").style.display=game.current_bet===0?"inline-block":"none";
-  document.getElementById("raiseBtn").style.display=game.current_bet>0?"inline-block":"none";
+  document.getElementById("betBtn").style.display=!riverBettingLocked&&game.current_bet===0?"inline-block":"none";
+  document.getElementById("raiseBtn").style.display=!riverBettingLocked&&game.current_bet>0?"inline-block":"none";
   const amount=document.getElementById("amountInput");amount.min=game.minimum_raise;amount.step=game.minimum_raise;if(!amount.value)amount.value=game.minimum_raise;
 
   const showdownMap=new Map((game.showdown||[]).map(row=>[String(row.user_id),row]));

@@ -774,8 +774,12 @@ const game =
 const session =
   params.get("session");
 
-if(game === "poker" || game === "daifugo"){
+if(game === "poker" || game === "chinchiro" || game === "daifugo"){
   document.getElementById("maxPlayersGroup").style.display = "block";
+}
+if(game === "chinchiro"){
+  const select=document.getElementById("maxPlayersSelect");
+  select.innerHTML='<option value="2">2莠ｺ</option><option value="3">3莠ｺ</option><option value="4">4莠ｺ</option><option value="5">5莠ｺ</option><option value="6" selected>6莠ｺ</option>';
 }
 if(game === "daifugo"){
   const select=document.getElementById("maxPlayersSelect");
@@ -1358,7 +1362,7 @@ document
           session,
           game,
           rate,
-          max_players: game === "poker" || game === "daifugo"
+          max_players: game === "poker" || game === "chinchiro" || game === "daifugo"
             ? Number(document.getElementById("maxPlayersSelect").value)
             : 2,
           room_name,
