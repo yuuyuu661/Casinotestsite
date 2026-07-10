@@ -592,7 +592,9 @@ document.getElementById("othelloCard").addEventListener("click", () => goLobby("
 document.getElementById("dobutsuCard").addEventListener("click", () => goLobby("dobutsu"));
 document.getElementById("chinchiroCard").addEventListener("click", () => goLobby("chinchiro"));
 document.getElementById("daifugoCard").addEventListener("click", () => goLobby("daifugo"));
-document.getElementById("blackjackCard").addEventListener("click", () => goLobby("blackjack"));
+document.getElementById("blackjackCard").addEventListener("click", () => {
+  location.href = `/blackjack/${session ? `?session=${session}` : ""}`;
+});
 document.getElementById("slotCard").addEventListener("click", () => {
   location.href = `/slot/${session ? `?session=${session}` : ""}`;
 });
