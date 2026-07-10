@@ -234,6 +234,7 @@ function roleFor(userId){
 function revealNewRoll(nextHistory){
   const history = Array.isArray(nextHistory) ? nextHistory.slice() : [];
   if(history.length <= visibleRollHistory.length){
+    visibleRollHistory = history;
     render();
     return;
   }
@@ -303,8 +304,10 @@ function render(){
   }
 
   if(gameState?.phase === "waiting"){
-    resultText.textContent = "参加者を待っています";
-    subText.textContent = "全員が準備できたらホストが開始できます。";
+    resultText.textContent = gameState?.finished ? "シリーズ終了" : "参加者を待っています";
+    subText.textContent = gameState?.finished
+      ? "全員が準備完了すると、ホストが再戦を開始できます。"
+      : "全員が準備できたらホストが開始できます。";
   }else if(gameState?.phase === "dealer_select"){
     resultText.textContent = "親決め中";
     subText.textContent = turnPlayer ? `${turnPlayer.user_name} が振る番です。役なしは最大3回まで振れます。` : "";
@@ -347,7 +350,8 @@ function render(){
   const isHost = String(room.host_user_id) === String(myUserId);
   const myTurn = String(gameState?.current_turn_user_id) === String(myUserId);
   readyBtn.disabled = isWatch || !myUserId || gameState?.phase !== "waiting";
-  startBtn.disabled = isWatch || !isHost || gameState?.phase !== "waiting" || players.length < 2;
+  const allReady = players.length >= 2 && players.every(player => player.ready);
+  startBtn.disabled = isWatch || !isHost || gameState?.phase !== "waiting" || !allReady;
   rollBtn.disabled = isWatch || !myTurn || !["dealer_select","playing"].includes(gameState?.phase);
 }
 
