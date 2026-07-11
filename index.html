@@ -383,6 +383,12 @@ body{
             <div class="game-desc">手札をうまく出し切るカードゲーム。革命や階級の駆け引きが勝負を動かします。</div>
             <div class="tag-row"><span class="tag">カード</span><span class="tag">複数人</span></div>
           </div>
+
+          <div class="game-card" id="mahjongCard">
+            <div class="game-title">麻雀</div>
+            <div class="game-desc">3人麻雀・4人麻雀に対応したオンライン対戦。全員準備後にホストが対局を開始します。</div>
+            <div class="tag-row"><span class="tag">3～4人</span><span class="tag">東風・東南戦</span></div>
+          </div>
         </div>
       </div>
     </div>
@@ -592,6 +598,7 @@ document.getElementById("othelloCard").addEventListener("click", () => goLobby("
 document.getElementById("dobutsuCard").addEventListener("click", () => goLobby("dobutsu"));
 document.getElementById("chinchiroCard").addEventListener("click", () => goLobby("chinchiro"));
 document.getElementById("daifugoCard").addEventListener("click", () => goLobby("daifugo"));
+document.getElementById("mahjongCard").addEventListener("click", () => goLobby("mahjong"));
 document.getElementById("blackjackCard").addEventListener("click", () => {
   location.href = `/blackjack/${session ? `?session=${session}` : ""}`;
 });
