@@ -128,6 +128,30 @@ const payouts = {
 const labels = {seven:"SEVEN",gem:"GEM",bell:"BELL",grape:"GRAPE",lemon:"LEMON",slime:"SLIME"};
 const sounds = ["bgmNormal","bgmBonus","startSound","stopSound","win3Sound","win4Sound","win5Sound"]
   .map(id => document.getElementById(id));
+let audioContext = null;
+let masterGain = null;
+let selectedVolume = .35;
+function prepareAudio(){
+  if(!audioContext){
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if(AudioContextClass){
+      audioContext = new AudioContextClass();
+      masterGain = audioContext.createGain();
+      masterGain.gain.value = selectedVolume;
+      masterGain.connect(audioContext.destination);
+      sounds.forEach(sound => {
+        audioContext.createMediaElementSource(sound).connect(masterGain);
+        sound.volume = 1;
+      });
+    }
+  }
+  if(audioContext?.state === "suspended")audioContext.resume().catch(() => {});
+}
+function applyVolume(value){
+  selectedVolume = Math.max(0, Math.min(1, Number(value)));
+  if(masterGain)masterGain.gain.setValueAtTime(selectedVolume, audioContext.currentTime);
+  else sounds.forEach(sound => sound.volume = selectedVolume);
+}
 const reelsEl = document.getElementById("reels");
 const spinBtn = document.getElementById("spinBtn");
 const betSelect = document.getElementById("betSelect");
@@ -252,12 +276,14 @@ function stopReel(column){
 }
 
 function playSound(id){
+  prepareAudio();
   const audio = document.getElementById(id);
   audio.currentTime = 0;
   audio.play().catch(() => {});
 }
 
 function setBgm(bonus){
+  prepareAudio();
   const normal = document.getElementById("bgmNormal");
   const bonusBgm = document.getElementById("bgmBonus");
   const active = bonus ? bonusBgm : normal;
@@ -398,10 +424,12 @@ function renderPaytable(bonus){
   `).join("");
 }
 
-document.getElementById("volume").addEventListener("input", event => {
-  sounds.forEach(sound => sound.volume = Number(event.target.value) / 100);
-});
-sounds.forEach(sound => sound.volume = .35);
+const volumeControl = document.getElementById("volume");
+const updateVolume = event => applyVolume(Number(event.target.value) / 100);
+volumeControl.addEventListener("input", updateVolume);
+volumeControl.addEventListener("change", updateVolume);
+volumeControl.addEventListener("touchstart", prepareAudio, {passive:true});
+applyVolume(.35);
 spinBtn.addEventListener("click", spin);
 document.getElementById("backBtn").addEventListener("click", () => {
   location.href = `/${session ? `?session=${session}` : ""}`;

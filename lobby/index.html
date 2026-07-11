@@ -648,6 +648,28 @@ body{
       </div>
     </div>
 
+    <div class="form-group" id="mahjongRulesGroup" style="display:none">
+      <label>麻雀ルール</label>
+      <div style="display:grid;gap:10px;padding:12px;border:1px solid #334155;border-radius:10px">
+        <label>対局形式
+          <select id="mahjongRoundFormat"><option value="hanchan">東南戦</option><option value="tonpu">東風戦</option></select>
+        </label>
+        <div id="mahjongRuleOptions" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">
+          <label><input type="checkbox" data-rule="open_tanyao" checked> 喰いタン</label>
+          <label><input type="checkbox" data-rule="allow_atodzuke" checked> 後付け</label>
+          <label><input type="checkbox" data-rule="red_fives" checked> 赤ドラ</label>
+          <label><input type="checkbox" data-rule="double_ron" checked> ダブロン</label>
+          <label><input type="checkbox" data-rule="abortive_draws" checked> 途中流局</label>
+          <label><input type="checkbox" data-rule="bankruptcy_ends_game" checked> 飛び終了</label>
+          <label><input type="checkbox" data-rule="kazoe_yakuman" checked> 数え役満</label>
+          <label><input type="checkbox" data-rule="kiriage_mangan"> 切り上げ満貫</label>
+          <label><input type="checkbox" data-rule="nagashi_mangan" checked> 流し満貫</label>
+          <label><input type="checkbox" data-rule="sanma_nuki_dora" checked> 三麻・北抜き</label>
+          <label><input type="checkbox" data-rule="sanma_tsumo_loss" checked> 三麻・ツモ損</label>
+        </div>
+      </div>
+    </div>
+
     <!-- ロビー名 -->
 
     <div class="form-group">
@@ -774,7 +796,7 @@ const game =
 const session =
   params.get("session");
 
-if(game === "poker" || game === "chinchiro" || game === "daifugo"){
+if(game === "poker" || game === "chinchiro" || game === "daifugo" || game === "mahjong"){
   document.getElementById("maxPlayersGroup").style.display = "block";
 }
 if(game === "chinchiro"){
@@ -785,6 +807,11 @@ if(game === "daifugo"){
   const select=document.getElementById("maxPlayersSelect");
   select.innerHTML='<option value="3">3人</option><option value="4">4人</option><option value="5" selected>5人</option>';
   document.getElementById("daifugoRulesGroup").style.display = "block";
+}
+if(game === "mahjong"){
+  const select=document.getElementById("maxPlayersSelect");
+  select.innerHTML='<option value="3">3人（三麻）</option><option value="4" selected>4人（四麻）</option>';
+  document.getElementById("mahjongRulesGroup").style.display = "block";
 }
 
 /* =========================
@@ -866,6 +893,7 @@ const gameNames = {
   poker   : "🃏 ポーカー ロビー",
   daifugo : "👑 大富豪 ロビー",
   chinchiro : "🎲 チンチロ ロビー"
+  ,mahjong : "🀄 麻雀 ロビー"
 
 };
 
@@ -1345,7 +1373,13 @@ document
   const rules = game === "daifugo"
     ? Object.fromEntries([...document.querySelectorAll("#daifugoRuleOptions [data-rule]")]
         .map(input => [input.dataset.rule, input.checked]))
-    : {};
+    : game === "mahjong"
+      ? {
+          round_format: document.getElementById("mahjongRoundFormat").value,
+          ...Object.fromEntries([...document.querySelectorAll("#mahjongRuleOptions [data-rule]")]
+            .map(input => [input.dataset.rule, input.checked]))
+        }
+      : {};
 
   try{
 
@@ -1362,7 +1396,7 @@ document
           session,
           game,
           rate,
-          max_players: game === "poker" || game === "chinchiro" || game === "daifugo"
+          max_players: game === "poker" || game === "chinchiro" || game === "daifugo" || game === "mahjong"
             ? Number(document.getElementById("maxPlayersSelect").value)
             : 2,
           room_name,
