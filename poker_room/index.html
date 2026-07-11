@@ -92,7 +92,6 @@ button,input{font:inherit}button{border:0;border-radius:8px;padding:11px 15px;fo
         <input id="amountInput" class="amount" type="number" min="1" step="1">
         <button id="betBtn" class="bet">ベット</button>
         <button id="raiseBtn" class="raise">レイズ</button>
-        <button id="allInBtn" class="raise">オールイン</button>
       </div>
       <div id="message" class="message"></div>
     </section>
@@ -128,7 +127,7 @@ const suitNames = {s:"spades",h:"hearts",d:"diamonds",c:"clubs"};
 const errorMessages = {
   not_your_turn:"あなたの番ではありません",cannot_check:"コールかフォールドを選んでください",
   nothing_to_call:"現在コールするベットはありません",invalid_bet:"ベット額を確認してください",
-  invalid_raise:"レイズ額を確認してください（上限は部屋レートの2倍です）",call_limit_exceeded:"コール上限（部屋レートの2倍）を超えています。オールインかフォールドを選んでください",insufficient_balance:"残高が不足しています"
+  invalid_raise:"レイズ額を確認してください（上限は部屋レートの2倍です）",call_limit_exceeded:"コール上限（部屋レートの2倍）を超えています。フォールドを選んでください",insufficient_balance:"残高が不足しています"
 };
 
 function formatRrc(value){return `${Number(value||0).toLocaleString()} rrc`}
@@ -211,7 +210,7 @@ function render(){
   const isMyTurn=String(game.current_turn_user_id)===String(me.user_id);
   document.getElementById("readyBtn").disabled=!waiting||myPlayer?.ready;
   document.getElementById("startBtn").disabled=!waiting||!isHost||game.players.length<2||!game.players.every(player=>player.ready);
-  ["foldBtn","checkBtn","callBtn","betBtn","raiseBtn","allInBtn","amountInput"].forEach(id=>document.getElementById(id).disabled=!isMyTurn||myPlayer?.folded||myPlayer?.all_in);
+  ["foldBtn","checkBtn","callBtn","betBtn","raiseBtn","amountInput"].forEach(id=>document.getElementById(id).disabled=!isMyTurn||myPlayer?.folded);
   document.getElementById("checkBtn").disabled=!isMyTurn||toCall>0;
   document.getElementById("callBtn").disabled=!isMyTurn||toCall===0;
   document.getElementById("callBtn").textContent=toCall?`コール ${formatRrc(toCall)}`:"コール";
@@ -250,7 +249,6 @@ document.getElementById("checkBtn").addEventListener("click",()=>emit("poker_act
 document.getElementById("callBtn").addEventListener("click",()=>emit("poker_action",{action:"call"}));
 document.getElementById("betBtn").addEventListener("click",()=>emit("poker_action",{action:"bet",amount:Number(document.getElementById("amountInput").value)}));
 document.getElementById("raiseBtn").addEventListener("click",()=>emit("poker_action",{action:"raise",amount:Number(document.getElementById("amountInput").value)}));
-document.getElementById("allInBtn").addEventListener("click",()=>emit("poker_action",{action:"all_in"}));
 
 document.querySelectorAll(".tab").forEach(button=>button.addEventListener("click",()=>{document.querySelectorAll(".tab,.tab-content").forEach(item=>item.classList.remove("active"));button.classList.add("active");document.getElementById(button.dataset.tab).classList.add("active")}));
 function sendChat(){const input=document.getElementById("chatInput");const message=input.value.trim();if(!message||!me)return;socket.emit("chat_message",{room_id:roomId,user_name:me.user_name,message,game:"poker"});input.value=""}
