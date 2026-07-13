@@ -796,6 +796,9 @@ const game =
 const session =
   params.get("session");
 
+const practiceRateGames =
+  new Set(["chinchiro", "dobutsu", "othello"]);
+
 if(game === "poker" || game === "chinchiro" || game === "daifugo" || game === "mahjong"){
   document.getElementById("maxPlayersGroup").style.display = "block";
 }
@@ -812,6 +815,13 @@ if(game === "mahjong"){
   const select=document.getElementById("maxPlayersSelect");
   select.innerHTML='<option value="3">3人（三麻）</option><option value="4" selected>4人（四麻）</option>';
   document.getElementById("mahjongRulesGroup").style.display = "block";
+}
+if(practiceRateGames.has(game)){
+  const rateSelect = document.getElementById("rateSelect");
+  rateSelect.insertAdjacentHTML(
+    "afterbegin",
+    '<option value="0">練習用 - 0rrc</option>'
+  );
 }
 
 /* =========================
@@ -907,6 +917,16 @@ gameTitle.innerText =
 ========================= */
 
 const rooms = [];
+const rateLabels = {
+  practice: "練習用",
+  low_1: "超低レート",
+  low_2: "低レート",
+  middle: "中レート",
+  high: "高レート",
+  very_high: "超高レート",
+  premium: "絶頂レート",
+  ultimate: "超絶頂レート"
+};
 
 /* =========================
    ロビー取得
@@ -1023,7 +1043,7 @@ function renderRooms(){
         </div>
 
         <div class="room-rate">
-          💰 ${room.rate_name}
+          💰 ${rateLabels[room.rate_name] || room.rate_name}
           (${Number(
             room.rate_amount
           ).toLocaleString()} rrc)
