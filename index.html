@@ -389,6 +389,12 @@ body{
             <div class="game-desc">3人麻雀・4人麻雀に対応したオンライン対戦。全員準備後にホストが対局を開始します。</div>
             <div class="tag-row"><span class="tag">3～4人</span><span class="tag">東風・東南戦</span></div>
           </div>
+
+          <div class="game-card" id="rouletteCard">
+            <div class="game-title">ルーレット</div>
+            <div class="game-desc">全員が同じテーブルで遊ぶ常時稼働のアメリカンルーレットです。ベット状況を共有しながら進行します。</div>
+            <div class="tag-row"><span class="tag">リアルタイム</span><span class="tag">複数人</span></div>
+          </div>
         </div>
       </div>
     </div>
@@ -602,6 +608,16 @@ document.getElementById("mahjongCard").addEventListener("click", () => {
   const password = prompt("運営パスワードを入力してください");
   if(password === "yamadayamada"){
     goLobby("mahjong");
+    return;
+  }
+  if(password !== null){
+    alert("パスワードが違います");
+  }
+});
+document.getElementById("rouletteCard").addEventListener("click", () => {
+  const password = prompt("運営パスワードを入力してください");
+  if(password === "yamadayamada"){
+    location.href = `/roulette/${session ? `?session=${session}` : ""}`;
     return;
   }
   if(password !== null){
