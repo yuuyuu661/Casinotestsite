@@ -598,7 +598,16 @@ document.getElementById("othelloCard").addEventListener("click", () => goLobby("
 document.getElementById("dobutsuCard").addEventListener("click", () => goLobby("dobutsu"));
 document.getElementById("chinchiroCard").addEventListener("click", () => goLobby("chinchiro"));
 document.getElementById("daifugoCard").addEventListener("click", () => goLobby("daifugo"));
-document.getElementById("mahjongCard").addEventListener("click", () => goLobby("mahjong"));
+document.getElementById("mahjongCard").addEventListener("click", () => {
+  const password = prompt("運営パスワードを入力してください");
+  if(password === "yamadayamada"){
+    goLobby("mahjong");
+    return;
+  }
+  if(password !== null){
+    alert("パスワードが違います");
+  }
+});
 document.getElementById("blackjackCard").addEventListener("click", () => {
   location.href = `/blackjack/${session ? `?session=${session}` : ""}`;
 });
