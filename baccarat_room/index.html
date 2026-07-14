@@ -234,7 +234,7 @@ function render(){
   renderCards("bankerCards",game.banker_cards||[],"banker");
   document.getElementById("waitingActions").style.display=game.phase==="waiting"?"flex":"none";
   document.getElementById("readyBtn").disabled=game.phase!=="waiting"||my?.ready;
-  document.getElementById("startBtn").disabled=game.phase!=="waiting"||!isHost||game.players.length<2||!game.players.every(player=>player.ready);
+  document.getElementById("startBtn").disabled=game.phase!=="waiting"||!isHost||game.players.length<1||!game.players.every(player=>player.ready);
   document.getElementById("betPanel").style.display=game.phase==="betting"&&!my?.bet?"grid":"none";
   document.getElementById("confirmBtn").style.display=game.phase==="squeeze"&&game.is_squeezer?"inline-block":"none";
   const players=document.getElementById("players");players.innerHTML="";
