@@ -147,9 +147,10 @@ function makeScratch(card,side,index,interactive){
   const wrap=document.createElement("div");wrap.className="card-wrap";
   const img=document.createElement("img");img.className="card";img.src=cardPath(card);img.alt=card;wrap.appendChild(img);
   const canvas=document.createElement("canvas");canvas.className="scratch";canvas.width=164;canvas.height=240;wrap.appendChild(canvas);
-  canvas.dataset.side=side;canvas.dataset.index=String(index);
+  const squeezeId=String(game?.squeeze?.id||"");
+  canvas.dataset.squeezeId=squeezeId;canvas.dataset.side=side;canvas.dataset.index=String(index);
   const ctx=canvas.getContext("2d");ctx.fillStyle="#111827";ctx.fillRect(0,0,canvas.width,canvas.height);ctx.fillStyle="#facc15";ctx.font="bold 22px sans-serif";ctx.textAlign="center";ctx.fillText("SCRATCH",82,125);
-  (game.squeeze_progress||[]).filter(point=>point.side===side&&Number(point.index)===index).forEach(point=>drawScratchHole(canvas,point.x,point.y,point.r));
+  (game.squeeze_progress||[]).filter(point=>String(point.squeeze_id||"")===squeezeId&&point.side===side&&Number(point.index)===index).forEach(point=>drawScratchHole(canvas,point.x,point.y,point.r));
   if(!interactive)return wrap;
   let lastEmit=0;
   function draw(event){
@@ -162,7 +163,7 @@ function makeScratch(card,side,index,interactive){
     const now=Date.now();
     if(now-lastEmit>35){
       lastEmit=now;
-      socket.emit("baccarat_squeeze_draw",{room_id:roomId,session,side,index,x,y,r:.12});
+      socket.emit("baccarat_squeeze_draw",{room_id:roomId,session,squeeze_id:squeezeId,side,index,x,y,r:.12});
     }
   }
   canvas.addEventListener("pointermove",draw);
@@ -249,7 +250,7 @@ const socket=io(API_BASE,{auth:{room_id:roomId,session,game:"baccarat"}});
 socket.on("connect",()=>socket.emit("join_room",{room_id:roomId,game:"baccarat"}));
 socket.on("baccarat:update",loadState);
 socket.on("baccarat:squeeze_draw",point=>{
-  const canvas=document.querySelector(`.scratch[data-side="${point.side}"][data-index="${point.index}"]`);
+  const canvas=document.querySelector(`.scratch[data-squeeze-id="${point.squeeze_id}"][data-side="${point.side}"][data-index="${point.index}"]`);
   if(canvas)drawScratchHole(canvas,Number(point.x),Number(point.y),Number(point.r||.12));
 });
 socket.on("casino:user_joined",async()=>{await loadRoom();await loadState()});
