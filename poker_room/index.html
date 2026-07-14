@@ -162,8 +162,13 @@ async function loadState(){
   const response=await fetch(`${API_BASE}/api/casino/poker/state?room_id=${roomId}&session=${session}`);
   if(!response.ok)return;
   const data=await response.json();
-  const justFinished=data.game?.finished&&!game?.finished;
+  const wasFinished=Boolean(game?.finished);
+  const justFinished=Boolean(data.game?.finished)&&!wasFinished;
   game=data.game;
+  if(wasFinished&&!game?.finished){
+    resultShown=false;
+    document.getElementById("resultOverlay").classList.remove("show");
+  }
   if(justFinished)await loadMe();
   render();
 }
