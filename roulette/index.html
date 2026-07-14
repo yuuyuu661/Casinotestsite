@@ -33,9 +33,10 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .wheel-center{position:relative;z-index:2;width:45%;aspect-ratio:1;border-radius:50%;background:#f8fafc;color:#111827;display:grid;place-items:center;border:10px solid #b45309;box-shadow:0 0 0 8px rgba(0,0,0,.24),inset 0 0 24px rgba(0,0,0,.25);text-align:center}
 .result-number{font-size:clamp(2.5rem,8vw,4.8rem);font-weight:1000;line-height:.95}.result-color{font-size:.9rem;font-weight:900;color:#64748b}
 .ball{position:absolute;top:8%;left:50%;z-index:3;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 4px 10px rgba(0,0,0,.5);transform:translateX(-50%)}
-.table{display:grid;grid-template-columns:repeat(14,1fr);gap:5px;background:#052e16;border-radius:8px;padding:10px;border:1px solid rgba(255,255,255,.18)}
+.table{display:grid;grid-template-columns:repeat(14,minmax(48px,1fr));grid-auto-rows:minmax(44px,auto);gap:5px;background:#052e16;border-radius:8px;padding:10px;border:1px solid rgba(255,255,255,.18);overflow-x:auto}
 .bet-cell{min-height:44px;padding:6px 2px;background:#14532d;color:#fff;border:1px solid rgba(255,255,255,.28);font-weight:900}
-.num.red{background:#991b1b}.num.black{background:#020617}.num.green{background:#047857}.zero{grid-row:span 2}.wide{grid-column:span 4}.outside{grid-column:span 2;background:#166534}
+.bet-cell small{display:block;margin-top:3px;color:#d1fae5;font-size:.68rem;line-height:1.2;font-weight:800}
+.num.red{background:#991b1b}.num.black{background:#020617}.num.green{background:#047857}.zero{grid-column:1;grid-row:1 / span 2}.double-zero{grid-column:1;grid-row:3 / span 2}.wide{grid-column:span 4}.outside{grid-column:span 2;background:#166534}.column-bet{background:#0f766e}.column-target{outline:3px solid #facc15;box-shadow:0 0 14px rgba(250,204,21,.75);transform:translateY(-1px)}
 .bet-panel{display:flex;gap:10px;justify-content:center;align-items:end;flex-wrap:wrap;margin-top:14px}
 .control{display:grid;gap:5px;color:#cbd5e1;font-weight:800}select{min-width:150px;padding:11px;background:#020617;color:#fff;border:1px solid var(--line);border-radius:8px;font-weight:900}
 .volume{width:100%}
@@ -44,7 +45,7 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .history{display:flex;gap:7px;flex-wrap:wrap}.chip{min-width:38px;text-align:center;padding:7px 8px;border-radius:999px;font-weight:1000}.chip.red{background:#991b1b}.chip.black{background:#020617;border:1px solid #475569}.chip.green{background:#047857}
 .rules{color:#cbd5e1;line-height:1.7;font-size:.92rem}.rules ul{padding-left:18px}.rules li{margin:7px 0}.empty{color:#94a3b8;padding:12px;background:#111827;border-radius:7px;text-align:center}
 .result-modal{position:fixed;inset:0;z-index:30;display:none;place-items:center;background:rgba(2,6,23,.72);padding:18px}.result-modal.show{display:grid}.result-card{width:min(420px,100%);background:#0f172a;border:2px solid var(--gold);border-radius:10px;padding:22px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.45)}.result-card.win{border-color:#22c55e}.result-card.lose{border-color:#ef4444}.result-title{font-size:2rem;font-weight:1000;color:var(--gold);margin-bottom:10px}.result-net{font-size:2.4rem;font-weight:1000;margin:12px 0}.result-net.win{color:#4ade80}.result-net.lose{color:#f87171}.result-detail{color:#cbd5e1;line-height:1.7}.result-close{margin-top:16px;padding:11px 20px;background:var(--gold);color:#111827}
-@media(max-width:1120px){.layout{grid-template-columns:1fr}.stage{order:-1}.table{grid-template-columns:repeat(7,1fr)}.zero,.wide,.outside{grid-column:span 1;grid-row:auto}}
+@media(max-width:1120px){.layout{grid-template-columns:1fr}.stage{order:-1}.table{grid-template-columns:repeat(14,minmax(48px,1fr))}.wide{grid-column:span 4}.outside{grid-column:span 2}}
 @media(max-width:640px){.page{padding:10px}.stage{padding:10px;border-width:3px}.table{gap:3px;padding:6px}.bet-cell{min-height:38px;font-size:.82rem}.status{grid-template-columns:1fr}.wallet{width:100%;justify-content:space-between}.wheel-label{transform:rotate(var(--angle)) translateY(-42vw) rotate(calc(-1 * var(--angle)));font-size:.62rem}}
 </style>
 </head>
@@ -70,13 +71,15 @@ button:disabled{opacity:.45;cursor:not-allowed}
       </ul>
       <div class="panel-title">ベット種類</div>
       <ul>
-        <li>1st 12: 1～12 のどれかが出れば当たり</li>
-        <li>2nd 12: 13～24 のどれかが出れば当たり</li>
-        <li>3rd 12: 25～36 のどれかが出れば当たり</li>
-        <li>1-18 / 19-36: 数字の範囲に賭けます</li>
-        <li>EVEN / ODD: 偶数・奇数に賭けます</li>
-        <li>RED / BLACK: 赤・黒に賭けます</li>
-        <li>COLUMN 1～3: 縦列のどれかに賭けます</li>
+        <li>1st 12: 1～12 のどれかが出れば当たり / 2倍配当</li>
+        <li>2nd 12: 13～24 のどれかが出れば当たり / 2倍配当</li>
+        <li>3rd 12: 25～36 のどれかが出れば当たり / 2倍配当</li>
+        <li>1-18 / 19-36: 数字の範囲に賭けます / 等倍配当</li>
+        <li>EVEN / ODD: 偶数・奇数に賭けます / 等倍配当</li>
+        <li>RED / BLACK: 赤・黒に賭けます / 等倍配当</li>
+        <li>COLUMN 1: 1,4,7,10,13,16,19,22,25,28,31,34 / 2倍配当</li>
+        <li>COLUMN 2: 2,5,8,11,14,17,20,23,26,29,32,35 / 2倍配当</li>
+        <li>COLUMN 3: 3,6,9,12,15,18,21,24,27,30,33,36 / 2倍配当</li>
       </ul>
       <div class="panel-title">進行</div>
       <p>5分間ベットを受け付け、その後5分間スピンフェーズに入ります。結果表示から10秒後に残高へ反映します。</p>
@@ -174,7 +177,11 @@ function betLabel(type,value){
     parity:String(value).toUpperCase(),
     range:value==="low"?"1-18":"19-36",
     dozen:{first:"1st 12",second:"2nd 12",third:"3rd 12"}[value]||value,
-    column:`COLUMN ${value}`
+    column:{
+      "1":"COLUMN 1 (1,4,7...34)",
+      "2":"COLUMN 2 (2,5,8...35)",
+      "3":"COLUMN 3 (3,6,9...36)"
+    }[value]||`COLUMN ${value}`
   };
   return labels[type]||String(value);
 }
@@ -187,30 +194,56 @@ function mmss(sec){
 function makeButton(text,type,value,extra=""){
   const btn=document.createElement("button");
   btn.className=`bet-cell ${extra}`;
-  btn.textContent=text;
+  btn.innerHTML=text;
   btn.dataset.type=type;
   btn.dataset.value=value;
   btn.addEventListener("click",()=>placeBet(type,value));
   table.appendChild(btn);
+  return btn;
 }
 function buildTable(){
   makeButton("0","straight","0","num green zero");
-  makeButton("00","straight","00","num green zero");
-  for(let i=1;i<=36;i++){
-    makeButton(String(i),"straight",String(i),`num ${colorOf(i)}`);
-  }
-  makeButton("1st 12","dozen","first","outside wide");
-  makeButton("2nd 12","dozen","second","outside wide");
-  makeButton("3rd 12","dozen","third","outside wide");
-  makeButton("1-18","range","low","outside");
-  makeButton("EVEN","parity","even","outside");
-  makeButton("RED","color","red","outside num red");
-  makeButton("BLACK","color","black","outside num black");
-  makeButton("ODD","parity","odd","outside");
-  makeButton("19-36","range","high","outside");
-  makeButton("COLUMN 1","column","1","outside wide");
-  makeButton("COLUMN 2","column","2","outside wide");
-  makeButton("COLUMN 3","column","3","outside wide");
+  makeButton("00","straight","00","num green double-zero");
+  const rows = [
+    [3,6,9,12,15,18,21,24,27,30,33,36],
+    [2,5,8,11,14,17,20,23,26,29,32,35],
+    [1,4,7,10,13,16,19,22,25,28,31,34],
+  ];
+  rows.forEach((row,rowIndex)=>{
+    row.forEach((number,columnIndex)=>{
+      const btn=makeButton(String(number),"straight",String(number),`num ${colorOf(number)} column-${((number-1)%3)+1}`);
+      btn.style.gridColumn=String(columnIndex + 2);
+      btn.style.gridRow=String(rowIndex + 1);
+    });
+  });
+  [["1st 12","first",2],["2nd 12","second",6],["3rd 12","third",10]].forEach(([label,value,column])=>{
+    const btn=makeButton(label,"dozen",value,"outside wide");
+    btn.style.gridColumn=`${column} / span 4`;
+    btn.style.gridRow="4";
+  });
+  [["1-18","range","low",2],["EVEN","parity","even",4],["RED","color","red",6],["BLACK","color","black",8],["ODD","parity","odd",10],["19-36","range","high",12]].forEach(([label,type,value,column])=>{
+    const btn=makeButton(label,type,value,`outside ${value}`);
+    btn.style.gridColumn=`${column} / span 2`;
+    btn.style.gridRow="5";
+  });
+  [
+    ["COLUMN 1<br><small>1,4,7...34</small>","1",2],
+    ["COLUMN 2<br><small>2,5,8...35</small>","2",6],
+    ["COLUMN 3<br><small>3,6,9...36</small>","3",10],
+  ].forEach(([label,value,column])=>{
+    const btn=makeButton(label,"column",value,"outside wide column-bet");
+    btn.style.gridColumn=`${column} / span 4`;
+    btn.style.gridRow="6";
+    btn.addEventListener("mouseenter",()=>setColumnPreview(value,true));
+    btn.addEventListener("mouseleave",()=>setColumnPreview(value,false));
+    btn.addEventListener("focus",()=>setColumnPreview(value,true));
+    btn.addEventListener("blur",()=>setColumnPreview(value,false));
+  });
+}
+function setColumnPreview(column,active){
+  document.querySelectorAll(`.column-${column}`).forEach(cell=>{
+    cell.classList.toggle("column-target",active);
+  });
 }
 function buildWheelNumbers(){
   const wheel=document.getElementById("wheel");
