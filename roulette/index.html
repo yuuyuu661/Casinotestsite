@@ -67,6 +67,16 @@ button:disabled{opacity:.45;cursor:not-allowed}
         <li>ダース、カラム: 2倍配当</li>
         <li>0 と 00 は緑です。外側ベットは外れになります。</li>
       </ul>
+      <div class="panel-title">ベット種類</div>
+      <ul>
+        <li>1st 12: 1～12 のどれかが出れば当たり</li>
+        <li>2nd 12: 13～24 のどれかが出れば当たり</li>
+        <li>3rd 12: 25～36 のどれかが出れば当たり</li>
+        <li>1-18 / 19-36: 数字の範囲に賭けます</li>
+        <li>EVEN / ODD: 偶数・奇数に賭けます</li>
+        <li>RED / BLACK: 赤・黒に賭けます</li>
+        <li>COLUMN 1～3: 縦列のどれかに賭けます</li>
+      </ul>
       <div class="panel-title">進行</div>
       <p>5分間ベットを受け付け、その後5分間スピンフェーズに入ります。結果表示から10秒後に残高へ反映します。</p>
       <div class="panel-title">直近結果</div>
@@ -79,8 +89,9 @@ button:disabled{opacity:.45;cursor:not-allowed}
         <div id="countdown" class="countdown">--:--</div>
       </div>
       <div class="wheel-wrap">
-        <div class="wheel" id="wheel"></div>
-        <div class="wheel-numbers" id="wheelNumbers"></div>
+        <div class="wheel" id="wheel">
+          <div class="wheel-numbers" id="wheelNumbers"></div>
+        </div>
         <div class="ball"></div>
         <div class="wheel-center">
           <div>
@@ -135,12 +146,25 @@ const table=document.getElementById("rouletteTable");
 let latestPhase="";
 let lastResult="";
 let shownResultRound=null;
+let currentMyTotal=0;
+let roundBetLimit=100000;
 
 function colorOf(value){
   if(value==="0"||value==="00") return "green";
   return redNumbers.has(String(value)) ? "red" : "black";
 }
 function format(n){return `${Number(n||0).toLocaleString()} rrc`}
+function betLabel(type,value){
+  const labels={
+    straight:`Number ${value}`,
+    color:String(value).toUpperCase(),
+    parity:String(value).toUpperCase(),
+    range:value==="low"?"1-18":"19-36",
+    dozen:{first:"1st 12",second:"2nd 12",third:"3rd 12"}[value]||value,
+    column:`COLUMN ${value}`
+  };
+  return labels[type]||String(value);
+}
 function mmss(sec){
   const safe=Math.max(0,Number(sec||0));
   const m=String(Math.floor(safe/60)).padStart(2,"0");
@@ -211,6 +235,8 @@ async function loadState(){
 function render(data){
   document.getElementById("balanceText").textContent=format(data.balance);
   const myTotal=data.bets.filter(b=>String(b.user_id)===String(data.user_id)).reduce((sum,b)=>sum+Number(b.amount),0);
+  currentMyTotal=myTotal;
+  roundBetLimit=Number(data.round_bet_limit||roundBetLimit);
   document.getElementById("myBetText").textContent=format(myTotal);
   const phaseText=document.getElementById("phaseText");
   phaseText.textContent=data.phase==="betting" ? "BETTING / ベット受付中" : "SPIN / ベット締切";
@@ -285,6 +311,14 @@ function maybeShowResult(data){
 async function placeBet(type,value){
   try{
     const amount=Number(document.getElementById("amountSelect").value);
+    const label=betLabel(type,value);
+    if(currentMyTotal + amount > roundBetLimit){
+      document.getElementById("message").textContent=`1ベットフェーズの合計上限は ${format(roundBetLimit)} です`;
+      return;
+    }
+    if(!confirm(`${label} に ${format(amount)} ベットしますか？\nこのフェーズの合計: ${format(currentMyTotal + amount)} / ${format(roundBetLimit)}`)){
+      return;
+    }
     const data=await api("/api/casino/roulette/bet",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
