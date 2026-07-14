@@ -288,12 +288,34 @@ rouletteBgm.preload="auto";
 rouletteBgm.loop=true;
 let soundUnlocked=false;
 let selectedVolume=.35;
+let audioContext=null;
+let masterGain=null;
+function prepareAudio(){
+  if(!audioContext){
+    const AudioContextClass=window.AudioContext||window.webkitAudioContext;
+    if(AudioContextClass){
+      audioContext=new AudioContextClass();
+      masterGain=audioContext.createGain();
+      masterGain.gain.value=selectedVolume;
+      masterGain.connect(audioContext.destination);
+      audioContext.createMediaElementSource(rouletteSound).connect(masterGain);
+      audioContext.createMediaElementSource(rouletteBgm).connect(masterGain);
+      rouletteSound.volume=1;
+      rouletteBgm.volume=.55;
+    }
+  }
+  if(audioContext?.state==="suspended")audioContext.resume().catch(()=>{});
+}
 function applyVolume(value){
   selectedVolume=Math.max(0,Math.min(1,Number(value)));
-  rouletteSound.volume=selectedVolume;
-  rouletteBgm.volume=selectedVolume*.55;
+  if(masterGain)masterGain.gain.setValueAtTime(selectedVolume,audioContext.currentTime);
+  else{
+    rouletteSound.volume=selectedVolume;
+    rouletteBgm.volume=selectedVolume*.55;
+  }
 }
 function unlockRouletteSound(){
+  prepareAudio();
   if(soundUnlocked){
     return;
   }
@@ -301,6 +323,7 @@ function unlockRouletteSound(){
   rouletteBgm.play().catch(()=>{});
 }
 function playRouletteSound(){
+  prepareAudio();
   rouletteSound.pause();
   rouletteSound.currentTime=0;
   rouletteSound.play().catch(()=>{});
