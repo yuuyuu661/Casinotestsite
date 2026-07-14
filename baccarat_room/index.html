@@ -18,7 +18,7 @@ button,input,select{font:inherit}button{border:0;border-radius:8px;padding:11px 
 .tabs{display:flex;gap:8px;margin-bottom:12px}.tab{flex:1;background:#1e293b;color:#cbd5e1}.tab.active{background:var(--gold);color:#111827}.tab-content{display:none}.tab-content.active{display:block}
 .rule-list{display:grid;gap:8px;color:#e5e7eb}.rule{padding:10px;background:#0f172a;border-radius:7px}.rule strong{color:#fde047}.chat-box{height:430px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin-bottom:10px}.chat-message{padding:9px;background:#0f172a;border-radius:6px}.chat-user{color:var(--gold);font-weight:900}.chat-input-row{display:flex;gap:7px}.chat-input{min-width:0;flex:1;padding:10px;background:#020617;color:#fff;border:1px solid var(--line);border-radius:6px}.send{background:#2563eb;color:#fff}
 .table{background:#064e3b;border:5px solid #854d0e;border-radius:24px;padding:18px;text-align:center;min-height:620px;box-shadow:inset 0 0 45px rgba(0,0,0,.45)}
-.phase{font-weight:1000;color:#fde047;margin-bottom:14px}.hands{display:grid;grid-template-columns:1fr 1fr;gap:14px}.hand{background:rgba(2,6,23,.45);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:12px}.hand-title{font-size:1.25rem;font-weight:1000;margin-bottom:10px}.hand-title.player{color:#93c5fd}.hand-title.banker{color:#fca5a5}.cards{display:flex;justify-content:center;gap:10px;min-height:130px;align-items:center}.card-wrap{position:relative;width:82px;height:120px}.card{width:82px;height:120px;object-fit:contain;border-radius:6px;filter:drop-shadow(0 5px 5px rgba(0,0,0,.35))}.card-back{width:82px;height:120px;border:4px solid #fff;border-radius:6px;background:repeating-linear-gradient(45deg,#7f1d1d 0 8px,#111827 8px 16px);box-shadow:0 5px 8px rgba(0,0,0,.35)}.scratch{position:absolute;inset:0;width:100%;height:100%;border-radius:6px;touch-action:none}
+.phase{font-weight:1000;color:#fde047;margin-bottom:14px}.hands{display:grid;grid-template-columns:1fr 1fr;gap:14px}.hand{background:rgba(2,6,23,.45);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:12px}.hand-title{font-size:1.25rem;font-weight:1000;margin-bottom:10px}.hand-title.player{color:#93c5fd}.hand-title.banker{color:#fca5a5}.cards{display:flex;justify-content:center;gap:10px;min-height:130px;align-items:center}.hand-total{margin-top:10px;color:#fde047;font-size:1.15rem;font-weight:1000;min-height:28px}.card-wrap{position:relative;width:82px;height:120px}.card{width:82px;height:120px;object-fit:contain;border-radius:6px;filter:drop-shadow(0 5px 5px rgba(0,0,0,.35))}.card-back{width:82px;height:120px;border:4px solid #fff;border-radius:6px;background:repeating-linear-gradient(45deg,#7f1d1d 0 8px,#111827 8px 16px);box-shadow:0 5px 8px rgba(0,0,0,.35)}.scratch{position:absolute;inset:0;width:100%;height:100%;border-radius:6px;touch-action:none}
 .bet-panel{display:grid;gap:10px;margin:18px auto 0;max-width:680px}.bet-options{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.bet-side{background:#1f2937;color:#fff;border:1px solid var(--line)}.bet-side.selected[data-side=player]{background:var(--blue)}.bet-side.selected[data-side=banker]{background:var(--red)}.bet-side.selected[data-side=tie]{background:var(--green)}.bet-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}.amount{width:180px;padding:12px;background:#020617;color:#fff;border:1px solid var(--line);border-radius:8px}.bet-submit,.ready,.start,.confirm{background:var(--gold);color:#111827}.ready{background:#16a34a;color:#fff}.confirm{margin-top:14px}.message{min-height:28px;margin-top:12px;color:#fde68a;font-weight:900}
 .players{display:grid;gap:8px}.player{padding:10px;background:#0f172a;border-radius:7px;border:1px solid transparent}.player.ready{border-color:#22c55e}.player.bet{border-color:var(--gold)}.player-top{display:flex;justify-content:space-between;gap:8px;font-weight:900}.player-meta{margin-top:5px;color:#cbd5e1;font-size:.86rem}
 .result-overlay{position:fixed;inset:0;z-index:20;display:none;place-items:center;padding:18px;background:rgba(2,6,23,.82);backdrop-filter:blur(5px)}.result-overlay.show{display:grid}.result-card{width:min(680px,100%);padding:24px;border:2px solid var(--gold);border-radius:8px;background:#0f172a;box-shadow:0 22px 70px #000}.result-title{text-align:center;color:var(--gold);font-size:2rem;font-weight:1000}.result-summary{text-align:center;margin:8px 0 18px;font-size:1.2rem;font-weight:900}.result-list{display:grid;gap:8px}.result-row{display:grid;grid-template-columns:1fr auto;gap:10px;padding:12px;border:1px solid var(--line);border-radius:7px;background:#111827}.positive{color:#4ade80}.negative{color:#f87171}.result-close{display:block;width:100%;margin-top:18px;background:var(--gold);color:#111827;font-weight:1000}
@@ -69,10 +69,12 @@ button,input,select{font:inherit}button{border:0;border-radius:8px;padding:11px 
         <div class="hand">
           <div class="hand-title player">PLAYER</div>
           <div id="playerCards" class="cards"></div>
+          <div id="playerTableTotal" class="hand-total"></div>
         </div>
         <div class="hand">
           <div class="hand-title banker">BANKER</div>
           <div id="bankerCards" class="cards"></div>
+          <div id="bankerTableTotal" class="hand-total"></div>
         </div>
       </div>
 
@@ -129,36 +131,53 @@ function formatRrc(value){return `${Number(value||0).toLocaleString()} rrc`}
 function cardPath(card){const rank=card[0]==="T"?"10":card[0];return `/static/poker/cards/${suitNames[card[1]]}_${rank}.png`}
 function cardValue(card){const rank=card[0];if(rank==="A")return 1;if(["T","J","Q","K"].includes(rank))return 0;return Number(rank)}
 function total(cards){return cards.filter(Boolean).reduce((sum,card)=>sum+cardValue(card),0)%10}
-function isCurrentSqueeze(side){return game?.is_squeezer&&game.squeeze?.side===side}
+function isCurrentSqueeze(side,index){
+  return game?.squeeze?.side===side&&index>=Number(game.squeeze.from||0)&&index<Number(game.squeeze.to||0);
+}
+function drawScratchHole(canvas,x,y,r=.12){
+  const ctx=canvas.getContext("2d");
+  ctx.globalCompositeOperation="destination-out";
+  ctx.beginPath();
+  ctx.arc(x*canvas.width,y*canvas.height,r*canvas.width,0,Math.PI*2);
+  ctx.fill();
+}
 
-function makeScratch(card){
+function makeScratch(card,side,index,interactive){
   const wrap=document.createElement("div");wrap.className="card-wrap";
   const img=document.createElement("img");img.className="card";img.src=cardPath(card);img.alt=card;wrap.appendChild(img);
   const canvas=document.createElement("canvas");canvas.className="scratch";canvas.width=164;canvas.height=240;wrap.appendChild(canvas);
+  canvas.dataset.side=side;canvas.dataset.index=String(index);
   const ctx=canvas.getContext("2d");ctx.fillStyle="#111827";ctx.fillRect(0,0,canvas.width,canvas.height);ctx.fillStyle="#facc15";ctx.font="bold 22px sans-serif";ctx.textAlign="center";ctx.fillText("SCRATCH",82,125);
+  (game.squeeze_progress||[]).filter(point=>point.side===side&&Number(point.index)===index).forEach(point=>drawScratchHole(canvas,point.x,point.y,point.r));
+  if(!interactive)return wrap;
+  let lastEmit=0;
   function draw(event){
     event.preventDefault();
     const rect=canvas.getBoundingClientRect();
     const point=event.touches?event.touches[0]:event;
-    const x=(point.clientX-rect.left)*(canvas.width/rect.width);
-    const y=(point.clientY-rect.top)*(canvas.height/rect.height);
-    ctx.globalCompositeOperation="destination-out";
-    ctx.beginPath();ctx.arc(x,y,24,0,Math.PI*2);ctx.fill();
+    const x=Math.max(0,Math.min(1,(point.clientX-rect.left)/rect.width));
+    const y=Math.max(0,Math.min(1,(point.clientY-rect.top)/rect.height));
+    drawScratchHole(canvas,x,y,.12);
+    const now=Date.now();
+    if(now-lastEmit>35){
+      lastEmit=now;
+      socket.emit("baccarat_squeeze_draw",{room_id:roomId,session,side,index,x,y,r:.12});
+    }
   }
   canvas.addEventListener("pointermove",draw);
   canvas.addEventListener("pointerdown",draw);
   canvas.addEventListener("touchmove",draw,{passive:false});
   return wrap;
 }
-function cardElement(card,side){
+function cardElement(card,side,index){
   if(!card){const back=document.createElement("div");back.className="card-back";return back}
-  if(isCurrentSqueeze(side))return makeScratch(card);
+  if(isCurrentSqueeze(side,index))return makeScratch(card,side,index,game.is_squeezer);
   const img=document.createElement("img");img.className="card";img.src=cardPath(card);img.alt=card;return img;
 }
 function renderCards(targetId,cards,side){
   const target=document.getElementById(targetId);target.innerHTML="";
-  cards.forEach(card=>target.appendChild(cardElement(card,side)));
-  if(!cards.length){target.appendChild(cardElement(null,side));target.appendChild(cardElement(null,side))}
+  cards.forEach((card,index)=>target.appendChild(cardElement(card,side,index)));
+  if(!cards.length){target.appendChild(cardElement(null,side,0));target.appendChild(cardElement(null,side,1))}
 }
 async function loadMe(){
   if(!session)return;
@@ -202,8 +221,12 @@ function render(){
   const isHost=String(game.host_user_id)===String(me.user_id);
   document.getElementById("roundText").textContent=game.round_number||"-";
   document.getElementById("phaseText").textContent=phaseNames[game.phase]||game.phase;
-  document.getElementById("playerTotalText").textContent=game.last_result?game.last_result.player_total:(game.player_cards.some(Boolean)?total(game.player_cards):"-");
-  document.getElementById("bankerTotalText").textContent=game.last_result?game.last_result.banker_total:(game.banker_cards.some(Boolean)?total(game.banker_cards):"-");
+  const playerShownTotal=game.last_result?game.last_result.player_total:game.player_revealed_total;
+  const bankerShownTotal=game.last_result?game.last_result.banker_total:game.banker_revealed_total;
+  document.getElementById("playerTotalText").textContent=playerShownTotal??"-";
+  document.getElementById("bankerTotalText").textContent=bankerShownTotal??"-";
+  document.getElementById("playerTableTotal").textContent=playerShownTotal==null?"":`合計 ${playerShownTotal}`;
+  document.getElementById("bankerTableTotal").textContent=bankerShownTotal==null?"":`合計 ${bankerShownTotal}`;
   document.getElementById("tablePhase").textContent=game.phase==="waiting"?"全員準備後、ホストが開始できます":game.phase==="betting"?"PLAYER / BANKER / TIE のどれかにベットしてください":game.is_squeezer?`${sideNames[game.squeeze.side]} のスクイーズ担当です`:`${sideNames[game.squeeze?.side]} のスクイーズ待ち`;
   renderCards("playerCards",game.player_cards||[],"player");
   renderCards("bankerCards",game.banker_cards||[],"banker");
@@ -224,6 +247,10 @@ function render(){
 const socket=io(API_BASE,{auth:{room_id:roomId,session,game:"baccarat"}});
 socket.on("connect",()=>socket.emit("join_room",{room_id:roomId,game:"baccarat"}));
 socket.on("baccarat:update",loadState);
+socket.on("baccarat:squeeze_draw",point=>{
+  const canvas=document.querySelector(`.scratch[data-side="${point.side}"][data-index="${point.index}"]`);
+  if(canvas)drawScratchHole(canvas,Number(point.x),Number(point.y),Number(point.r||.12));
+});
 socket.on("casino:user_joined",async()=>{await loadRoom();await loadState()});
 socket.on("casino:room_deleted",()=>location.href=`/lobby?game=baccarat&session=${session}`);
 function emit(event,payload={}){socket.emit(event,{room_id:roomId,session,...payload},response=>{if(response&&!response.ok)document.getElementById("message").textContent=errorMessages[response.error]||"操作できませんでした"})}
