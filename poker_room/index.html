@@ -209,7 +209,7 @@ function render(){
   document.getElementById("actions").style.display=activePhase?"flex":"none";
   const isHost=String(game.host_user_id)===String(me.user_id);
   const isMyTurn=String(game.current_turn_user_id)===String(me.user_id);
-  document.getElementById("readyBtn").disabled=!waiting||myPlayer?.ready;
+  document.getElementById("readyBtn").disabled=!waiting||(game.phase==="waiting"&&myPlayer?.ready);
   document.getElementById("startBtn").disabled=!waiting||!isHost||game.players.length<2||!game.players.every(player=>player.ready);
   ["foldBtn","checkBtn","callBtn","betBtn","raiseBtn","amountInput"].forEach(id=>document.getElementById(id).disabled=!isMyTurn||myPlayer?.folded);
   document.getElementById("checkBtn").disabled=!isMyTurn||toCall>0;
