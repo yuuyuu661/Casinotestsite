@@ -25,11 +25,11 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .phase{font-size:1.35rem;font-weight:1000}.phase.betting{color:#86efac}.phase.spinning{color:#fbbf24}
 .countdown{font-variant-numeric:tabular-nums;font-size:1.4rem;font-weight:1000;color:#fff}
 .wheel-wrap{position:relative;display:grid;place-items:center;margin:8px auto 18px;width:min(430px,100%);aspect-ratio:1}
-.wheel{position:absolute;inset:0;border-radius:50%;border:12px solid #78350f;background:conic-gradient(from -90deg,#047857 0 9.47deg,#111827 9.47deg 18.94deg,#b91c1c 18.94deg 28.41deg,#111827 28.41deg 37.88deg,#b91c1c 37.88deg 47.35deg,#111827 47.35deg 56.82deg,#b91c1c 56.82deg 66.29deg,#111827 66.29deg 75.76deg,#b91c1c 75.76deg 85.23deg,#111827 85.23deg 94.7deg,#b91c1c 94.7deg 104.17deg,#111827 104.17deg 113.64deg,#b91c1c 113.64deg 123.11deg,#111827 123.11deg 132.58deg,#b91c1c 132.58deg 142.05deg,#111827 142.05deg 151.52deg,#b91c1c 151.52deg 160.99deg,#111827 160.99deg 170.46deg,#b91c1c 170.46deg 179.93deg,#047857 179.93deg 189.4deg,#b91c1c 189.4deg 198.87deg,#111827 198.87deg 208.34deg,#b91c1c 208.34deg 217.81deg,#111827 217.81deg 227.28deg,#b91c1c 227.28deg 236.75deg,#111827 236.75deg 246.22deg,#b91c1c 246.22deg 255.69deg,#111827 255.69deg 265.16deg,#b91c1c 265.16deg 274.63deg,#111827 274.63deg 284.1deg,#b91c1c 284.1deg 293.57deg,#111827 293.57deg 303.04deg,#b91c1c 303.04deg 312.51deg,#111827 312.51deg 321.98deg,#b91c1c 321.98deg 331.45deg,#111827 331.45deg 340.92deg,#b91c1c 340.92deg 350.39deg,#111827 350.39deg 360deg);transition:transform 5s cubic-bezier(.14,.78,.16,1)}
+.wheel{position:absolute;inset:0;border-radius:50%;border:12px solid #78350f;background:#111827;transition:transform 5s cubic-bezier(.14,.78,.16,1)}
 .wheel-numbers{position:absolute;inset:0;border-radius:50%;pointer-events:none;z-index:2}
 .wheel-label{position:absolute;left:50%;top:50%;width:28px;margin-left:-14px;margin-top:-10px;text-align:center;font-size:.76rem;font-weight:1000;color:#fff;text-shadow:0 1px 3px #000;transform:rotate(var(--angle)) translateY(-185px) rotate(calc(-1 * var(--angle)))}
-.wheel.spinning{animation:wheelSpin 3.5s cubic-bezier(.1,.7,.18,1)}
-@keyframes wheelSpin{from{transform:rotate(0)}to{transform:rotate(1440deg)}}
+.wheel.spinning{animation:wheelSpin .9s linear infinite}
+@keyframes wheelSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
 .wheel-center{position:relative;z-index:2;width:45%;aspect-ratio:1;border-radius:50%;background:#f8fafc;color:#111827;display:grid;place-items:center;border:10px solid #b45309;box-shadow:0 0 0 8px rgba(0,0,0,.24),inset 0 0 24px rgba(0,0,0,.25);text-align:center}
 .result-number{font-size:clamp(2.5rem,8vw,4.8rem);font-weight:1000;line-height:.95}.result-color{font-size:.9rem;font-weight:900;color:#64748b}
 .ball{position:absolute;top:8%;left:50%;z-index:3;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 4px 10px rgba(0,0,0,.5);transform:translateX(-50%)}
@@ -144,14 +144,23 @@ const wheelOrder=["0","28","9","26","30","11","7","20","32","17","5","22","34","
 const redNumbers=new Set(["1","3","5","7","9","12","14","16","18","19","21","23","25","27","30","32","34","36"]);
 const table=document.getElementById("rouletteTable");
 let latestPhase="";
-let lastResult="";
+let lastResultRound=null;
 let shownResultRound=null;
 let currentMyTotal=0;
 let roundBetLimit=100000;
+let wheelRotation=0;
+const wheelSlice=360 / wheelOrder.length;
 
 function colorOf(value){
   if(value==="0"||value==="00") return "green";
   return redNumbers.has(String(value)) ? "red" : "black";
+}
+function wheelColor(value){
+  return {
+    green:"#047857",
+    red:"#b91c1c",
+    black:"#020617"
+  }[colorOf(value)];
 }
 function format(n){return `${Number(n||0).toLocaleString()} rrc`}
 function betLabel(type,value){
@@ -200,15 +209,40 @@ function buildTable(){
   makeButton("COLUMN 3","column","3","outside wide");
 }
 function buildWheelNumbers(){
+  const wheel=document.getElementById("wheel");
   const box=document.getElementById("wheelNumbers");
+  const slices=wheelOrder.map((number,index)=>{
+    const start=index * wheelSlice;
+    const end=(index + 1) * wheelSlice;
+    return `${wheelColor(number)} ${start}deg ${end}deg`;
+  });
+  wheel.style.background=`conic-gradient(from ${-wheelSlice / 2}deg, ${slices.join(",")})`;
   box.innerHTML="";
   wheelOrder.forEach((number,index)=>{
     const label=document.createElement("span");
     label.className="wheel-label";
     label.textContent=number;
-    label.style.setProperty("--angle",`${index * (360 / wheelOrder.length)}deg`);
+    label.style.setProperty("--angle",`${index * wheelSlice}deg`);
     box.appendChild(label);
   });
+}
+function spinWheelToResult(result){
+  const wheel=document.getElementById("wheel");
+  const index=wheelOrder.indexOf(String(result));
+  if(index < 0){
+    return;
+  }
+  wheel.classList.remove("spinning");
+  const targetCenter=index * wheelSlice;
+  const minimumTurns=4 * 360;
+  const baseTurns=Math.ceil(wheelRotation / 360) * 360;
+  let nextRotation=baseTurns + minimumTurns - targetCenter;
+  while(nextRotation <= wheelRotation + 360){
+    nextRotation += 360;
+  }
+  wheelRotation=nextRotation;
+  wheel.style.transition="transform 5s cubic-bezier(.14,.78,.16,1)";
+  wheel.style.transform=`rotate(${wheelRotation}deg)`;
 }
 async function api(path,options={}){
   const res=await fetch(`${API_BASE}${path}`,options);
@@ -244,17 +278,18 @@ function render(data){
   document.getElementById("countdown").textContent=mmss(data.seconds_remaining);
   setButtonsDisabled(data.phase!=="betting");
   if(data.phase==="spinning" && latestPhase!=="spinning"){
-    document.getElementById("wheel").classList.add("spinning");
-    setTimeout(()=>document.getElementById("wheel").classList.remove("spinning"),3600);
+    const wheel=document.getElementById("wheel");
+    wheel.style.transition="";
+    wheel.classList.add("spinning");
   }
   latestPhase=data.phase;
   if(data.result){
     document.getElementById("resultNumber").textContent=data.result;
     document.getElementById("resultColor").textContent=data.result_color.toUpperCase();
-    if(data.result!==lastResult){
-      document.getElementById("wheel").style.transform=`rotate(${720+Math.floor(Math.random()*360)}deg)`;
+    if(data.round_id!==lastResultRound){
+      spinWheelToResult(data.result);
     }
-    lastResult=data.result;
+    lastResultRound=data.round_id;
   }else{
     document.getElementById("resultNumber").textContent="?";
     document.getElementById("resultColor").textContent="WAITING";
