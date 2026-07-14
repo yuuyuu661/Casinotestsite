@@ -644,6 +644,8 @@ body{
         <label><input type="checkbox" data-rule="five_skip"> 5スキップ</label>
         <label><input type="checkbox" data-rule="nine_reverse"> 9リバース</label>
         <label><input type="checkbox" data-rule="jack_back" checked> Jバック</label>
+        <label><input type="checkbox" data-rule="miyako_ochi"> 都落ち</label>
+        <label><input type="checkbox" data-rule="twelve_bomber"> 12ボンバー</label>
         <label><input type="checkbox" data-rule="foul_finish" checked> 反則上がり</label>
       </div>
     </div>
@@ -1059,7 +1061,7 @@ function renderRooms(){
           ルール：${Object.entries(room.custom_rules).filter(([,enabled])=>enabled).map(([key])=>({
             joker_two:"Joker2枚",revolution:"革命",stairs:"階段",eight_cut:"8切り",suit_lock:"しばり",
             number_lock:"数しば",spade_three:"スペ3返し",five_skip:"5スキップ",
-            nine_reverse:"9リバース",jack_back:"Jバック",foul_finish:"反則上がり"
+            nine_reverse:"9リバース",jack_back:"Jバック",miyako_ochi:"都落ち",twelve_bomber:"12ボンバー",foul_finish:"反則上がり"
           })[key]).filter(Boolean).join(" / ") || "基本ルールのみ"}
         </div>` : ""}
 
