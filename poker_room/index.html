@@ -127,7 +127,8 @@ const suitNames = {s:"spades",h:"hearts",d:"diamonds",c:"clubs"};
 const errorMessages = {
   not_your_turn:"あなたの番ではありません",cannot_check:"コールかフォールドを選んでください",
   nothing_to_call:"現在コールするベットはありません",invalid_bet:"ベット額を確認してください",
-  invalid_raise:"レイズ額を確認してください（上限は部屋レートの2倍です）",call_limit_exceeded:"コール上限（部屋レートの2倍）を超えています。フォールドを選んでください",insufficient_balance:"残高が不足しています"
+  invalid_raise:"レイズ額を確認してください（上限は部屋レートの2倍です）",call_limit_exceeded:"コール上限（部屋レートの2倍）を超えています。フォールドを選んでください",insufficient_balance:"残高が不足しています",
+  raise_limit_reached:"このフェーズのレイズは2回までです"
 };
 
 function formatRrc(value){return `${Number(value||0).toLocaleString()} rrc`}
@@ -194,7 +195,7 @@ function render(){
   const myPlayer=game.players.find(player=>String(player.user_id)===String(me.user_id));
   const current=game.players.find(player=>String(player.user_id)===String(game.current_turn_user_id));
   const toCall=Math.max(0,Number(game.current_bet)-(myPlayer?.street_bet||0));
-  const riverBettingLocked=game.phase==="river";
+  const riverBettingLocked=false;
   document.getElementById("phaseText").textContent=phases[game.phase]||game.phase;
   document.getElementById("turnText").textContent=current?.user_name||"-";
   document.getElementById("currentBetText").textContent=formatRrc(game.current_bet);
@@ -203,7 +204,7 @@ function render(){
   renderCards(document.getElementById("community"),game.community_cards||[],5);
   renderCards(document.getElementById("holeCards"),game.my_hole_cards||[],2);
 
-  const waiting=game.phase==="waiting";
+  const waiting=game.phase==="waiting"||game.phase==="finished";
   document.getElementById("waitingActions").style.display=waiting?"flex":"none";
   document.getElementById("actions").style.display=activePhase?"flex":"none";
   const isHost=String(game.host_user_id)===String(me.user_id);

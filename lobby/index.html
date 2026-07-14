@@ -580,7 +580,7 @@ body{
 
     <!-- レート -->
 
-    <div class="form-group">
+    <div class="form-group" id="rateGroup">
 
       <label>
         レート
@@ -799,7 +799,7 @@ const session =
 const practiceRateGames =
   new Set(["chinchiro", "dobutsu", "othello"]);
 
-if(game === "poker" || game === "chinchiro" || game === "daifugo" || game === "mahjong"){
+if(game === "poker" || game === "chinchiro" || game === "daifugo" || game === "mahjong" || game === "baccarat"){
   document.getElementById("maxPlayersGroup").style.display = "block";
 }
 if(game === "chinchiro"){
@@ -815,6 +815,11 @@ if(game === "mahjong"){
   const select=document.getElementById("maxPlayersSelect");
   select.innerHTML='<option value="3">3人（三麻）</option><option value="4" selected>4人（四麻）</option>';
   document.getElementById("mahjongRulesGroup").style.display = "block";
+}
+if(game === "baccarat"){
+  const select=document.getElementById("maxPlayersSelect");
+  select.innerHTML='<option value="2">2人</option><option value="3">3人</option><option value="4">4人</option><option value="5">5人</option><option value="6">6人</option><option value="7">7人</option><option value="8">8人</option><option value="9">9人</option><option value="10" selected>10人</option>';
+  document.getElementById("rateGroup").style.display = "none";
 }
 if(practiceRateGames.has(game)){
   const rateSelect = document.getElementById("rateSelect");
@@ -901,6 +906,7 @@ const gameNames = {
   othello : "⚫ オセロ ロビー",
   dobutsu : "🦁 どうぶつしょうぎ ロビー",
   poker   : "🃏 ポーカー ロビー",
+  baccarat : "🃎 バカラ ロビー",
   daifugo : "👑 大富豪 ロビー",
   chinchiro : "🎲 チンチロ ロビー"
   ,mahjong : "🀄 麻雀 ロビー"
@@ -1044,9 +1050,9 @@ function renderRooms(){
 
         <div class="room-rate">
           💰 ${rateLabels[room.rate_name] || room.rate_name}
-          (${Number(
+          ${game === "baccarat" ? "(ルーム内でベット)" : `(${Number(
             room.rate_amount
-          ).toLocaleString()} rrc)
+          ).toLocaleString()} rrc)`}
         </div>
 
         ${game === "daifugo" ? `<div style="grid-column:1/-1;color:#cbd5e1;font-size:.85rem">
@@ -1381,7 +1387,7 @@ document
 .addEventListener("click", async () => {
 
   const rate =
-    Number(
+    game === "baccarat" ? 0 : Number(
       document.getElementById("rateSelect").value
     );
 
@@ -1416,7 +1422,7 @@ document
           session,
           game,
           rate,
-          max_players: game === "poker" || game === "chinchiro" || game === "daifugo" || game === "mahjong"
+          max_players: game === "poker" || game === "chinchiro" || game === "daifugo" || game === "mahjong" || game === "baccarat"
             ? Number(document.getElementById("maxPlayersSelect").value)
             : 2,
           room_name,

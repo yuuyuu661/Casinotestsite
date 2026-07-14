@@ -360,6 +360,12 @@ body{
             <div class="tag-row"><span class="tag">カード</span><span class="tag">心理戦</span></div>
           </div>
 
+          <div class="game-card" id="baccaratCard">
+            <div class="game-title">バカラ</div>
+            <div class="game-desc">プレイヤー・バンカー・タイのどれかに賭ける王道カードゲーム。スクイーズ演出でじわっと勝負を見届けます。</div>
+            <div class="tag-row"><span class="tag">カード</span><span class="tag">2〜10人</span></div>
+          </div>
+
           <div class="game-card" id="othelloCard">
             <div class="game-title">オセロ</div>
             <div class="game-desc">シンプルなルールで奥が深い定番対戦。終盤の一手で大きく流れが変わります。</div>
@@ -600,6 +606,7 @@ function goLobby(game){
 }
 
 document.getElementById("pokerCard").addEventListener("click", () => goLobby("poker"));
+document.getElementById("baccaratCard").addEventListener("click", () => goLobby("baccarat"));
 document.getElementById("othelloCard").addEventListener("click", () => goLobby("othello"));
 document.getElementById("dobutsuCard").addEventListener("click", () => goLobby("dobutsu"));
 document.getElementById("chinchiroCard").addEventListener("click", () => goLobby("chinchiro"));
