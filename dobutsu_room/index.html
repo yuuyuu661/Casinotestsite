@@ -142,7 +142,7 @@ body{
   display:grid;
 
   grid-template-columns:
-    280px 1fr 320px;
+    minmax(300px,320px) minmax(420px,1fr) minmax(300px,320px);
 
   gap:24px;
 }
@@ -219,6 +219,7 @@ body{
   align-items:center;
 
   width:100%;
+  min-height:640px;
 }
 
 .board{
@@ -282,11 +283,38 @@ body{
   cursor:pointer;
 
   transition:0.15s;
+  position:relative;
 }
 
 .cell:hover{
   background:
     rgba(255,255,255,0.08);
+}
+
+.cell.selected{
+  background:rgba(250,204,21,0.22);
+  box-shadow:
+    inset 0 0 0 3px #facc15,
+    0 0 18px rgba(250,204,21,0.4);
+}
+
+.cell.valid-move{
+  background:rgba(34,197,94,0.22);
+  box-shadow:inset 0 0 0 2px rgba(74,222,128,0.8);
+}
+
+.cell.valid-move::after{
+  content:"";
+  width:18px;
+  height:18px;
+  border-radius:999px;
+  background:#4ade80;
+  opacity:.86;
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  box-shadow:0 0 12px rgba(74,222,128,.65);
 }
 
 /* 石 */
@@ -308,6 +336,11 @@ body{
 
   pointer-events:none;
 
+}
+
+.dobutsu-piece.opponent-piece,
+.captured-piece.opponent-piece{
+  transform:rotate(180deg);
 }
 
 .black{
@@ -523,8 +556,20 @@ body{
   flex-wrap:wrap;
   gap:8px;
   width:100%;
-  min-height:72px;
-  margin-top:12px;
+  min-height:76px;
+  margin:12px 0;
+  padding:10px;
+  border:1px dashed rgba(250,204,21,0.35);
+  border-radius:14px;
+  background:rgba(2,6,23,0.35);
+}
+
+.captured-area::before{
+  content:attr(data-label);
+  color:#facc15;
+  font-size:.82rem;
+  font-weight:900;
+  margin-right:8px;
 }
 
 .captured-piece{
@@ -532,10 +577,25 @@ body{
   height:48px;
   cursor:pointer;
   transition:0.15s;
+  border-radius:10px;
+  padding:4px;
+  border:2px solid transparent;
+  background:rgba(255,255,255,0.08);
 }
 
 .captured-piece:hover{
   transform:scale(1.08);
+  border-color:rgba(250,204,21,.65);
+}
+
+.captured-piece.opponent-piece:hover{
+  transform:rotate(180deg) scale(1.08);
+}
+
+.captured-piece.selected{
+  border-color:#facc15;
+  box-shadow:0 0 16px rgba(250,204,21,.45);
+  background:rgba(250,204,21,.16);
 }
 
 #jankenResult{
@@ -551,6 +611,10 @@ body{
 
   .main-layout{
     grid-template-columns:1fr;
+  }
+
+  .board-area{
+    min-height:auto;
   }
 
   .board{
@@ -830,6 +894,11 @@ roomIdDisplay.innerText =
 let myUserId = null;
 let myColor = null;
 let myUserName = null;
+let hostUserId = null;
+let roomBlackUserId = null;
+let roomWhiteUserId = null;
+let viewColor = "black";
+let isRoomPlayer = false;
  
 
 let selectedPiece = null;
@@ -837,6 +906,46 @@ let selectedCaptured = null;
 let gameState = null;
 let gameEnded = false;
 let tryWinner = null;
+
+function isFlippedView(){
+  return gameType === "dobutsu" && viewColor === "white";
+}
+
+function toBoardCoords(displayX, displayY){
+  if(!isFlippedView()){
+    return {x:displayX, y:displayY};
+  }
+  return {
+    x:BOARD_W - 1 - displayX,
+    y:BOARD_H - 1 - displayY
+  };
+}
+
+function updateViewPerspective(){
+  if(myColor){
+    viewColor = myColor;
+    return;
+  }
+
+  const blackId =
+    gameState?.black_user_id || roomBlackUserId;
+
+  const whiteId =
+    gameState?.white_user_id || roomWhiteUserId;
+
+  if(!hostUserId || (!blackId && !whiteId)){
+    viewColor = "black";
+    return;
+  }
+
+  if(String(hostUserId) === String(blackId)){
+    viewColor = "black";
+  }else if(String(hostUserId) === String(whiteId)){
+    viewColor = "white";
+  }else{
+    viewColor = "black";
+  }
+}
 
 /* =========================
    API
@@ -917,16 +1026,35 @@ if(gameType === "othello"){
 
 function renderBoard(){
 
+  updateViewPerspective();
+
   board.innerHTML = "";
 
-  for(let y=0;y<BOARD_H;y++){
+  for(let displayY=0;displayY<BOARD_H;displayY++){
 
-    for(let x=0;x<BOARD_W;x++){
+    for(let displayX=0;displayX<BOARD_W;displayX++){
+
+      const coord =
+        toBoardCoords(displayX, displayY);
+
+      const x =
+        coord.x;
+
+      const y =
+        coord.y;
 
       const cell =
         document.createElement("div");
 
       cell.className = "cell";
+
+      if(
+        selectedPiece &&
+        selectedPiece.x === x &&
+        selectedPiece.y === y
+      ){
+        cell.classList.add("selected");
+      }
 
       // =========================
       // 移動可能マス表示
@@ -948,14 +1076,13 @@ function renderBoard(){
           );
 
         if(canMove){
-
-          cell.style.background =
-            "rgba(239,68,68,0.25)";
-
-          cell.style.boxShadow =
-            "inset 0 0 12px rgba(239,68,68,0.35)";
+          cell.classList.add("valid-move");
         }
 
+      }
+
+      if(selectedCaptured && canDropCapturedAt(selectedCaptured, x, y)){
+        cell.classList.add("valid-move");
       }
 
       cell.addEventListener("click", () => {
@@ -1072,11 +1199,8 @@ function renderBoard(){
         img.src =
           `/static/dobutsu/${value.type}.png`;
 
-        if(value.owner === "white"){
-
-          img.style.transform =
-            "rotate(180deg)";
-
+        if(value.owner !== viewColor){
+          img.classList.add("opponent-piece");
         }
 
         cell.appendChild(img);
@@ -1173,22 +1297,43 @@ function getValidMoves(
     move.x>=0 &&
     move.x<BOARD_W &&
     move.y>=0 &&
-    move.y<BOARD_H
+    move.y<BOARD_H &&
+    (!grid[move.y][move.x] || grid[move.y][move.x].owner !== piece.owner)
 
   );
 
 }
 
-  function updateCaptured(){
+function canDropCapturedAt(pieceType, x, y){
+  if(!gameState || !myColor){
+    return false;
+  }
 
-  const blackDiv =
-    document.getElementById("captured-black");
+  if(grid[y][x]){
+    return false;
+  }
 
-  const whiteDiv =
-    document.getElementById("captured-white");
+  if(!gameState.captured?.[myColor]?.includes(pieceType)){
+    return false;
+  }
 
-  blackDiv.innerHTML = "";
-  whiteDiv.innerHTML = "";
+  if(pieceType === "chick"){
+    if(myColor === "black" && y === 0){
+      return false;
+    }
+
+    if(myColor === "white" && y === BOARD_H - 1){
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function renderCapturedPieces(target, owner, label){
+
+  target.innerHTML = "";
+  target.dataset.label = label;
 
   if(!gameState){
     return;
@@ -1198,7 +1343,7 @@ function getValidMoves(
     return;
   }
 
-  for(const piece of gameState.captured.black){
+  for(const piece of gameState.captured[owner]){
 
     const img =
       document.createElement("img");
@@ -1209,7 +1354,19 @@ function getValidMoves(
     img.className =
       "captured-piece";
 
+    if(owner !== viewColor){
+      img.classList.add("opponent-piece");
+    }
+
+    if(selectedCaptured === piece && owner === myColor){
+      img.classList.add("selected");
+    }
+
     img.onclick = () => {
+
+      if(gameEnded || myColor !== currentTurn || owner !== myColor){
+        return;
+      }
 
       selectedCaptured = piece;
       selectedPiece = null;
@@ -1218,36 +1375,47 @@ function getValidMoves(
 
     };
 
-    blackDiv.appendChild(img);
+    target.appendChild(img);
 
   }
+}
 
-  for(const piece of gameState.captured.white){
 
-    const img =
-      document.createElement("img");
-
-    img.src =
-      `/static/dobutsu/${piece}.png`;
-
-    img.className =
-      "captured-piece";
-
-    img.style.transform =
-      "rotate(180deg)";
-
-    img.onclick = () => {
-
-      selectedCaptured = piece;
-      selectedPiece = null;
-
-      renderBoard();
-
-    };
-
-    whiteDiv.appendChild(img);
-
+function capturedLabel(owner){
+  if(myColor){
+    return owner === myColor ? "自分の持ち駒" : "相手の持ち駒";
   }
+  return owner === "black" ? "先手の持ち駒" : "後手の持ち駒";
+}
+
+
+function updateCaptured(){
+
+  updateViewPerspective();
+
+  const topDiv =
+    document.getElementById("captured-white");
+
+  const bottomDiv =
+    document.getElementById("captured-black");
+
+  const topOwner =
+    isFlippedView() ? "black" : "white";
+
+  const bottomOwner =
+    isFlippedView() ? "white" : "black";
+
+  renderCapturedPieces(
+    topDiv,
+    topOwner,
+    capturedLabel(topOwner)
+  );
+
+  renderCapturedPieces(
+    bottomDiv,
+    bottomOwner,
+    capturedLabel(bottomOwner)
+  );
 
 }
 
@@ -1383,6 +1551,18 @@ async function loadRoomInfo(){
       return;
     }
 
+    hostUserId =
+      data.host_user_id;
+
+    roomBlackUserId =
+      data.black_user_id;
+
+    roomWhiteUserId =
+      data.white_user_id;
+
+    isRoomPlayer =
+      data.players.some(player => String(player.user_id) === String(myUserId));
+
     // =========================
     // 自分の色判定
     // =========================
@@ -1404,6 +1584,8 @@ async function loadRoomInfo(){
       myColor = null;
 
     }
+
+    updateViewPerspective();
 
     renderPlayers(
       data.players,
@@ -1553,6 +1735,10 @@ const jankenResult =
 
 socket.on("janken:start", () => {
 
+  if(myUserId && !isRoomPlayer){
+    return;
+  }
+
   jankenResult.innerText =
     "好きな手を選んでください";
 
@@ -1565,6 +1751,10 @@ document
 .forEach(btn => {
 
   btn.addEventListener("click", () => {
+
+    if(!isRoomPlayer){
+      return;
+    }
 
     const hand =
       btn.dataset.hand;
