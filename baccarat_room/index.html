@@ -91,7 +91,7 @@ button,input,select{font:inherit}button{border:0;border-radius:8px;padding:11px 
           <button class="bet-side" data-side="tie">TIE<br>8倍</button>
         </div>
         <div class="bet-row">
-          <input id="amountInput" class="amount" type="number" min="2000" max="100000" step="1000" value="2000">
+          <input id="amountInput" class="amount" type="number" min="2000" max="300000" step="1000" value="2000">
           <button id="betBtn" class="bet-submit">ベットする</button>
         </div>
       </div>
@@ -126,7 +126,7 @@ let me=null,roomInfo=null,game=null,resultKey=null,selectedSide="player";
 const phaseNames={waiting:"準備フェーズ",betting:"ベットフェーズ",squeeze:"スクイーズフェーズ"};
 const sideNames={player:"PLAYER",banker:"BANKER",tie:"TIE"};
 const suitNames={s:"spades",h:"hearts",d:"diamonds",c:"clubs"};
-const errorMessages={host_only:"ホストのみ開始できます",not_ready:"参加者が足りません",players_not_ready:"全員の準備完了が必要です",invalid_amount:"ベット額は2,000〜100,000rrcです",already_bet:"この局はすでにベット済みです",insufficient_balance:"残高が不足しています",not_squeezer:"現在のスクイーズ担当ではありません"};
+const errorMessages={host_only:"ホストのみ開始できます",not_ready:"参加者が足りません",players_not_ready:"全員の準備完了が必要です",invalid_amount:"ベット額は2,000〜300,000rrcです",already_bet:"この局はすでにベット済みです",insufficient_balance:"残高が不足しています",not_squeezer:"現在のスクイーズ担当ではありません"};
 
 function formatRrc(value){return `${Number(value||0).toLocaleString()} rrc`}
 function cardPath(card){const rank=card[0]==="T"?"10":card[0];return `/static/poker/cards/${suitNames[card[1]]}_${rank}.png`}
