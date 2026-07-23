@@ -384,6 +384,12 @@ body{
             <div class="tag-row"><span class="tag">サイコロ</span><span class="tag">運勝負</span></div>
           </div>
 
+          <div class="game-card" id="minesweeperCard">
+            <div class="game-title">マインスイーパー</div>
+            <div class="game-desc">共通盤面に地雷を仕込み合う2人対戦。自分の地雷を避けつつ、相手の罠を読み切ります。</div>
+            <div class="tag-row"><span class="tag">2人対戦</span><span class="tag">読み合い</span></div>
+          </div>
+
           <div class="game-card" id="daifugoCard">
             <div class="game-title">大富豪</div>
             <div class="game-desc">手札をうまく出し切るカードゲーム。革命や階級の駆け引きが勝負を動かします。</div>
@@ -610,6 +616,7 @@ document.getElementById("baccaratCard").addEventListener("click", () => goLobby(
 document.getElementById("othelloCard").addEventListener("click", () => goLobby("othello"));
 document.getElementById("dobutsuCard").addEventListener("click", () => goLobby("dobutsu"));
 document.getElementById("chinchiroCard").addEventListener("click", () => goLobby("chinchiro"));
+document.getElementById("minesweeperCard").addEventListener("click", () => goLobby("minesweeper"));
 document.getElementById("daifugoCard").addEventListener("click", () => goLobby("daifugo"));
 document.getElementById("mahjongCard").addEventListener("click", () => {
   const password = prompt("運営パスワードを入力してください");

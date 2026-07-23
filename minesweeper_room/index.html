@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>マインスイーパー</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:radial-gradient(circle at top,#172554,#020617 48%,#000);
+  color:#f8fafc;
+  font-family:"Hiragino Sans","Yu Gothic UI",sans-serif;
+}
+.container{width:100%;max-width:1380px;margin:auto;padding:18px}
+.top-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.back-btn,.small-btn{
+  border:none;border-radius:8px;padding:11px 16px;background:#1e293b;color:#fff;
+  font-weight:900;cursor:pointer
+}
+.balance{color:#facc15;font-weight:900}
+.title{text-align:center;color:#facc15;font-size:clamp(2rem,5vw,3.3rem);font-weight:900;margin:8px 0 16px}
+.info-area{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px}
+.info-box{background:#0f172a;border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:14px;text-align:center}
+.label{color:#94a3b8;font-size:.86rem;font-weight:800;margin-bottom:7px}
+.value{font-size:1.15rem;font-weight:900}
+.layout{display:grid;grid-template-columns:minmax(250px,.85fr) minmax(360px,1.2fr) minmax(260px,.85fr);gap:16px;align-items:start}
+.panel{background:rgba(15,23,42,.86);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:16px}
+.panel-title{font-size:1.12rem;font-weight:900;color:#facc15;margin-bottom:12px}
+.rule-list{color:#dbeafe;line-height:1.8;padding-left:18px}
+.rule-list strong{color:#facc15}
+.player-list,.log-list{display:grid;gap:10px}
+.player-card,.log-row{background:rgba(255,255,255,.045);border-radius:8px;padding:12px}
+.player-card.me{border:1px solid rgba(250,204,21,.55)}
+.player-name{font-weight:900;margin-bottom:6px}
+.player-status{color:#cbd5e1;font-size:.92rem;line-height:1.55}
+.board-wrap{display:flex;flex-direction:column;align-items:center;gap:14px}
+.message{min-height:48px;color:#e2e8f0;line-height:1.6;text-align:center;font-weight:800}
+.board{
+  width:min(92vw,528px);
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:7px;
+  background:linear-gradient(145deg,#78350f,#451a03);
+  border:6px solid #92400e;
+  border-radius:10px;
+  padding:10px;
+  box-shadow:0 18px 45px rgba(0,0,0,.45)
+}
+.cell{
+  aspect-ratio:1;
+  border:none;
+  border-radius:8px;
+  background:#111827 url("/static/minesweeper/tile_closed.png") center/cover no-repeat;
+  cursor:pointer;
+  position:relative;
+  overflow:hidden;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
+}
+.cell.safe{background-image:url("/static/minesweeper/tile_safe.png");cursor:default}
+.cell.mine,.cell.own-mine{background-image:url("/static/minesweeper/tile_mine.png")}
+.cell.own-mine::after{
+  content:"MY";
+  position:absolute;right:4px;bottom:4px;
+  font-size:.7rem;font-weight:900;color:#fff;background:rgba(220,38,38,.86);
+  padding:2px 5px;border-radius:999px
+}
+.cell.hit{box-shadow:0 0 0 4px rgba(248,113,113,.95),0 0 24px rgba(248,113,113,.9)}
+.cell.last-safe{box-shadow:0 0 0 4px rgba(74,222,128,.9),0 0 20px rgba(74,222,128,.65)}
+.cell.safe-burst{animation:safeBurst .8s ease-out}
+.cell.mine-burst{animation:mineBurst .9s ease-out}
+.cell:disabled{cursor:default}
+@keyframes safeBurst{
+  0%{transform:scale(.92);filter:brightness(1)}
+  35%{transform:scale(1.08);filter:brightness(1.55)}
+  100%{transform:scale(1);filter:brightness(1)}
+}
+@keyframes mineBurst{
+  0%{transform:scale(1);filter:brightness(1)}
+  25%{transform:scale(1.16) rotate(-4deg);filter:brightness(1.9)}
+  55%{transform:scale(.96) rotate(4deg);filter:brightness(1.25)}
+  100%{transform:scale(1);filter:brightness(1)}
+}
+.effect-overlay{
+  position:fixed;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  pointer-events:none;
+  z-index:9999;
+}
+.effect-overlay.show{display:flex}
+.effect-card{
+  min-width:min(82vw,420px);
+  padding:30px 34px;
+  border-radius:8px;
+  text-align:center;
+  font-size:clamp(2rem,8vw,4.2rem);
+  font-weight:900;
+  letter-spacing:.04em;
+  transform:scale(.8);
+  opacity:0;
+}
+.effect-overlay.safe .effect-card{
+  color:#dcfce7;
+  background:rgba(22,101,52,.86);
+  border:2px solid rgba(134,239,172,.95);
+  box-shadow:0 0 50px rgba(34,197,94,.7);
+  animation:effectPop .95s ease-out forwards;
+}
+.effect-overlay.mine{
+  background:radial-gradient(circle,rgba(248,113,113,.35),rgba(0,0,0,.72));
+}
+.effect-overlay.mine .effect-card{
+  color:#fff;
+  background:rgba(127,29,29,.9);
+  border:2px solid rgba(252,165,165,.95);
+  box-shadow:0 0 70px rgba(239,68,68,.9);
+  animation:effectPop 1.15s ease-out forwards;
+}
+@keyframes effectPop{
+  0%{transform:scale(.75);opacity:0}
+  25%{transform:scale(1.08);opacity:1}
+  72%{transform:scale(1);opacity:1}
+  100%{transform:scale(.96);opacity:0}
+}
+.actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+.ready-btn{background:#22c55e;color:#fff}
+.start-btn{background:#facc15;color:#111827}
+.janken-area{display:none;gap:10px;justify-content:center;flex-wrap:wrap}
+.janken-area.show{display:flex}
+.janken-btn{background:#1e293b;color:#fff;border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:13px 18px;font-weight:900;cursor:pointer}
+.danger{color:#fca5a5;font-weight:900}
+.positive{color:#86efac;font-weight:900}
+.tabs{display:flex;gap:8px;margin-bottom:12px}
+.tab-btn{flex:1;background:#1e293b;color:#cbd5e1}
+.tab-btn.active{background:#facc15;color:#111827}
+.tab-content{display:none}.tab-content.active{display:block}
+.chat-box{height:360px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+.chat-message{background:rgba(255,255,255,.05);border-radius:8px;padding:10px}
+.chat-user{font-weight:900;color:#facc15;margin-bottom:4px}
+.chat-text{color:#e2e8f0;overflow-wrap:anywhere}
+.chat-input-area{display:flex;gap:8px}
+.chat-input{min-width:0;flex:1;background:#020617;border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:11px;color:#fff}
+.send-btn{background:#2563eb;color:#fff}
+button{border:none;border-radius:8px;padding:13px 18px;font-size:1rem;font-weight:900;cursor:pointer}
+button:disabled{opacity:.45;cursor:not-allowed}
+@media(max-width:1000px){.layout{grid-template-columns:1fr}.board{width:min(94vw,500px);gap:6px;padding:8px}}
+@media(max-width:520px){.container{padding:12px}.board{gap:4px;border-width:4px}.panel{padding:13px}.cell{border-radius:6px}}
+</style>
+</head>
+<body>
+<main class="container">
+  <div class="top-bar">
+    <button class="back-btn" id="backBtn">ロビーへ戻る</button>
+    <div class="balance" id="balanceText">残高取得中...</div>
+  </div>
+
+  <h1 class="title">MINESWEEPER</h1>
+
+  <section class="info-area">
+    <div class="info-box"><div class="label">レート</div><div class="value" id="rateText">-</div></div>
+    <div class="info-box"><div class="label">フェーズ</div><div class="value" id="phaseText">-</div></div>
+    <div class="info-box"><div class="label">現在のターン</div><div class="value" id="turnText">-</div></div>
+    <div class="info-box"><div class="label">開いた安全マス</div><div class="value" id="openedText">0</div></div>
+  </section>
+
+  <section class="layout">
+    <aside class="panel">
+      <div class="panel-title">プレイヤー</div>
+      <div id="playerList" class="player-list"></div>
+    </aside>
+
+    <section class="panel board-wrap">
+      <div class="message" id="messageText">参加者を待っています。</div>
+      <div class="janken-area" id="jankenArea">
+        <button class="janken-btn" data-hand="gu">グー</button>
+        <button class="janken-btn" data-hand="choki">チョキ</button>
+        <button class="janken-btn" data-hand="pa">パー</button>
+      </div>
+      <div class="board" id="board"></div>
+      <div class="actions">
+        <button class="ready-btn" id="readyBtn">準備完了</button>
+        <button class="start-btn" id="startBtn">ゲーム開始</button>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="rulesTab">ルール</button>
+        <button class="tab-btn" data-tab="chatTab">チャット</button>
+      </div>
+      <div id="rulesTab" class="tab-content active">
+        <div class="panel-title">遊び方</div>
+        <ul class="rule-list">
+          <li>じゃんけんで先攻を決めます。</li>
+          <li>両者が共通盤面に<strong>地雷を3個ずつ</strong>設置します。</li>
+          <li>自分の地雷は見えますが、相手の地雷は見えません。</li>
+          <li>安全なマスなら相手のターンへ進みます。</li>
+          <li>地雷を踏んだプレイヤーが負けです。</li>
+        </ul>
+      </div>
+      <div id="chatTab" class="tab-content">
+        <div id="chatBox" class="chat-box"></div>
+        <div class="chat-input-area">
+          <input id="chatInput" class="chat-input" type="text" maxlength="200" placeholder="メッセージを入力">
+          <button id="sendBtn" class="send-btn">送信</button>
+        </div>
+      </div>
+    </aside>
+  </section>
+</main>
+
+<div id="effectOverlay" class="effect-overlay">
+  <div id="effectCard" class="effect-card"></div>
+</div>
+
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script>
+const params = new URLSearchParams(location.search);
+const roomId = params.get("room");
+const session = params.get("session");
+const isWatch = params.get("watch") === "1";
+const API_BASE = "https://api.oasis.red";
+const socket = io(API_BASE, { transports:["websocket","polling"] });
+
+let myUserId = null;
+let myUserName = "";
+let roomInfo = null;
+let gameState = null;
+
+const balanceText = document.getElementById("balanceText");
+const rateText = document.getElementById("rateText");
+const phaseText = document.getElementById("phaseText");
+const turnText = document.getElementById("turnText");
+const openedText = document.getElementById("openedText");
+const messageText = document.getElementById("messageText");
+const board = document.getElementById("board");
+const playerList = document.getElementById("playerList");
+const readyBtn = document.getElementById("readyBtn");
+const startBtn = document.getElementById("startBtn");
+const jankenArea = document.getElementById("jankenArea");
+const chatBox = document.getElementById("chatBox");
+const chatInput = document.getElementById("chatInput");
+const sendBtn = document.getElementById("sendBtn");
+const effectOverlay = document.getElementById("effectOverlay");
+const effectCard = document.getElementById("effectCard");
+let lastEffectKey = "";
+
+const phaseLabels = {
+  waiting:"待機中",
+  janken:"じゃんけん",
+  placing:"地雷設置",
+  playing:"探索中",
+  finished:"終了"
+};
+
+function formatRrc(value){
+  return `${Number(value || 0).toLocaleString()} rrc`;
+}
+
+function playerName(userId){
+  const p = (gameState?.players || []).find(player => String(player.user_id) === String(userId));
+  return p ? p.user_name : "-";
+}
+
+async function api(path, body){
+  const res = await fetch(`${API_BASE}${path}`, {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(body)
+  });
+  const data = await res.json().catch(() => ({}));
+  if(!res.ok || data.ok === false){
+    throw new Error(data.detail || data.error || "通信エラー");
+  }
+  return data;
+}
+
+async function loadMe(){
+  if(!session){
+    balanceText.textContent = "セッションなし";
+    return;
+  }
+  const res = await fetch(`${API_BASE}/api/casino/me?session=${session}`);
+  const data = await res.json();
+  if(data.ok){
+    myUserId = String(data.user_id);
+    myUserName = data.user_name;
+    balanceText.textContent = `残高 ${formatRrc(data.balance)}`;
+  }
+}
+
+async function loadRoom(){
+  const res = await fetch(`${API_BASE}/api/casino/room-info?room_id=${roomId}`);
+  const data = await res.json();
+  if(!data.ok){
+    messageText.textContent = "ルーム情報を取得できません。";
+    return;
+  }
+  roomInfo = data.room;
+  rateText.textContent = roomInfo.rate_amount === 0 ? "練習用 0 rrc" : formatRrc(roomInfo.rate_amount);
+}
+
+async function loadState(){
+  if(!session) return;
+  const res = await fetch(`${API_BASE}/api/casino/minesweeper/state?room_id=${roomId}&session=${session}`);
+  const data = await res.json();
+  if(data.ok){
+    gameState = data.game;
+    render();
+  }
+}
+
+function render(){
+  if(!gameState) return;
+  phaseText.textContent = phaseLabels[gameState.phase] || gameState.phase;
+  turnText.textContent = gameState.current_turn ? playerName(gameState.current_turn) : "-";
+  openedText.textContent = `${gameState.opened_count}`;
+  messageText.textContent = gameState.message || "";
+  renderPlayers();
+  renderBoard();
+  renderControls();
+  playLastOpenEffect();
+}
+
+function renderPlayers(){
+  playerList.innerHTML = "";
+  (gameState.players || []).forEach(player => {
+    const card = document.createElement("div");
+    card.className = `player-card ${String(player.user_id) === myUserId ? "me" : ""}`;
+    const turn = String(gameState.current_turn) === String(player.user_id) ? " / ターン中" : "";
+    const result = String(gameState.winner_user_id) === String(player.user_id)
+      ? `<div class="positive">勝者</div>`
+      : String(gameState.loser_user_id) === String(player.user_id)
+        ? `<div class="danger">敗者</div>`
+        : "";
+    card.innerHTML = `
+      <div class="player-name">${player.user_name}${turn}</div>
+      <div class="player-status">
+        準備：${player.ready ? "完了" : "未完了"}<br>
+        じゃんけん：${player.janken_done ? "提出済み" : "未提出"}<br>
+        地雷：${player.mine_count}/${gameState.mines_per_player}
+      </div>
+      ${result}
+    `;
+    playerList.appendChild(card);
+  });
+}
+
+function renderBoard(){
+  board.innerHTML = "";
+  (gameState.cells || []).forEach(cell => {
+    const button = document.createElement("button");
+    button.className = "cell";
+    if(cell.opened && !cell.mine) button.classList.add("safe");
+    if(cell.own_mine) button.classList.add("own-mine");
+    if(cell.mine) button.classList.add("mine");
+    if(cell.hit) button.classList.add("hit");
+    if(gameState.last_open && gameState.last_open.index === cell.index && !gameState.last_open.hit){
+      button.classList.add("last-safe");
+    }
+    if(gameState.last_open && gameState.last_open.index === cell.index){
+      button.classList.add(gameState.last_open.hit ? "mine-burst" : "safe-burst");
+    }
+    button.disabled = isWatch || gameState.phase === "finished" || cell.opened;
+    button.addEventListener("click", () => onCell(cell));
+    board.appendChild(button);
+  });
+}
+
+function playLastOpenEffect(){
+  const last = gameState?.last_open;
+  if(!last) return;
+  const key = `${last.index}:${last.user_id}:${last.hit}`;
+  if(key === lastEffectKey) return;
+  lastEffectKey = key;
+  effectOverlay.className = `effect-overlay show ${last.hit ? "mine" : "safe"}`;
+  effectCard.textContent = last.hit ? "BOOM!" : "SAFE";
+  window.setTimeout(() => {
+    effectOverlay.className = "effect-overlay";
+  }, last.hit ? 1150 : 950);
+}
+
+function renderControls(){
+  const isHost = roomInfo && String(roomInfo.host_user_id) === myUserId;
+  const me = (gameState.players || []).find(player => String(player.user_id) === myUserId);
+  readyBtn.disabled = isWatch || !me || gameState.phase !== "waiting" || String(gameState.host_user_id) === myUserId;
+  readyBtn.textContent = me?.ready ? "準備完了済み" : "準備完了";
+  startBtn.disabled = isWatch || !isHost || gameState.phase !== "waiting";
+  jankenArea.classList.toggle("show", !isWatch && gameState.phase === "janken" && me && !me.janken_done);
+}
+
+async function onCell(cell){
+  try{
+    if(gameState.phase === "placing"){
+      await api("/api/casino/minesweeper/place", {session, room_id:roomId, index:cell.index});
+    }else if(gameState.phase === "playing"){
+      if(String(gameState.current_turn) !== myUserId) return;
+      await api("/api/casino/minesweeper/open", {session, room_id:roomId, index:cell.index});
+    }
+    await loadState();
+    await loadMe();
+  }catch(err){
+    alert(err.message);
+  }
+}
+
+readyBtn.addEventListener("click", async () => {
+  try{
+    await api("/api/casino/minesweeper/ready", {session, room_id:roomId, ready:true});
+    await loadState();
+  }catch(err){ alert(err.message); }
+});
+
+startBtn.addEventListener("click", async () => {
+  try{
+    await api("/api/casino/minesweeper/start", {session, room_id:roomId});
+    await loadState();
+    await loadMe();
+  }catch(err){ alert(err.message); }
+});
+
+document.querySelectorAll(".janken-btn").forEach(button => {
+  button.addEventListener("click", async () => {
+    try{
+      await api("/api/casino/minesweeper/janken", {session, room_id:roomId, hand:button.dataset.hand});
+      await loadState();
+    }catch(err){ alert(err.message); }
+  });
+});
+
+document.querySelectorAll(".tab-btn").forEach(button => {
+  button.addEventListener("click", () => {
+    document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+    document.querySelectorAll(".tab-content").forEach(tab => tab.classList.remove("active"));
+    button.classList.add("active");
+    document.getElementById(button.dataset.tab).classList.add("active");
+  });
+});
+
+function appendChat(data){
+  const row = document.createElement("div");
+  row.className = "chat-message";
+  row.innerHTML = `<div class="chat-user">${data.user_name || "unknown"}</div><div class="chat-text"></div>`;
+  row.querySelector(".chat-text").textContent = data.message || "";
+  chatBox.appendChild(row);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+sendBtn.addEventListener("click", () => {
+  const message = chatInput.value.trim();
+  if(!message) return;
+  socket.emit("chat_message", {room_id:roomId, user_name:myUserName, message});
+  chatInput.value = "";
+});
+chatInput.addEventListener("keydown", event => {
+  if(event.key === "Enter") sendBtn.click();
+});
+
+socket.on("connect", () => {
+  socket.emit("join_room", {room_id:roomId, game:"minesweeper", watch:isWatch});
+});
+socket.on("minesweeper:update", async () => {
+  await loadState();
+  await loadMe();
+});
+socket.on("chat_message", appendChat);
+socket.on("casino:room_deleted", () => {
+  alert("ルームが削除されました。");
+  location.href = `/lobby?game=minesweeper&session=${session || ""}`;
+});
+
+document.getElementById("backBtn").addEventListener("click", () => {
+  location.href = `/lobby?game=minesweeper&session=${session || ""}`;
+});
+
+(async function init(){
+  await loadMe();
+  await loadRoom();
+  await loadState();
+})();
+</script>
+</body>
+</html>

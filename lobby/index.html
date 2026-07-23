@@ -799,7 +799,7 @@ const session =
   params.get("session");
 
 const practiceRateGames =
-  new Set(["chinchiro", "dobutsu", "othello"]);
+  new Set(["chinchiro", "dobutsu", "othello", "minesweeper"]);
 
 if(game === "poker" || game === "chinchiro" || game === "daifugo" || game === "mahjong" || game === "baccarat"){
   document.getElementById("maxPlayersGroup").style.display = "block";
@@ -910,7 +910,8 @@ const gameNames = {
   poker   : "🃏 ポーカー ロビー",
   baccarat : "🃎 バカラ ロビー",
   daifugo : "👑 大富豪 ロビー",
-  chinchiro : "🎲 チンチロ ロビー"
+  chinchiro : "🎲 チンチロ ロビー",
+  minesweeper : "💣 マインスイーパー ロビー"
   ,mahjong : "🀄 麻雀 ロビー"
 
 };
