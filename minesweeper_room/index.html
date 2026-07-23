@@ -488,9 +488,12 @@ function playLastOpenEffect(){
 function renderControls(){
   const isHost = roomInfo && String(roomInfo.host_user_id) === myUserId;
   const me = (gameState.players || []).find(player => String(player.user_id) === myUserId);
-  readyBtn.disabled = isWatch || !me || gameState.phase !== "waiting" || String(gameState.host_user_id) === myUserId;
-  readyBtn.textContent = me?.ready ? "準備完了済み" : "準備完了";
-  startBtn.disabled = isWatch || !isHost || gameState.phase !== "waiting";
+  const canReadyPhase = gameState.phase === "waiting" || gameState.phase === "finished";
+  const hostReadyLocked = gameState.phase === "waiting" && String(gameState.host_user_id) === myUserId;
+  const allReady = (gameState.players || []).length === 2 && (gameState.players || []).every(player => player.ready);
+  readyBtn.disabled = isWatch || !me || !canReadyPhase || hostReadyLocked;
+  readyBtn.textContent = gameState.phase === "finished" ? "再戦準備" : (me?.ready ? "準備完了済み" : "準備完了");
+  startBtn.disabled = isWatch || !isHost || gameState.phase !== "waiting" || !allReady;
   const canConfirm = !isWatch && gameState.phase === "placing" && me && !me.place_confirmed && me.mine_count === gameState.mines_per_player;
   confirmBtn.disabled = !canConfirm;
   confirmBtn.textContent = me?.place_confirmed ? "配置確定済み" : "配置確定";
