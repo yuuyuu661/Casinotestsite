@@ -24,6 +24,8 @@ body{
 .info-box{background:#0f172a;border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:14px;text-align:center}
 .label{color:#94a3b8;font-size:.86rem;font-weight:800;margin-bottom:7px}
 .value{font-size:1.15rem;font-weight:900}
+.volume-box{display:flex;align-items:center;gap:10px;justify-content:center}
+.volume-slider{width:min(220px,48vw);accent-color:#38bdf8}
 .layout{display:grid;grid-template-columns:minmax(250px,.85fr) minmax(360px,1.2fr) minmax(260px,.85fr);gap:16px;align-items:start}
 .panel{background:rgba(15,23,42,.86);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:16px}
 .panel-title{font-size:1.12rem;font-weight:900;color:#facc15;margin-bottom:12px}
@@ -190,6 +192,13 @@ button:disabled{opacity:.45;cursor:not-allowed}
     <div class="info-box"><div class="label">フェーズ</div><div class="value" id="phaseText">-</div></div>
     <div class="info-box"><div class="label">現在のターン</div><div class="value" id="turnText">-</div></div>
     <div class="info-box"><div class="label">開いた安全マス</div><div class="value" id="openedText">0</div></div>
+    <div class="info-box">
+      <div class="label">音量</div>
+      <div class="volume-box">
+        <input id="volumeSlider" class="volume-slider" type="range" min="0" max="100" value="45">
+        <span id="volumeText">45%</span>
+      </div>
+    </div>
   </section>
 
   <section class="layout">
@@ -288,7 +297,50 @@ const chatInput = document.getElementById("chatInput");
 const sendBtn = document.getElementById("sendBtn");
 const effectOverlay = document.getElementById("effectOverlay");
 const effectCard = document.getElementById("effectCard");
+const volumeSlider = document.getElementById("volumeSlider");
+const volumeText = document.getElementById("volumeText");
 let lastEffectKey = "";
+const safeSe = new Audio("/static/minesweeper/safe.wav");
+const explosionSe = new Audio("/static/minesweeper/explosion.wav");
+const bgm = new Audio("/static/minesweeper/bgm.wav");
+safeSe.preload = "auto";
+explosionSe.preload = "auto";
+bgm.preload = "auto";
+bgm.loop = true;
+
+function setVolume(value){
+  const volume = Math.max(0, Math.min(1, Number(value) / 100));
+  safeSe.volume = volume;
+  explosionSe.volume = volume;
+  bgm.volume = volume * 0.55;
+  volumeText.textContent = `${Math.round(volume * 100)}%`;
+  localStorage.setItem("minesweeperVolume", String(Math.round(volume * 100)));
+}
+
+const savedVolume = localStorage.getItem("minesweeperVolume");
+if(savedVolume !== null){
+  volumeSlider.value = savedVolume;
+}
+setVolume(volumeSlider.value);
+volumeSlider.addEventListener("input", () => setVolume(volumeSlider.value));
+
+function unlockAudio(){
+  [safeSe, explosionSe].forEach(audio => {
+    audio.volume = 0;
+    audio.play()
+      .then(() => {
+        audio.pause();
+        audio.currentTime = 0;
+        audio.volume = 1;
+      })
+      .catch(() => {
+        audio.volume = 1;
+      });
+  });
+  bgm.play().catch(() => {});
+  document.removeEventListener("pointerdown", unlockAudio);
+}
+document.addEventListener("pointerdown", unlockAudio, {once:true});
 
 const phaseLabels = {
   waiting:"待機中",
@@ -425,6 +477,9 @@ function playLastOpenEffect(){
   lastEffectKey = key;
   effectOverlay.className = `effect-overlay show ${last.hit ? "mine" : "safe"}`;
   effectCard.textContent = last.hit ? "BOOM!" : "SAFE";
+  const audio = last.hit ? explosionSe : safeSe;
+  audio.currentTime = 0;
+  audio.play().catch(() => {});
   window.setTimeout(() => {
     effectOverlay.className = "effect-overlay";
   }, last.hit ? 1150 : 950);
