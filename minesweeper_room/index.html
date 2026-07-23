@@ -51,7 +51,7 @@ body{
   aspect-ratio:1;
   border:none;
   border-radius:8px;
-  background:#111827 url("/static/minesweeper/tile_closed.png") center/cover no-repeat;
+  background:#111827 url("/static/minesweeper/tile_closed.png") center/100% 100% no-repeat;
   cursor:pointer;
   position:relative;
   overflow:hidden;
@@ -131,6 +131,32 @@ body{
 .janken-area{display:none;gap:10px;justify-content:center;flex-wrap:wrap}
 .janken-area.show{display:flex}
 .janken-btn{background:#1e293b;color:#fff;border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:13px 18px;font-weight:900;cursor:pointer}
+.confirm-btn{background:#38bdf8;color:#082f49}
+.janken-modal{
+  position:fixed;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background:rgba(0,0,0,.74);
+  z-index:9000;
+  padding:18px;
+}
+.janken-modal.show{display:flex}
+.janken-box{
+  width:min(94vw,560px);
+  background:#0f172a;
+  border:1px solid rgba(250,204,21,.45);
+  border-radius:8px;
+  padding:22px;
+  text-align:center;
+}
+.janken-title{font-size:1.35rem;font-weight:900;color:#facc15;margin-bottom:8px}
+.janken-desc{color:#cbd5e1;margin-bottom:18px}
+.janken-buttons{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.janken-btn.card{padding:8px;background:rgba(255,255,255,.06);border-radius:8px}
+.janken-btn.card img{width:110px;height:150px;object-fit:cover;border-radius:8px;display:block}
+#jankenResult{margin-top:16px;color:#facc15;font-weight:900}
 .danger{color:#fca5a5;font-weight:900}
 .positive{color:#86efac;font-weight:900}
 .tabs{display:flex;gap:8px;margin-bottom:12px}
@@ -175,14 +201,13 @@ button:disabled{opacity:.45;cursor:not-allowed}
     <section class="panel board-wrap">
       <div class="message" id="messageText">参加者を待っています。</div>
       <div class="janken-area" id="jankenArea">
-        <button class="janken-btn" data-hand="gu">グー</button>
-        <button class="janken-btn" data-hand="choki">チョキ</button>
-        <button class="janken-btn" data-hand="pa">パー</button>
+        <span>じゃんけんカードを選んでください</span>
       </div>
       <div class="board" id="board"></div>
       <div class="actions">
         <button class="ready-btn" id="readyBtn">準備完了</button>
         <button class="start-btn" id="startBtn">ゲーム開始</button>
+        <button class="confirm-btn" id="confirmBtn">配置確定</button>
       </div>
     </section>
 
@@ -194,8 +219,9 @@ button:disabled{opacity:.45;cursor:not-allowed}
       <div id="rulesTab" class="tab-content active">
         <div class="panel-title">遊び方</div>
         <ul class="rule-list">
-          <li>じゃんけんで先攻を決めます。</li>
           <li>両者が共通盤面に<strong>地雷を3個ずつ</strong>設置します。</li>
+          <li>3個置いたら配置確定を押します。</li>
+          <li>両者の配置確定後、カードじゃんけんで先攻を決めます。</li>
           <li>自分の地雷は見えますが、相手の地雷は見えません。</li>
           <li>安全なマスなら相手のターンへ進みます。</li>
           <li>地雷を踏んだプレイヤーが負けです。</li>
@@ -211,6 +237,19 @@ button:disabled{opacity:.45;cursor:not-allowed}
     </aside>
   </section>
 </main>
+
+<div id="jankenModal" class="janken-modal">
+  <div class="janken-box">
+    <div class="janken-title">先攻を決めるじゃんけん</div>
+    <div class="janken-desc">好きなカードを選んでください</div>
+    <div class="janken-buttons">
+      <button class="janken-btn card" data-hand="gu"><img src="/images/gu5.jpg" alt="グー"></button>
+      <button class="janken-btn card" data-hand="choki"><img src="/images/cyo5.jpg" alt="チョキ"></button>
+      <button class="janken-btn card" data-hand="pa"><img src="/images/pa5.jpg" alt="パー"></button>
+    </div>
+    <div id="jankenResult">カードを選んでください</div>
+  </div>
+</div>
 
 <div id="effectOverlay" class="effect-overlay">
   <div id="effectCard" class="effect-card"></div>
@@ -240,7 +279,10 @@ const board = document.getElementById("board");
 const playerList = document.getElementById("playerList");
 const readyBtn = document.getElementById("readyBtn");
 const startBtn = document.getElementById("startBtn");
+const confirmBtn = document.getElementById("confirmBtn");
 const jankenArea = document.getElementById("jankenArea");
+const jankenModal = document.getElementById("jankenModal");
+const jankenResult = document.getElementById("jankenResult");
 const chatBox = document.getElementById("chatBox");
 const chatInput = document.getElementById("chatInput");
 const sendBtn = document.getElementById("sendBtn");
@@ -340,8 +382,9 @@ function renderPlayers(){
       <div class="player-name">${player.user_name}${turn}</div>
       <div class="player-status">
         準備：${player.ready ? "完了" : "未完了"}<br>
-        じゃんけん：${player.janken_done ? "提出済み" : "未提出"}<br>
-        地雷：${player.mine_count}/${gameState.mines_per_player}
+        地雷：${player.mine_count}/${gameState.mines_per_player}<br>
+        配置：${player.place_confirmed ? "確定済み" : "未確定"}<br>
+        ${gameState.phase === "janken" ? `じゃんけん：${player.janken_done ? "提出済み" : "未提出"}` : ""}
       </div>
       ${result}
     `;
@@ -364,7 +407,11 @@ function renderBoard(){
     if(gameState.last_open && gameState.last_open.index === cell.index){
       button.classList.add(gameState.last_open.hit ? "mine-burst" : "safe-burst");
     }
-    button.disabled = isWatch || gameState.phase === "finished" || cell.opened;
+    const me = (gameState.players || []).find(player => String(player.user_id) === myUserId);
+    const placementLocked = gameState.phase === "placing" && me?.place_confirmed;
+    const canPlace = gameState.phase === "placing" && !placementLocked;
+    const canOpen = gameState.phase === "playing" && String(gameState.current_turn) === myUserId;
+    button.disabled = isWatch || cell.opened || (!canPlace && !canOpen) || gameState.phase === "finished";
     button.addEventListener("click", () => onCell(cell));
     board.appendChild(button);
   });
@@ -389,7 +436,15 @@ function renderControls(){
   readyBtn.disabled = isWatch || !me || gameState.phase !== "waiting" || String(gameState.host_user_id) === myUserId;
   readyBtn.textContent = me?.ready ? "準備完了済み" : "準備完了";
   startBtn.disabled = isWatch || !isHost || gameState.phase !== "waiting";
-  jankenArea.classList.toggle("show", !isWatch && gameState.phase === "janken" && me && !me.janken_done);
+  const canConfirm = !isWatch && gameState.phase === "placing" && me && !me.place_confirmed && me.mine_count === gameState.mines_per_player;
+  confirmBtn.disabled = !canConfirm;
+  confirmBtn.textContent = me?.place_confirmed ? "配置確定済み" : "配置確定";
+  const shouldShowJanken = !isWatch && gameState.phase === "janken" && me && !me.janken_done;
+  jankenArea.classList.toggle("show", shouldShowJanken);
+  jankenModal.classList.toggle("show", shouldShowJanken);
+  if(shouldShowJanken){
+    jankenResult.textContent = "好きなカードを選んでください";
+  }
 }
 
 async function onCell(cell){
@@ -422,10 +477,18 @@ startBtn.addEventListener("click", async () => {
   }catch(err){ alert(err.message); }
 });
 
+confirmBtn.addEventListener("click", async () => {
+  try{
+    await api("/api/casino/minesweeper/confirm", {session, room_id:roomId});
+    await loadState();
+  }catch(err){ alert(err.message); }
+});
+
 document.querySelectorAll(".janken-btn").forEach(button => {
   button.addEventListener("click", async () => {
     try{
       await api("/api/casino/minesweeper/janken", {session, room_id:roomId, hand:button.dataset.hand});
+      jankenResult.textContent = "相手の選択を待っています...";
       await loadState();
     }catch(err){ alert(err.message); }
   });
