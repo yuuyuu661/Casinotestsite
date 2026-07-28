@@ -366,6 +366,12 @@ body{
             <div class="tag-row"><span class="tag">カード</span><span class="tag">2〜10人</span></div>
           </div>
 
+          <div class="game-card" id="blackjackMultiCard">
+            <div class="game-title">マルチブラックジャック</div>
+            <div class="game-desc">参加者全員で21に近い手を競う対戦ブラックジャック。全員準備後、ホストが同じ流れで開始します。</div>
+            <div class="tag-row"><span class="tag">カード</span><span class="tag">2〜10人</span></div>
+          </div>
+
           <div class="game-card" id="othelloCard">
             <div class="game-title">オセロ</div>
             <div class="game-desc">シンプルなルールで奥が深い定番対戦。終盤の一手で大きく流れが変わります。</div>
@@ -394,12 +400,6 @@ body{
             <div class="game-title">大富豪</div>
             <div class="game-desc">手札をうまく出し切るカードゲーム。革命や階級の駆け引きが勝負を動かします。</div>
             <div class="tag-row"><span class="tag">カード</span><span class="tag">複数人</span></div>
-          </div>
-
-          <div class="game-card" id="mahjongCard">
-            <div class="game-title">麻雀</div>
-            <div class="game-desc">3人麻雀・4人麻雀に対応したオンライン対戦。全員準備後にホストが対局を開始します。</div>
-            <div class="tag-row"><span class="tag">3～4人</span><span class="tag">東風・東南戦</span></div>
           </div>
 
           <div class="game-card" id="rouletteCard">
@@ -619,21 +619,12 @@ function goLobby(game){
 
 document.getElementById("pokerCard").addEventListener("click", () => goLobby("poker"));
 document.getElementById("baccaratCard").addEventListener("click", () => goLobby("baccarat"));
+document.getElementById("blackjackMultiCard").addEventListener("click", () => goLobby("blackjack_multi"));
 document.getElementById("othelloCard").addEventListener("click", () => goLobby("othello"));
 document.getElementById("dobutsuCard").addEventListener("click", () => goLobby("dobutsu"));
 document.getElementById("chinchiroCard").addEventListener("click", () => goLobby("chinchiro"));
 document.getElementById("minesweeperCard").addEventListener("click", () => goLobby("minesweeper"));
 document.getElementById("daifugoCard").addEventListener("click", () => goLobby("daifugo"));
-document.getElementById("mahjongCard").addEventListener("click", () => {
-  const password = prompt("運営パスワードを入力してください");
-  if(password === "yamadayamada"){
-    goLobby("mahjong");
-    return;
-  }
-  if(password !== null){
-    alert("パスワードが違います");
-  }
-});
 document.getElementById("rouletteCard").addEventListener("click", () => {
   location.href = `/roulette/${session ? `?session=${session}` : ""}`;
 });
@@ -644,13 +635,6 @@ document.getElementById("slotCard").addEventListener("click", () => {
   location.href = `/slot/${session ? `?session=${session}` : ""}`;
 });
 document.getElementById("jugglerCard").addEventListener("click", () => {
-  const password = prompt("運営パスワードを入力してください");
-  if(password !== "yamadayamada"){
-    if(password !== null){
-      alert("パスワードが違います");
-    }
-    return;
-  }
   location.href = `/juggler/${session ? `?session=${session}` : ""}`;
 });
 

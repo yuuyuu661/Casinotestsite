@@ -58,9 +58,9 @@ button,select,input{font:inherit}button{border:0;border-radius:8px;font-weight:9
         <div id="reels" class="reels"></div>
         <svg id="paylineSvg" class="payline-svg" viewBox="0 0 300 300" preserveAspectRatio="none" aria-hidden="true"><polyline id="paylinePath" points=""></polyline></svg>
         <div class="stop-row">
-          <button class="stop-btn" data-reel="left">STOP 1</button>
-          <button class="stop-btn" data-reel="middle">STOP 2</button>
-          <button class="stop-btn" data-reel="right">STOP 3</button>
+          <button class="stop-btn" data-reel="left">STOP</button>
+          <button class="stop-btn" data-reel="middle">STOP</button>
+          <button class="stop-btn" data-reel="right">STOP</button>
         </div>
         <div class="controls">
           <label class="control">BET
@@ -117,16 +117,6 @@ button,select,input{font:inherit}button{border:0;border-radius:8px;font-weight:9
 <script>
 const API_BASE="https://api.oasis.red";
 const session=new URLSearchParams(location.search).get("session");
-const adminPassword = sessionStorage.getItem("oasisJugglerAdmin");
-if(adminPassword !== "ok"){
-  const password = prompt("運営パスワードを入力してください");
-  if(password === "yamadayamada"){
-    sessionStorage.setItem("oasisJugglerAdmin","ok");
-  }else{
-    alert("パスワードが違います");
-    location.href = `/${session?`?session=${session}`:""}`;
-  }
-}
 const reelKeys=["left","middle","right"];
 const fallbackStrips={
   left:["grape","seven","pig","bar","bell","seven","cherry","bar","oasis","seven","pierrot","bar","grape","seven","pig","bar","bell","seven","cherry","bar","oasis"],
