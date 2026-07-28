@@ -41,7 +41,7 @@ button,select,input{font:inherit}button{border:0;border-radius:8px;font-weight:9
       </table>
       <div class="note">設定は毎日0:00(JST)に抽選されます。設定1〜3は各33%、設定4は1%です。本日の設定は非公開なので、台データから推測してください。</div>
       <div class="panel-title" style="margin-top:16px">目押しについて</div>
-      <div class="note">固定リール配列を使った目押し風演出です。完全自由目押しで配当すると経済が壊れるため、当選フラグはサーバー側で管理しています。</div>
+      <div class="note">当たりフラグはサーバー側で管理し、STOPした位置から3コマ以内なら滑って揃います。目押しの気持ちよさを残しつつ、設定確率以上には当たりません。</div>
     </aside>
 
     <section class="machine">
@@ -76,7 +76,7 @@ button,select,input{font:inherit}button{border:0;border-radius:8px;font-weight:9
         <div class="stat"><span>ゲーム数</span><strong id="spinsStat">0</strong></div>
         <div class="stat"><span>BIG</span><strong id="bigStat">0</strong></div>
         <div class="stat"><span>REG</span><strong id="regStat">0</strong></div>
-        <div class="stat"><span>チェリー</span><strong id="cherryStat">0</strong></div>
+        <div class="stat"><span>小役チップ</span><strong id="cherryStat">0</strong></div>
         <div class="stat"><span>累計収支</span><strong id="profitStat">0 rrc</strong></div>
       </div>
       <div class="panel-title" style="margin-top:16px">報酬</div>
@@ -84,7 +84,7 @@ button,select,input{font:inherit}button{border:0;border-radius:8px;font-weight:9
       <label class="control" style="margin-top:16px">音量
         <input id="volume" class="volume" type="range" min="0" max="100" value="35">
       </label>
-      <div class="note">BIGはBET x200、REGはBET x70、チェリーはBET返しです。報酬は一度だけ付与されます。</div>
+      <div class="note">BIGはBET x200、REGはBET x70、小役チップはBET返しです。報酬は一度だけ付与されます。</div>
     </aside>
   </section>
 </main>
@@ -119,12 +119,14 @@ if(adminPassword !== "ok"){
 }
 const reelKeys=["left","middle","right"];
 const fallbackStrips={
-  left:["grape","pig","seven","grape","pig","grape","bar","cherry","grape","seven","pierrot","grape","pig","grape","cherry","bar","grape","pig","grape","seven","bell"],
-  middle:["pierrot","seven","cherry","grape","pig","cherry","grape","bell","pig","cherry","grape","bar","pig","cherry","grape","bell","pig","cherry","grape","seven","pig"],
-  right:["pig","bell","pierrot","grape","pig","bell","pierrot","grape","pig","bell","pierrot","grape","pig","bell","pierrot","grape","pig","bell","bar","seven","grape"]
+  left:["grape","seven","pig","bar","bell","seven","cherry","bar","oasis","seven","pierrot","bar","grape","seven","pig","bar","bell","seven","cherry","bar","oasis"],
+  middle:["pierrot","bar","grape","seven","cherry","bar","bell","seven","pig","bar","oasis","seven","grape","bar","pierrot","seven","cherry","bar","bell","seven","pig"],
+  right:["bell","seven","cherry","bar","grape","seven","pig","bar","pierrot","seven","oasis","bar","bell","seven","cherry","bar","grape","seven","pig","bar","pierrot"]
 };
 let reelStrips=fallbackStrips;
 let balance=0,spinning=false,spinResult=null,stopped={left:true,middle:true,right:true},queued=new Set(),timers=[];
+let reelMotion={};
+const SLIP_RANGE=3;
 const reelsEl=document.getElementById("reels"),resultEl=document.getElementById("result"),spinBtn=document.getElementById("spinBtn"),betSelect=document.getElementById("betSelect"),chanceLamp=document.getElementById("chanceLamp");
 const bonusOverlay=document.getElementById("bonusOverlay"),bonusTitle=document.getElementById("bonusTitle"),bonusPay=document.getElementById("bonusPay"),bonusSub=document.getElementById("bonusSub");
 const sounds=["startSound","stopSound","winSound"].map(id=>document.getElementById(id));
@@ -134,6 +136,29 @@ function play(id){const a=document.getElementById(id);a.currentTime=0;a.play().c
 function img(symbol){return `/juggler/images/${symbol}.png`}
 function symbolNode(symbol,center=false){const cell=document.createElement("div");cell.className=`symbol${center?" center":""}`;const image=document.createElement("img");image.src=img(symbol);image.alt=symbol;cell.appendChild(image);return cell}
 function visibleFromStrip(key,index){const strip=reelStrips[key],len=strip.length;return [strip[(index-1+len)%len],strip[index%len],strip[(index+1)%len]]}
+function forwardDistance(from,to,len){return (to-from+len)%len}
+function circularDistance(from,to,len){const forward=forwardDistance(from,to,len);return Math.min(forward,len-forward)}
+function currentCenterIndex(key){
+  const motion=reelMotion[key],strip=reelStrips[key];
+  if(!motion||!strip)return 0;
+  const elapsed=(performance.now()-motion.startedAt)/1000;
+  return Math.floor(motion.startIndex+elapsed*motion.speed)%strip.length;
+}
+function pickSlipCenter(key,pressedIndex){
+  const strip=reelStrips[key],len=strip.length;
+  if(!spinResult||!strip)return pressedIndex;
+  const target=spinResult.outcome==="big"?"seven":spinResult.outcome==="reg"?"bar":spinResult.outcome==="cherry"&&key==="left"?"cherry":null;
+  if(!target)return pressedIndex;
+  const candidates=strip.map((symbol,index)=>symbol===target?index:-1).filter(index=>index>=0);
+  const inRange=candidates.map(index=>({index,distance:circularDistance(pressedIndex,index,len)})).filter(item=>item.distance<=SLIP_RANGE).sort((a,b)=>a.distance-b.distance)[0];
+  return inRange?inRange.index:pressedIndex;
+}
+function renderStoppedReel(key,centerIndex,win=false){
+  const idx=reelKeys.indexOf(key),strip=reelsEl.children[idx].querySelector(".strip");
+  strip.classList.remove("spinning");strip.innerHTML="";
+  visibleFromStrip(key,centerIndex).forEach((s,i)=>strip.appendChild(symbolNode(s,i===1)));
+  if(win)strip.children[1].classList.add("win");
+}
 function buildReels(randomize=false){
   reelsEl.innerHTML="";
   reelKeys.forEach(key=>{
@@ -142,14 +167,15 @@ function buildReels(randomize=false){
     symbols.forEach((s,i)=>strip.appendChild(symbolNode(s,i===1)));win.appendChild(strip);reelsEl.appendChild(win);
   });
 }
-function startReels(){[...reelsEl.querySelectorAll(".strip")].forEach((strip,i)=>{strip.innerHTML="";const base=reelStrips[reelKeys[i]];[...base,...base].forEach(s=>strip.appendChild(symbolNode(s)));strip.classList.add("spinning")});document.querySelectorAll(".stop-btn").forEach(b=>b.disabled=false)}
+function startReels(){reelMotion={};[...reelsEl.querySelectorAll(".strip")].forEach((strip,i)=>{const key=reelKeys[i],base=reelStrips[key],startIndex=Math.floor(Math.random()*base.length);reelMotion[key]={startIndex,startedAt:performance.now(),speed:18+i*1.25};strip.innerHTML="";[...base,...base].slice(startIndex,startIndex+base.length+8).forEach(s=>strip.appendChild(symbolNode(s)));strip.classList.add("spinning")});document.querySelectorAll(".stop-btn").forEach(b=>b.disabled=false)}
 function stopReel(key){
   if(!spinning||stopped[key])return;
   if(!spinResult){queued.add(key);return}
   stopped[key]=true;queued.delete(key);play("stopSound");
-  const idx=reelKeys.indexOf(key);const strip=reelsEl.children[idx].querySelector(".strip");strip.classList.remove("spinning");strip.innerHTML="";
-  spinResult.reels[key].forEach((s,i)=>strip.appendChild(symbolNode(s,i===1)));
-  if(["big","reg"].includes(spinResult.outcome))strip.children[1].classList.add("win");
+  const pressedIndex=currentCenterIndex(key);
+  const centerIndex=pickSlipCenter(key,pressedIndex);
+  const winCenter=["big","reg"].includes(spinResult.outcome)&&["seven","bar"].includes(reelStrips[key][centerIndex]);
+  renderStoppedReel(key,centerIndex,winCenter);
   document.querySelector(`[data-reel="${key}"]`).disabled=true;
   if(reelKeys.every(k=>stopped[k]))finishSpin();
 }
@@ -160,7 +186,7 @@ function finishSpin(){
   const rewardText=spinResult.reward_total>0?` / 報酬 +${spinResult.reward_total.toLocaleString()}rrc`:"";
   if(spinResult.outcome==="big"){resultEl.classList.add("win");resultEl.textContent=`BIG BONUS! ${spinResult.payout.toLocaleString()}rrc${rewardText}`;play("winSound");showBonus("big")}
   else if(spinResult.outcome==="reg"){resultEl.classList.add("win");resultEl.textContent=`REG BONUS! ${spinResult.payout.toLocaleString()}rrc${rewardText}`;play("winSound");showBonus("reg")}
-  else if(spinResult.outcome==="cherry"){resultEl.classList.add("win");resultEl.textContent=`チェリー ${spinResult.payout.toLocaleString()}rrc${rewardText}`}
+  else if(spinResult.outcome==="cherry"){resultEl.classList.add("win");resultEl.textContent=`小役チップ ${spinResult.payout.toLocaleString()}rrc${rewardText}`}
   else{resultEl.textContent=rewardText?`ハズレ${rewardText}`:"ハズレ"}
 }
 function showBonus(kind){
