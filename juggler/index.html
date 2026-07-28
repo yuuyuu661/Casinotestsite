@@ -166,7 +166,7 @@ let volume=.35;function applyVolume(v){volume=Math.max(0,Math.min(1,Number(v)));
 function play(id){const a=document.getElementById(id);a.currentTime=0;a.play().catch(()=>{})}
 function startBgm(){const bgm=document.getElementById("bgmSound");if(bgm.paused)bgm.play().catch(()=>{})}
 function img(symbol){return `/juggler/images/${symbol}.png`}
-function symbolNode(symbol,center=false){const cell=document.createElement("div");cell.className=`symbol${center?" center":""}`;const image=document.createElement("img");image.src=img(symbol);image.alt=symbol;cell.appendChild(image);return cell}
+function symbolNode(symbol,center=false){const cell=document.createElement("div");cell.className=`symbol${center?" center":""}`;cell.dataset.symbol=symbol;const image=document.createElement("img");image.src=img(symbol);image.alt=symbol;cell.appendChild(image);return cell}
 function visibleFromStrip(key,index){const strip=reelStrips[key],len=strip.length;return [strip[(index-1+len)%len],strip[index%len],strip[(index+1)%len]]}
 function reelWindowSymbols(key,index){const strip=reelStrips[key],len=strip.length;return [strip[(index-2+len)%len],strip[(index-1+len)%len],strip[index%len],strip[(index+1)%len],strip[(index+2)%len]]}
 function symbolAtVisibleRow(key,centerIndex,row){const strip=reelStrips[key],len=strip.length;return strip[(centerIndex+Number(row)-1+len)%len]}
@@ -216,6 +216,10 @@ function applyWinningHighlights(payline){
     strip?.children[Number(payline.rows[key])+1]?.classList.add("win");
   });
 }
+function applyCherryHighlight(row){
+  const strip=reelsEl.children[0]?.querySelector(".strip");
+  strip?.children[Number(row)+1]?.classList.add("win");
+}
 function buildReels(randomize=false){
   reelsEl.innerHTML="";
   reelKeys.forEach(key=>{
@@ -255,7 +259,7 @@ function finishSpin(){
   if(spinResult.outcome==="big"){resultEl.classList.add("win");applyWinningHighlights(spinResult.payline);showPayline(spinResult.payline);resultEl.textContent=`BIG BONUS! ${spinResult.payout.toLocaleString()}rrc${rewardText}`;play("winSound");showBonus("big")}
   else if(spinResult.outcome==="reg"){resultEl.classList.add("win");applyWinningHighlights(spinResult.payline);showPayline(spinResult.payline);resultEl.textContent=`REG BONUS! ${spinResult.payout.toLocaleString()}rrc${rewardText}`;play("winSound");showBonus("reg")}
   else if(LINE_OUTCOMES[spinResult.outcome]){resultEl.classList.add("win");applyWinningHighlights(spinResult.payline);showPayline(spinResult.payline);resultEl.textContent=`${OUTCOME_LABELS[spinResult.outcome]} ${spinResult.payout.toLocaleString()}rrc${rewardText}`}
-  else if(spinResult.outcome==="cherry"){resultEl.classList.add("win");resultEl.textContent=`チェリー ${spinResult.payout.toLocaleString()}rrc${rewardText}`}
+  else if(spinResult.outcome==="cherry"){resultEl.classList.add("win");applyCherryHighlight(spinResult.cherry_row);resultEl.textContent=`チェリー ${spinResult.payout.toLocaleString()}rrc（BET返し）${rewardText}`}
   else{resultEl.textContent=rewardText?`ハズレ${rewardText}`:"ハズレ"}
 }
 function showBonus(kind){
