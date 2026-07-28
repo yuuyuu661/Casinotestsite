@@ -430,6 +430,12 @@ body{
             <div class="game-desc">リールを回して当たりを狙うシンプルなゲーム。短い時間でも遊びやすいです。</div>
             <div class="tag-row"><span class="tag">運試し</span><span class="tag">手軽</span></div>
           </div>
+
+          <div class="game-card" id="jugglerCard">
+            <div class="game-title">OASISジャグラー</div>
+            <div class="game-desc">日替わり設定と固定リール配列のソロスロット。台データを見ながらBIGとREGを狙います。</div>
+            <div class="tag-row"><span class="tag">設定推測</span><span class="tag">ソロ</span></div>
+          </div>
         </div>
       </div>
     </div>
@@ -636,6 +642,9 @@ document.getElementById("blackjackCard").addEventListener("click", () => {
 });
 document.getElementById("slotCard").addEventListener("click", () => {
   location.href = `/slot/${session ? `?session=${session}` : ""}`;
+});
+document.getElementById("jugglerCard").addEventListener("click", () => {
+  location.href = `/juggler/${session ? `?session=${session}` : ""}`;
 });
 
 loadMe();
