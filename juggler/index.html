@@ -136,6 +136,7 @@ function play(id){const a=document.getElementById(id);a.currentTime=0;a.play().c
 function img(symbol){return `/juggler/images/${symbol}.png`}
 function symbolNode(symbol,center=false){const cell=document.createElement("div");cell.className=`symbol${center?" center":""}`;const image=document.createElement("img");image.src=img(symbol);image.alt=symbol;cell.appendChild(image);return cell}
 function visibleFromStrip(key,index){const strip=reelStrips[key],len=strip.length;return [strip[(index-1+len)%len],strip[index%len],strip[(index+1)%len]]}
+function reelWindowSymbols(key,index){const strip=reelStrips[key],len=strip.length;return [strip[(index-2+len)%len],strip[(index-1+len)%len],strip[index%len],strip[(index+1)%len],strip[(index+2)%len]]}
 function forwardDistance(from,to,len){return (to-from+len)%len}
 function circularDistance(from,to,len){const forward=forwardDistance(from,to,len);return Math.min(forward,len-forward)}
 function currentCenterIndex(key){
@@ -156,8 +157,8 @@ function pickSlipCenter(key,pressedIndex){
 function renderStoppedReel(key,centerIndex,win=false){
   const idx=reelKeys.indexOf(key),strip=reelsEl.children[idx].querySelector(".strip");
   strip.classList.remove("spinning");strip.innerHTML="";
-  visibleFromStrip(key,centerIndex).forEach((s,i)=>strip.appendChild(symbolNode(s,i===1)));
-  if(win)strip.children[1].classList.add("win");
+  reelWindowSymbols(key,centerIndex).forEach((s,i)=>strip.appendChild(symbolNode(s,i===2)));
+  if(win)strip.children[2].classList.add("win");
 }
 function buildReels(randomize=false){
   reelsEl.innerHTML="";
