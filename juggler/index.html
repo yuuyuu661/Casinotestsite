@@ -114,8 +114,9 @@ button,select,input{font:inherit}button{border:0;border-radius:8px;font-weight:9
 </div>
 
 <audio id="startSound" src="/slot/sounds/start.mp3" preload="auto"></audio>
-<audio id="stopSound" src="/slot/sounds/stop.mp3" preload="auto"></audio>
+<audio id="stopSound" src="/juggler/sounds/reel_stop.mp3" preload="auto"></audio>
 <audio id="winSound" src="/slot/sounds/win5.mp3" preload="auto"></audio>
+<audio id="bgmSound" src="/juggler/sounds/jackpot_syndrome.mp3" preload="auto" loop></audio>
 
 <script>
 const API_BASE="https://api.oasis.red";
@@ -153,10 +154,11 @@ const LINE_PAY_SYMBOLS=new Set(Object.values(LINE_OUTCOMES));
 const OUTCOME_LABELS={cherry:"チェリー",grape:"グレープ",bell:"ベル",pig:"ピッグ",oasis:"OASIS",pierrot:"ピエロ"};
 const reelsEl=document.getElementById("reels"),resultEl=document.getElementById("result"),spinBtn=document.getElementById("spinBtn"),betSelect=document.getElementById("betSelect"),chanceLamp=document.getElementById("chanceLamp"),paylinePath=document.getElementById("paylinePath");
 const bonusOverlay=document.getElementById("bonusOverlay"),bonusTitle=document.getElementById("bonusTitle"),bonusPay=document.getElementById("bonusPay"),bonusSub=document.getElementById("bonusSub");
-const sounds=["startSound","stopSound","winSound"].map(id=>document.getElementById(id));
+const sounds=["startSound","stopSound","winSound","bgmSound"].map(id=>document.getElementById(id));
 let volume=.35;function applyVolume(v){volume=Math.max(0,Math.min(1,Number(v)));sounds.forEach(s=>s.volume=volume)}
 document.getElementById("volume").addEventListener("input",e=>applyVolume(e.target.value/100));applyVolume(.35);
 function play(id){const a=document.getElementById(id);a.currentTime=0;a.play().catch(()=>{})}
+function startBgm(){const bgm=document.getElementById("bgmSound");if(bgm.paused)bgm.play().catch(()=>{})}
 function img(symbol){return `/juggler/images/${symbol}.png`}
 function symbolNode(symbol,center=false){const cell=document.createElement("div");cell.className=`symbol${center?" center":""}`;const image=document.createElement("img");image.src=img(symbol);image.alt=symbol;cell.appendChild(image);return cell}
 function visibleFromStrip(key,index){const strip=reelStrips[key],len=strip.length;return [strip[(index-1+len)%len],strip[index%len],strip[(index+1)%len]]}
@@ -263,6 +265,7 @@ function showBonus(kind){
 }
 function previewBonus(kind){
   if(spinning)return;
+  startBgm();
   const payout=Number(betSelect.value||0)*(kind==="big"?150:50);
   spinResult={outcome:kind,payout,reward_total:0};
   resultEl.className="result win";
@@ -279,7 +282,7 @@ function burstSparks(kind){
   }
 }
 async function spin(){
-  if(spinning||!session)return;spinning=true;spinResult=null;queued.clear();hidePayline();stopped={left:false,middle:false,right:false};stoppedCenters={};spinBtn.disabled=true;betSelect.disabled=true;chanceLamp.classList.remove("on");resultEl.className="result";resultEl.textContent="リール回転中...";play("startSound");startReels();
+  if(spinning||!session)return;startBgm();spinning=true;spinResult=null;queued.clear();hidePayline();stopped={left:false,middle:false,right:false};stoppedCenters={};spinBtn.disabled=true;betSelect.disabled=true;chanceLamp.classList.remove("on");resultEl.className="result";resultEl.textContent="リール回転中...";play("startSound");startReels();
   try{
     const res=await fetch(`${API_BASE}/api/casino/juggler/spin`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({session,bet:Number(betSelect.value)})});
     const data=await res.json();if(!res.ok||!data.ok)throw new Error(data.detail||"スピンに失敗しました");spinResult=data;[...queued].forEach(stopReel);
