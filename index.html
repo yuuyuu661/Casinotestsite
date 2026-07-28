@@ -644,6 +644,13 @@ document.getElementById("slotCard").addEventListener("click", () => {
   location.href = `/slot/${session ? `?session=${session}` : ""}`;
 });
 document.getElementById("jugglerCard").addEventListener("click", () => {
+  const password = prompt("運営パスワードを入力してください");
+  if(password !== "yamadayamada"){
+    if(password !== null){
+      alert("パスワードが違います");
+    }
+    return;
+  }
   location.href = `/juggler/${session ? `?session=${session}` : ""}`;
 });
 

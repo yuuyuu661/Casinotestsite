@@ -9,16 +9,18 @@
 *{box-sizing:border-box}
 :root{--gold:#facc15;--red:#dc2626;--blue:#06184a;--panel:#0f172a;--line:rgba(255,255,255,.14)}
 body{margin:0;min-height:100vh;background:radial-gradient(circle at top,#122d71 0%,#020617 48%,#000 100%);color:#f8fafc;font-family:"Yu Gothic UI","Hiragino Sans",sans-serif}
+body.win-shake .machine{animation:cabinetPulse 1.2s ease-in-out 3}@keyframes cabinetPulse{0%,100%{filter:none;transform:translateY(0)}30%{filter:brightness(1.25) saturate(1.4);transform:translateY(-2px)}60%{filter:brightness(1.1);transform:translateY(1px)}}
 button,select,input{font:inherit}button{border:0;border-radius:8px;font-weight:900;cursor:pointer}button:disabled{opacity:.45;cursor:not-allowed}
 .page{width:min(1480px,100%);margin:auto;padding:18px}.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.back{padding:11px 16px;background:#1f2937;color:#fff;border:1px solid var(--line)}.wallet{display:flex;gap:18px;font-weight:900}.balance{color:var(--gold)}
 .title{text-align:center;margin:8px 0 18px;font-size:clamp(2rem,5vw,3.8rem);font-weight:1000;color:var(--gold);text-shadow:0 0 20px rgba(250,204,21,.45)}
 .layout{display:grid;grid-template-columns:minmax(250px,.75fr) minmax(520px,1.35fr) minmax(250px,.75fr);gap:16px;align-items:start}.panel{background:rgba(15,23,42,.88);border:1px solid var(--line);border-radius:8px;padding:16px;box-shadow:0 18px 40px rgba(0,0,0,.25)}.panel-title{color:var(--gold);font-size:1.1rem;font-weight:900;margin-bottom:12px}
 .machine{position:relative;min-height:780px;padding:0;overflow:hidden;background:#160404;border:5px solid var(--gold);box-shadow:0 0 36px rgba(250,204,21,.32)}.cabinet{position:absolute;inset:0;background:url("/juggler/images/cabinet.png") center top/cover no-repeat;opacity:.9;pointer-events:none}.playfield{position:relative;z-index:1;width:min(500px,86%);margin:305px auto 0;padding:14px;background:linear-gradient(180deg,rgba(8,15,36,.9),rgba(5,10,24,.96));border:3px solid #fbbf24;border-radius:10px;box-shadow:0 0 22px rgba(250,204,21,.4)}
-.chance-lamp{position:absolute;left:-74px;bottom:16px;width:62px;height:62px;border-radius:50%;display:grid;place-items:center;background:#172554;border:4px solid #60a5fa;color:#bfdbfe;font-size:.74rem;font-weight:1000;text-align:center;box-shadow:0 0 12px rgba(96,165,250,.45)}.chance-lamp.on{background:#e0f2fe;color:#1d4ed8;box-shadow:0 0 34px #38bdf8,0 0 64px #fef08a}
+.chance-lamp{position:absolute;left:-74px;bottom:16px;width:62px;height:62px;border-radius:50%;display:grid;place-items:center;background:#172554;border:4px solid #60a5fa;color:#bfdbfe;font-size:.74rem;font-weight:1000;text-align:center;box-shadow:0 0 12px rgba(96,165,250,.45)}.chance-lamp.on{background:#e0f2fe;color:#1d4ed8;animation:lampGlow .45s ease-in-out infinite alternate;box-shadow:0 0 34px #38bdf8,0 0 64px #fef08a}@keyframes lampGlow{from{transform:scale(1);filter:brightness(1)}to{transform:scale(1.08);filter:brightness(1.45)}}
 .reels{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.reel-window{height:282px;overflow:hidden;background:#f8fafc;border:4px solid #111827;border-radius:8px}.strip{transform:translateY(-94px)}.strip.spinning{animation:spin 720ms linear infinite}@keyframes spin{from{transform:translateY(-752px)}to{transform:translateY(-94px)}}.symbol{height:94px;display:grid;place-items:center;border-bottom:1px solid #d1d5db}.symbol img{width:84px;height:84px;object-fit:contain}.symbol.center{background:#fff7ed;box-shadow:inset 0 0 18px rgba(250,204,21,.55)}.symbol.win{background:#fef08a;box-shadow:inset 0 0 26px #f59e0b}
 .stop-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}.stop-btn{padding:12px;background:linear-gradient(#ef4444,#991b1b);color:#fff;border:2px solid #fecaca}.controls{display:flex;align-items:end;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:18px}.control{display:grid;gap:6px;color:#cbd5e1;font-weight:900}select{min-width:150px;padding:12px;background:#020617;color:#fff;border:1px solid var(--line);border-radius:8px}.spin-btn{min-width:180px;padding:15px 26px;background:linear-gradient(180deg,#fde047,#f59e0b);color:#111827;font-size:1.15rem}
 .result{position:relative;z-index:1;margin:16px auto 0;width:min(620px,90%);min-height:70px;padding:14px;text-align:center;font-weight:1000;font-size:1.25rem;background:rgba(2,6,23,.78);border:1px solid var(--line);border-radius:8px}.result.win{color:#fde047}.result.error{color:#fca5a5}
 .data-grid{display:grid;gap:10px}.stat{display:flex;justify-content:space-between;gap:12px;padding:10px;background:#020617;border-radius:6px}.stat strong{color:var(--gold)}.paytable{width:100%;border-collapse:collapse;font-size:.88rem}.paytable th,.paytable td{padding:7px 5px;border-bottom:1px solid var(--line);text-align:center}.note{color:#cbd5e1;font-size:.86rem;line-height:1.65;margin-top:12px}.reward{display:flex;justify-content:space-between;gap:10px;margin-top:8px;padding:9px;background:#172554;border-radius:6px}.volume{width:100%}
+.bonus-overlay{position:fixed;inset:0;z-index:50;display:none;place-items:center;padding:18px;background:rgba(2,6,23,.72);backdrop-filter:blur(5px)}.bonus-overlay.show{display:grid;animation:overlayIn .22s ease-out}.bonus-card{position:relative;width:min(760px,94vw);min-height:330px;padding:36px 24px;border:4px solid #facc15;border-radius:18px;background:#0f172a url("/juggler/images/bonus_burst.png") center/cover no-repeat;box-shadow:0 0 45px rgba(250,204,21,.55);overflow:hidden;text-align:center}.bonus-card::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(2,6,23,.1),rgba(2,6,23,.72));pointer-events:none}.bonus-content{position:relative;z-index:1;display:grid;gap:12px;place-items:center}.bonus-kicker{color:#bae6fd;font-weight:1000;letter-spacing:.22em}.bonus-title{font-size:clamp(2.6rem,10vw,6rem);font-weight:1000;color:#fef08a;text-shadow:0 0 18px #f97316,0 0 34px #fde047}.bonus-title.reg{color:#bfdbfe;text-shadow:0 0 18px #38bdf8,0 0 34px #60a5fa}.bonus-pay{font-size:clamp(1.4rem,4vw,2.4rem);font-weight:1000;color:#fff}.bonus-sub{color:#e0f2fe;font-weight:900}.spark{position:fixed;width:10px;height:10px;border-radius:50%;pointer-events:none;z-index:51;background:#fde047;box-shadow:0 0 14px #facc15;animation:sparkFall 1.1s ease-out forwards}@keyframes overlayIn{from{opacity:0;transform:scale(.98)}to{opacity:1;transform:scale(1)}}@keyframes sparkFall{to{transform:translate(var(--dx),var(--dy)) scale(.2);opacity:0}}
 @media(max-width:1080px){.layout{grid-template-columns:1fr}.machine{order:-1;min-height:720px}.playfield{margin-top:270px}.chance-lamp{left:10px;bottom:-80px}.result{margin-top:92px}}
 @media(max-width:620px){.page{padding:10px}.machine{min-height:590px;border-width:3px}.playfield{width:92%;margin-top:220px;padding:9px}.reel-window{height:213px}.symbol{height:71px}.symbol img{width:62px;height:62px}.strip{transform:translateY(-71px)}.strip.spinning{animation-name:spinMobile}@keyframes spinMobile{from{transform:translateY(-568px)}to{transform:translateY(-71px)}}.stop-btn{padding:10px 4px}.wallet{width:100%;justify-content:space-between}.chance-lamp{width:54px;height:54px;font-size:.66rem;bottom:-70px}}
 </style>
@@ -87,6 +89,17 @@ button,select,input{font:inherit}button{border:0;border-radius:8px;font-weight:9
   </section>
 </main>
 
+<div id="bonusOverlay" class="bonus-overlay">
+  <div class="bonus-card">
+    <div class="bonus-content">
+      <div class="bonus-kicker">GOGO OASIS</div>
+      <div id="bonusTitle" class="bonus-title">BIG BONUS</div>
+      <div id="bonusPay" class="bonus-pay">0 rrc</div>
+      <div id="bonusSub" class="bonus-sub">OASISランプ点灯！</div>
+    </div>
+  </div>
+</div>
+
 <audio id="startSound" src="/slot/sounds/start.mp3" preload="auto"></audio>
 <audio id="stopSound" src="/slot/sounds/stop.mp3" preload="auto"></audio>
 <audio id="winSound" src="/slot/sounds/win5.mp3" preload="auto"></audio>
@@ -94,6 +107,16 @@ button,select,input{font:inherit}button{border:0;border-radius:8px;font-weight:9
 <script>
 const API_BASE="https://api.oasis.red";
 const session=new URLSearchParams(location.search).get("session");
+const adminPassword = sessionStorage.getItem("oasisJugglerAdmin");
+if(adminPassword !== "ok"){
+  const password = prompt("運営パスワードを入力してください");
+  if(password === "yamadayamada"){
+    sessionStorage.setItem("oasisJugglerAdmin","ok");
+  }else{
+    alert("パスワードが違います");
+    location.href = `/${session?`?session=${session}`:""}`;
+  }
+}
 const reelKeys=["left","middle","right"];
 const fallbackStrips={
   left:["grape","pig","seven","grape","pig","grape","bar","cherry","grape","seven","pierrot","grape","pig","grape","cherry","bar","grape","pig","grape","seven","bell"],
@@ -103,6 +126,7 @@ const fallbackStrips={
 let reelStrips=fallbackStrips;
 let balance=0,spinning=false,spinResult=null,stopped={left:true,middle:true,right:true},queued=new Set(),timers=[];
 const reelsEl=document.getElementById("reels"),resultEl=document.getElementById("result"),spinBtn=document.getElementById("spinBtn"),betSelect=document.getElementById("betSelect"),chanceLamp=document.getElementById("chanceLamp");
+const bonusOverlay=document.getElementById("bonusOverlay"),bonusTitle=document.getElementById("bonusTitle"),bonusPay=document.getElementById("bonusPay"),bonusSub=document.getElementById("bonusSub");
 const sounds=["startSound","stopSound","winSound"].map(id=>document.getElementById(id));
 let volume=.35;function applyVolume(v){volume=Math.max(0,Math.min(1,Number(v)));sounds.forEach(s=>s.volume=volume)}
 document.getElementById("volume").addEventListener("input",e=>applyVolume(e.target.value/100));applyVolume(.35);
@@ -134,10 +158,29 @@ function finishSpin(){
   balance=spinResult.balance;renderBalance();renderStats(spinResult.stats);chanceLamp.classList.toggle("on",spinResult.chance);
   resultEl.className="result";
   const rewardText=spinResult.reward_total>0?` / 報酬 +${spinResult.reward_total.toLocaleString()}rrc`:"";
-  if(spinResult.outcome==="big"){resultEl.classList.add("win");resultEl.textContent=`BIG BONUS! ${spinResult.payout.toLocaleString()}rrc${rewardText}`;play("winSound")}
-  else if(spinResult.outcome==="reg"){resultEl.classList.add("win");resultEl.textContent=`REG BONUS! ${spinResult.payout.toLocaleString()}rrc${rewardText}`;play("winSound")}
+  if(spinResult.outcome==="big"){resultEl.classList.add("win");resultEl.textContent=`BIG BONUS! ${spinResult.payout.toLocaleString()}rrc${rewardText}`;play("winSound");showBonus("big")}
+  else if(spinResult.outcome==="reg"){resultEl.classList.add("win");resultEl.textContent=`REG BONUS! ${spinResult.payout.toLocaleString()}rrc${rewardText}`;play("winSound");showBonus("reg")}
   else if(spinResult.outcome==="cherry"){resultEl.classList.add("win");resultEl.textContent=`チェリー ${spinResult.payout.toLocaleString()}rrc${rewardText}`}
   else{resultEl.textContent=rewardText?`ハズレ${rewardText}`:"ハズレ"}
+}
+function showBonus(kind){
+  document.body.classList.add("win-shake");
+  bonusTitle.textContent=kind==="big"?"BIG BONUS":"REG BONUS";
+  bonusTitle.classList.toggle("reg",kind==="reg");
+  bonusPay.textContent=`${Number(spinResult.payout||0).toLocaleString()} rrc 獲得`;
+  bonusSub.textContent=spinResult.reward_total>0?`達成報酬 +${spinResult.reward_total.toLocaleString()} rrc`:"OASISランプ点灯！";
+  bonusOverlay.classList.add("show");
+  burstSparks(kind);
+  setTimeout(()=>bonusOverlay.classList.remove("show"),kind==="big"?2800:2200);
+  setTimeout(()=>document.body.classList.remove("win-shake"),3600);
+}
+function burstSparks(kind){
+  const colors=kind==="big"?["#fde047","#facc15","#38bdf8","#ffffff"]:["#93c5fd","#38bdf8","#ffffff","#fde047"];
+  for(let i=0;i<90;i++){
+    const dot=document.createElement("div");dot.className="spark";dot.style.left=`${45+Math.random()*10}vw`;dot.style.top=`${42+Math.random()*12}vh`;dot.style.background=colors[i%colors.length];
+    dot.style.setProperty("--dx",`${(Math.random()-.5)*1200}px`);dot.style.setProperty("--dy",`${(Math.random()-.7)*760}px`);
+    document.body.appendChild(dot);setTimeout(()=>dot.remove(),1200);
+  }
 }
 async function spin(){
   if(spinning||!session)return;spinning=true;spinResult=null;queued.clear();stopped={left:false,middle:false,right:false};spinBtn.disabled=true;betSelect.disabled=true;chanceLamp.classList.remove("on");resultEl.className="result";resultEl.textContent="リール回転中...";play("startSound");startReels();
