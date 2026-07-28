@@ -253,7 +253,7 @@ function stopReel(key){
 function finishSpin(){
   spinning=false;spinBtn.disabled=false;betSelect.disabled=false;
   sessionProfit+=Number(spinResult.payout||0)+Number(spinResult.reward_total||0)-Number(spinResult.bet||0);
-  balance=spinResult.balance;renderBalance();renderStats(spinResult.stats);chanceLamp.classList.toggle("on",spinResult.chance);
+  balance=spinResult.balance;renderBalance();renderStats(spinResult.stats);
   resultEl.className="result";
   const rewardText=spinResult.reward_total>0?` / 報酬 +${spinResult.reward_total.toLocaleString()}rrc`:"";
   if(spinResult.outcome==="big"){resultEl.classList.add("win");applyWinningHighlights(spinResult.payline);showPayline(spinResult.payline);resultEl.textContent=`BIG BONUS! ${spinResult.payout.toLocaleString()}rrc${rewardText}`;play("winSound");showBonus("big")}
@@ -285,7 +285,7 @@ async function spin(){
   if(spinning||!session)return;startBgm();spinning=true;spinResult=null;queued.clear();hidePayline();stopped={left:false,middle:false,right:false};stoppedCenters={};spinBtn.disabled=true;betSelect.disabled=true;chanceLamp.classList.remove("on");resultEl.className="result";resultEl.textContent="リール回転中...";play("startSound");startReels();
   try{
     const res=await fetch(`${API_BASE}/api/casino/juggler/spin`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({session,bet:Number(betSelect.value)})});
-    const data=await res.json();if(!res.ok||!data.ok)throw new Error(data.detail||"スピンに失敗しました");spinResult=data;[...queued].forEach(stopReel);
+    const data=await res.json();if(!res.ok||!data.ok)throw new Error(data.detail||"スピンに失敗しました");spinResult=data;chanceLamp.classList.toggle("on",Boolean(data.chance));[...queued].forEach(stopReel);
   }catch(err){resultEl.className="result error";resultEl.textContent=err.message==="Insufficient balance"?"残高が不足しています":err.message;spinning=false;spinBtn.disabled=false;betSelect.disabled=false;buildReels(true);document.querySelectorAll(".stop-btn").forEach(b=>b.disabled=true)}
 }
 function renderBalance(){document.getElementById("balanceText").textContent=`残高 ${Number(balance||0).toLocaleString()} rrc`}
