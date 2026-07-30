@@ -81,7 +81,19 @@ function me(){return game?.players.find(p=>p.is_me)}
 function current(){return game?.players.find(p=>p.is_turn)}
 function selectedCards(){const hand=[...(me()?.hand||[]),...(me()?.learned_magics||[])];return selected.map(uid=>hand.find(c=>c.uid===uid)).filter(Boolean)}
 function isAll(card){return card?.isAllAttack||card?.target==="all_enemies"||["all_attack","magic_all_attack"].includes(card?.effect)}
+function isAttack(card){return card?.type==="weapon"||card?.effect==="attack_defense"||(card?.type==="magic"&&["magic_attack","magic_all_attack","hp_drain","inflict_status"].includes(card?.effect))}
 function needsTarget(card){return !isAll(card)&&card?.target!=="self"&&!["exchange","sell","buy"].includes(card?.effect)}
+function canChoosePlayer(player){
+  const turn=current(),card=selectedCards()[0];
+  if(!player?.alive)return false;
+  if(game.can_defend)return Boolean(player.is_me);
+  if(["trade_sell","trade_buy"].includes(game.phase))return !player.is_me;
+  if(game.phase!=="turn"||!turn?.is_me||!card)return false;
+  if(isAll(card))return false;
+  if(isAttack(card))return card.effect==="random_target"||!player.is_me;
+  if(card.target==="self")return Boolean(player.is_me);
+  return true;
+}
 function isDefenseCard(card){return Boolean(card)&&(card.type==="armor"||Number(card.defense||0)>0||["reflect_normal","reflect_magic","nullify_magic","wall_defense","element_change"].includes(card.effect)||["reflect_magic","nullify_magic"].includes(card.secondaryEffect))}
 function defenseElementCanBlock(attackElement,defenseElement){if(["none","dark"].includes(attackElement))return true;if(attackElement==="light")return false;return ({fire:["water","light"],water:["fire","light"],wood:["earth","light"],earth:["wood","light"]}[attackElement]||[]).includes(defenseElement||"none")}
 function canSelectDefense(card){
@@ -121,7 +133,7 @@ function render(){
   if(game.phase==="turn"&&turn?.is_me)msg=selected.length?"使用対象のステータスをタップしてください。":"カードを選んでください。武器がなければ祈れます。";
   if(game.phase==="finished")msg=game.winner_ids.includes(mine?.user_id)?"あなたの勝利です！":"対戦終了";
   $("message").innerHTML=esc(msg);
-  $("players").innerHTML=game.players.map(p=>`<div class="player ${p.is_me?"me":""} ${p.is_turn?"turn":""} ${!p.alive?"dead":""} ${battle.defender_id===p.user_id?"defender":""} ${(game.phase==="turn"&&turn?.is_me&&selected.length)||game.phase.startsWith("trade_")||game.can_defend&&p.is_me?"targetable":""}" data-player="${esc(p.user_id)}"><span class="name">${esc(p.user_name)}</span><span class="stats">HP ${p.hp??"?"}　MP ${p.mp??"?"}　￥ ${p.gold??"?"}</span>${p.statuses.length||p.guardian?`<span class="badges">${p.statuses.map(s=>esc(statusNames[s]||s)).join("・")}${p.guardian?`${p.statuses.length?"・":""}守護神 ${esc(p.guardian.name)}`:""}</span>`:""}</div>`).join("");
+  $("players").innerHTML=game.players.map(p=>`<div class="player ${p.is_me?"me":""} ${p.is_turn?"turn":""} ${!p.alive?"dead":""} ${battle.defender_id===p.user_id?"defender":""} ${canChoosePlayer(p)?"targetable":""}" data-player="${esc(p.user_id)}"><span class="name">${esc(p.user_name)}</span><span class="stats">HP ${p.hp??"?"}　MP ${p.mp??"?"}　￥ ${p.gold??"?"}</span>${p.statuses.length||p.guardian?`<span class="badges">${p.statuses.map(s=>esc(statusNames[s]||s)).join("・")}${p.guardian?`${p.statuses.length?"・":""}守護神 ${esc(p.guardian.name)}`:""}</span>`:""}</div>`).join("");
   $("attackCards").innerHTML=(battle.attack_cards||[]).map(battleCard).join("")||'<div class="empty">攻撃カードなし</div>';
   $("defenseCards").innerHTML=(battle.defense_cards||[]).map(battleCard).join("")||'<div class="empty">防御カードなし</div>';
   $("attackTotal").textContent=`攻 ${battle.attack||0}`;$("defenseTotal").textContent=`守 ${battle.defense||0}`;
@@ -179,9 +191,14 @@ function selectCard(uid){
 }
 function choosePlayer(userId){
   if(game.can_defend&&me()?.user_id===userId){confirmDefense();return}
-  if(game.phase==="trade_sell"){if(!saleUid){toast("売るカードを先に選んでください");return}action({action:"trade",card_uid:saleUid,target_id:userId});return}
-  if(game.phase==="trade_buy"){action({action:"trade",target_id:userId,confirm:false});return}
-  if(game.phase==="turn"&&current()?.is_me&&selected.length)playCard(userId)
+  if(game.phase==="trade_sell"){if(me()?.user_id===userId){toast("自分とは取引できません");return}if(!saleUid){toast("売るカードを先に選んでください");return}action({action:"trade",card_uid:saleUid,target_id:userId});return}
+  if(game.phase==="trade_buy"){if(me()?.user_id===userId){toast("自分とは取引できません");return}action({action:"trade",target_id:userId,confirm:false});return}
+  if(game.phase==="turn"&&current()?.is_me&&selected.length){
+    const card=selectedCards()[0];
+    if(isAll(card)){toast("「全体へ発動」を押してください");return}
+    if(isAttack(card)&&card.effect!=="random_target"&&me()?.user_id===userId){toast("自分を攻撃対象には選べません");return}
+    playCard(userId)
+  }
 }
 function playCard(targetId){const cards=selectedCards();if(!cards.length)return;action({action:"play",card_uid:cards[0].uid,support_uids:cards.slice(1).map(c=>c.uid),target_id:targetId})}
 function confirmDefense(){action({action:"defend",defense_uids:[...selected]})}
