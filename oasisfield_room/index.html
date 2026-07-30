@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>オアシスフィールド</title>
+  <link rel="icon" href="data:,">
+  <style>
+    :root{--green:#079473;--deep:#006b56;--mint:#c9f7ef;--panel:#ecfffaf0;--line:#80cec0;--gold:#ffd65a;--red:#e73355;--ink:#073c34;--blue:#3659df}
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    body{margin:0;min-height:100vh;color:var(--ink);font-family:system-ui,-apple-system,"Yu Gothic",sans-serif;background:radial-gradient(circle at 30% 10%,#ddffff 0,#96eadf 42%,#45b99b 100%);font-weight:700}
+    button,input{font:inherit}button{touch-action:manipulation}
+    .app{width:min(1180px,100%);min-height:100vh;margin:auto;padding:10px;display:grid;grid-template-rows:auto auto auto 1fr;gap:9px}
+    .top{height:62px;border-radius:12px;background:var(--green);display:grid;grid-template-columns:64px 1fr auto;align-items:center;padding:7px 10px;color:white;box-shadow:0 3px 0 #00715a}
+    .back,.icon-btn{border:0;background:#eafff6;color:var(--deep);border-radius:9px;height:44px;min-width:48px;font-size:24px;font-weight:1000}
+    .gf{text-align:center}.gf b{display:inline-block;min-width:170px;padding:5px 24px;border-radius:999px;background:#efffec;color:#e06b53;font-size:28px;letter-spacing:.12em}.gf small{display:block;font-size:11px;color:#dcfff7}
+    .top-tools{display:flex;gap:7px;align-items:center}.volume{width:90px}
+    .message{min-height:43px;border:3px solid var(--green);border-radius:11px;background:#f1fffb;padding:8px 12px;text-align:center;font-size:15px}
+    .message.end{border-color:#c63343;background:#fff0f1}.message strong{color:#d8274b}
+    .players{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:7px}
+    .player{position:relative;border:3px solid #aaa;border-radius:999px;background:#f5f5f5;padding:7px 12px 7px 31px;display:grid;grid-template-columns:minmax(72px,1fr) auto;gap:7px;align-items:center;cursor:pointer;min-height:51px}
+    .player:before{content:"";position:absolute;left:8px;top:50%;width:16px;height:16px;transform:translateY(-50%);border-radius:50%;background:#aaa}
+    .player.me .name{color:var(--blue)}.player.turn{outline:4px solid var(--gold)}.player.dead{opacity:.5;filter:grayscale(1)}.player.targetable{animation:pulse 1.2s infinite;cursor:pointer}.player.defender{outline:4px solid #e64763}
+    @keyframes pulse{50%{box-shadow:0 0 0 6px #ffda5270}}
+    .name{font-size:18px;color:var(--green);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.stats{white-space:nowrap;font-size:13px;color:#4d6762}.badges{grid-column:1/-1;font-size:11px;color:#8c4d17;padding-left:2px}
+    .table{border:2px solid var(--line);border-radius:13px;background:var(--panel);padding:10px;min-height:260px;display:grid;grid-template-columns:1fr 116px 1fr;gap:8px}
+    .field{border-radius:12px;background:#dff8f2cc;min-height:188px;padding:8px;display:flex;flex-direction:column;gap:5px}
+    .field h2{text-align:center;margin:0 0 3px;font-size:14px}.battle-cards{display:flex;flex-direction:column;gap:5px;align-items:stretch}.battle-card{display:grid;grid-template-columns:58px 1fr auto;min-height:55px;border:1px solid #84cbbd;border-radius:9px;background:#effff7;overflow:hidden}.battle-card img{width:58px;height:55px;object-fit:cover}.battle-copy{padding:5px;min-width:0}.battle-copy b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.battle-copy small{display:block;color:#5e746f}.battle-num{align-self:center;padding-right:8px;font-size:20px}
+    .total{margin-top:auto;border:3px solid #555;border-radius:9px;background:#dfffc9;padding:4px;text-align:center;font-size:27px}
+    .versus{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}.versus b{font-size:38px;color:#fff3a2;text-shadow:0 2px 3px #777}.versus .damage{font-size:24px;color:var(--red)}.versus small{font-size:11px}
+    .workspace{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:9px;min-height:0}
+    .hand-panel,.detail{border:2px solid var(--line);border-radius:13px;background:var(--panel);padding:10px}.hand-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:7px}.hand-title h2,.detail h2{font-size:17px;margin:0}.actions{display:flex;gap:6px;flex-wrap:wrap}.btn{border:0;border-radius:9px;padding:9px 13px;background:#eefaf6;color:var(--ink);font-weight:1000}.btn.primary{background:var(--gold)}.btn.danger{background:#ba4348;color:#fff}.btn.pray{background:linear-gradient(#fff5a5,#ffd241);font-size:18px;border:3px solid #f3af18}.btn:disabled{opacity:.4}
+    .hand{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:7px;max-height:310px;overflow:auto;padding:3px}
+    .card{position:relative;border:3px solid transparent;border-radius:9px;background:#dbffc9;overflow:hidden;min-width:0;cursor:pointer;padding:0;text-align:left}.card.selected{border-color:#ffbd18;transform:translateY(-2px)}.card img{display:block;width:100%;aspect-ratio:1/1;object-fit:cover;background:#cde8df}.card-stat{display:block;text-align:center;padding:4px 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#385652;font-size:14px}.card-order{position:absolute;top:3px;right:3px;background:#ffcd31;color:#543400;border-radius:50%;width:22px;height:22px;text-align:center;line-height:22px}.element{font-weight:1000}.fire{color:#ed442d}.water{color:#2587e8}.wood{color:#168d3e}.earth{color:#967239}.light{color:#d29b00}.dark{color:#9a42ba}
+    .detail{min-width:0}.detail img{width:100%;aspect-ratio:16/10;object-fit:contain;background:#c7eee4;border-radius:9px}.detail .card-name{font-size:20px;margin:7px 0}.detail p{font-size:13px;line-height:1.55;margin:7px 0}.empty{height:100%;display:grid;place-items:center;color:#6e8f87;text-align:center}
+    .modal{position:fixed;inset:0;background:#002d28a8;display:none;place-items:center;padding:14px;z-index:20}.modal.show{display:grid}.dialog{width:min(500px,100%);max-height:90vh;overflow:auto;border-radius:14px;background:#edfff9;padding:16px;border:3px solid var(--green)}.dialog h2{margin-top:0}.exchange-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}.exchange-grid input{width:100%;font-size:24px;text-align:center;padding:8px;border:1px solid #7caea6;border-radius:8px}.step{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:5px 0}.step button{border:0;border-radius:7px;padding:6px;background:#d2eee8}.dialog-actions{display:flex;justify-content:flex-end;gap:7px;margin-top:12px}
+    .toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#092f2a;color:white;padding:10px 16px;border-radius:999px;z-index:30;opacity:0;pointer-events:none;transition:.2s}.toast.show{opacity:1}
+    @media(max-width:700px){.app{padding:6px}.top{height:56px}.gf b{min-width:130px;font-size:22px}.volume{width:65px}.players{grid-template-columns:1fr}.player{min-height:45px;padding-top:5px;padding-bottom:5px}.table{grid-template-columns:1fr 76px 1fr;padding:6px;min-height:230px}.field{padding:5px;min-height:180px}.battle-card{grid-template-columns:45px 1fr}.battle-card img{width:45px;height:48px}.battle-num{display:none}.total{font-size:22px}.versus b{font-size:27px}.workspace{grid-template-columns:1fr}.detail{display:none}.hand{grid-template-columns:repeat(5,minmax(58px,1fr));gap:5px;max-height:none}.card-stat{font-size:12px}.hand-panel{padding:7px}.top-tools .icon-btn{display:none}}
+    @media(max-width:430px){.hand{grid-template-columns:repeat(4,minmax(58px,1fr))}.player .name{font-size:17px}.stats{font-size:12px}.message{font-size:13px}.table{grid-template-columns:1fr 55px 1fr}.versus small{display:none}}
+  </style>
+</head>
+<body>
+<main class="app">
+  <header class="top">
+    <button class="back" id="backBtn" aria-label="ロビーへ戻る">←</button>
+    <div class="gf"><b id="gfLabel">G.F.-</b><small id="roomLabel">ROOM</small></div>
+    <div class="top-tools"><span>🔊</span><input class="volume" id="volume" type="range" min="0" max="100" value="35"><button class="icon-btn" id="reloadBtn" aria-label="更新">↻</button></div>
+  </header>
+  <div class="message" id="message">読み込み中...</div>
+  <section class="players" id="players"></section>
+  <section class="table" id="battleTable">
+    <div class="field" id="attackField"><h2>攻撃の場</h2><div class="battle-cards" id="attackCards"></div><div class="total" id="attackTotal">攻 0</div></div>
+    <div class="versus"><b>VS</b><div class="damage" id="damage">待機中</div><small id="elementText"></small></div>
+    <div class="field" id="defenseField"><h2>防御の場</h2><div class="battle-cards" id="defenseCards"></div><div class="total" id="defenseTotal">守 0</div></div>
+  </section>
+  <section class="workspace">
+    <div class="hand-panel">
+      <div class="hand-title"><h2>手札 <span id="handCount"></span></h2><div class="actions" id="actions"></div></div>
+      <div class="hand" id="hand"></div>
+    </div>
+    <aside class="detail" id="detail"><div class="empty">カードを選ぶと詳細を表示します。</div></aside>
+  </section>
+</main>
+<div class="modal" id="modal"><div class="dialog" id="dialog"></div></div>
+<div class="toast" id="toast"></div>
+<script>
+const API_BASE="https://api.oasis.red";
+const qs=new URLSearchParams(location.search);
+const room=qs.get("room"),session=qs.get("session");
+const $=id=>document.getElementById(id);
+let game=null,roomInfo=null,selected=[],saleUid=null,lastPhase="",busy=false;
+let audioCtx=null;
+const statusNames={cold:"風邪",fever:"熱病",hell:"地獄病",heaven:"天国病",fog:"霧",dream:"夢",dark_cloud:"暗雲",flash:"閃光",frenzy:"熱狂"};
+const elementData={fire:["🔥","火"],water:["💧","水"],wood:["🌿","木"],earth:["◆","土"],light:["☀","光"],dark:["☾","闇"],none:["",""]};
+const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function sound(kind="tap"){const volume=Number($("volume").value)/100;if(!volume)return;audioCtx??=new (window.AudioContext||window.webkitAudioContext)();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.frequency.value=kind==="hit"?180:kind==="block"?520:360;g.gain.value=.09*volume;o.connect(g);g.connect(audioCtx.destination);o.start();g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+.16);o.stop(audioCtx.currentTime+.17)}
+function toast(text){$("toast").textContent=text;$("toast").classList.add("show");setTimeout(()=>$("toast").classList.remove("show"),2100)}
+async function json(url,options){const res=await fetch(url,options);let data={};try{data=await res.json()}catch{}if(!res.ok||data.ok===false)throw new Error(data.detail||data.error||"通信に失敗しました");return data}
+function img(card){return `/of-admin/${String(card?.image||"").replace(/^\/+/,"")}`}
+function me(){return game?.players.find(p=>p.is_me)}
+function current(){return game?.players.find(p=>p.is_turn)}
+function selectedCards(){const hand=[...(me()?.hand||[]),...(me()?.learned_magics||[])];return selected.map(uid=>hand.find(c=>c.uid===uid)).filter(Boolean)}
+function isAll(card){return card?.isAllAttack||card?.target==="all_enemies"||["all_attack","magic_all_attack"].includes(card?.effect)}
+function needsTarget(card){return !isAll(card)&&card?.target!=="self"&&!["exchange","sell","buy"].includes(card?.effect)}
+function compact(card){const e=elementData[card.element]||elementData.none;if(card.catalogGroup==="additional_weapon")return `+${card.attack||0}${e[0]}`;if(card.attack)return `${card.effectChance<100?card.effectChance+"% ":""}攻${card.attack}${e[0]}`;if(card.defense)return `守${card.defense}${e[0]}`;if(card.mpCost)return `MP${card.mpCost} ${e[0]}`;if(card.effect==="sell")return "売る";if(card.effect==="buy")return "買う";if(card.effect==="exchange")return "両替";return card.effectPower?`効${card.effectPower}`:"特殊"}
+function special(card){if(card.statusEffect&&card.statusEffect!=="none")return `ダメージで${statusNames[card.statusEffect]||card.statusEffect}付与`;const map={multi_hit:`${card.hitCount||2}回攻撃`,reflect_normal:"攻撃を反射",reflect_magic:"奇跡を弾く",nullify_magic:"奇跡を止める",wall_defense:"無属性武器を止める",hp_drain:"ダメージ吸収",instant_defeat:"ダメージで即死",double_attack:"単体武器を2倍",sure_all_attack:"単体武器を全体化",add_magic_attack:`追加攻撃+${card.attack||card.effectPower||0}`,mp_free_magic:"直前の奇跡MP0"};return map[card.effect]||""}
+function cardView(card,index){return `<button class="card ${selected.includes(card.uid)?"selected":""}" data-card="${esc(card.uid)}"><img src="${img(card)}" alt="" onerror="this.style.visibility='hidden'"><span class="card-stat ${esc(card.element||"none")}">${esc(compact(card))}</span>${selected.includes(card.uid)?`<span class="card-order">${selected.indexOf(card.uid)+1}</span>`:""}</button>`}
+function battleCard(card){return `<div class="battle-card"><img src="${img(card)}" alt=""><div class="battle-copy"><b>${esc(card.name)}</b><small>${esc(compact(card))}${special(card)?`・${esc(special(card))}`:""}</small></div><span class="battle-num">${card.attack?`攻${card.attack}`:card.defense?`守${card.defense}`:""}</span></div>`}
+function render(){
+  if(!game)return;
+  const mine=me(),turn=current(),battle=game.battle||{};
+  $("gfLabel").textContent=`G.F.${game.end_time_limit}`;
+  $("roomLabel").textContent=`${room}・${game.turn_count}/${game.end_time_limit}${game.endgame?"・終末":""}`;
+  $("message").classList.toggle("end",game.endgame);
+  let msg=game.logs?.[0]||"";
+  if(game.phase==="waiting")msg="全員が準備したらホストが開始してください。";
+  if(game.phase==="defense"&&game.can_defend)msg=battle.hit?"防御カードを選び、自分のステータスをタップして確定してください。":"攻撃は外れました。自分のステータスをタップして進めてください。";
+  if(game.phase==="turn"&&turn?.is_me)msg=selected.length?"使用対象のステータスをタップしてください。":"カードを選んでください。武器がなければ祈れます。";
+  if(game.phase==="finished")msg=game.winner_ids.includes(mine?.user_id)?"あなたの勝利です！":"対戦終了";
+  $("message").innerHTML=esc(msg);
+  $("players").innerHTML=game.players.map(p=>`<div class="player ${p.is_me?"me":""} ${p.is_turn?"turn":""} ${!p.alive?"dead":""} ${battle.defender_id===p.user_id?"defender":""} ${(game.phase==="turn"&&turn?.is_me&&selected.length)||game.phase.startsWith("trade_")||game.can_defend&&p.is_me?"targetable":""}" data-player="${esc(p.user_id)}"><span class="name">${esc(p.user_name)}</span><span class="stats">HP ${p.hp??"?"}　MP ${p.mp??"?"}　￥ ${p.gold??"?"}</span>${p.statuses.length||p.guardian?`<span class="badges">${p.statuses.map(s=>esc(statusNames[s]||s)).join("・")}${p.guardian?`${p.statuses.length?"・":""}守護神 ${esc(p.guardian.name)}`:""}</span>`:""}</div>`).join("");
+  $("attackCards").innerHTML=(battle.attack_cards||[]).map(battleCard).join("")||'<div class="empty">攻撃カードなし</div>';
+  $("defenseCards").innerHTML=(battle.defense_cards||[]).map(battleCard).join("")||'<div class="empty">防御カードなし</div>';
+  $("attackTotal").textContent=`攻 ${battle.attack||0}`;$("defenseTotal").textContent=`守 ${battle.defense||0}`;
+  $("damage").textContent=battle.damage==null?(battle.hit===false?"はずれ":"待機中"):`${battle.damage} ダメージ`;
+  const ed=elementData[battle.element]||elementData.none;$("elementText").textContent=ed[1]?`${ed[0]} ${ed[1]}属性`:"無属性";
+  const hand=mine?.hand||[];$("handCount").textContent=`${hand.length}/${18}`;$("hand").innerHTML=hand.map(cardView).join("");
+  renderActions();renderDetail();bind();
+  if(lastPhase&&lastPhase!==game.phase&&battle.damage!=null)sound(battle.blocked?"block":"hit");lastPhase=game.phase;
+  if(game.phase.startsWith("trade_"))renderTrade();
+}
+function renderActions(){
+  const mine=me(),turn=current(),isHost=mine&&String(game.host_user_id)===String(mine.user_id),wait=["waiting","finished"].includes(game.phase),myTurn=game.phase==="turn"&&turn?.is_me,card=selectedCards()[0];
+  const noWeapon=!(mine?.hand||[]).some(c=>c.type==="weapon");
+  let html=`<button class="btn primary" id="readyBtn" ${wait?"":"disabled"}>${mine?.ready?"準備解除":"準備完了"}</button><button class="btn primary" id="startBtn" ${isHost&&wait&&game.players.length>=2&&game.players.every(p=>p.ready)?"":"disabled"}>対戦開始</button>`;
+  if(myTurn&&noWeapon)html+=`<button class="btn pray" id="prayBtn">✨ 祈る</button>`;
+  if(myTurn&&card&&isAll(card))html+=`<button class="btn danger" id="allBtn">全体へ発動</button>`;
+  if(myTurn&&game.endgame&&card)html+=`<button class="btn danger" id="sacrificeBtn">生贄にする</button>`;
+  if(selected.length)html+=`<button class="btn" id="clearBtn">選択解除</button>`;
+  if(game.phase.startsWith("trade_"))html+=`<button class="btn danger" id="cancelTradeBtn">取引をキャンセル</button>`;
+  $("actions").innerHTML=html;
+  $("readyBtn")?.addEventListener("click",()=>post("/ready",{ready:!mine?.ready}));
+  $("startBtn")?.addEventListener("click",()=>post("/start",{}));
+  $("prayBtn")?.addEventListener("click",()=>action({action:"pray"}));
+  $("allBtn")?.addEventListener("click",()=>playCard(null));
+  $("sacrificeBtn")?.addEventListener("click",()=>action({action:"sacrifice",card_uid:selected[0]}));
+  $("clearBtn")?.addEventListener("click",()=>{selected=[];saleUid=null;render()});
+  $("cancelTradeBtn")?.addEventListener("click",()=>action({action:"trade",cancel:true}));
+}
+function renderDetail(){
+  const card=selectedCards().at(-1);if(!card){$("detail").innerHTML='<div class="empty">カードを選ぶと詳細を表示します。</div>';return}
+  const e=elementData[card.element]||elementData.none;$("detail").innerHTML=`<h2>カード詳細</h2><img src="${img(card)}" alt=""><div class="card-name">${esc(card.name)}</div><p>${esc(compact(card))} ${e[1]?`<span class="${card.element}">${e[0]} ${e[1]}属性</span>`:""}</p>${special(card)?`<p><strong>${esc(special(card))}</strong></p>`:""}<p>${esc(card.desc||"")}</p><p>価格 ￥${card.price||0}</p>`
+}
+function bind(){
+  document.querySelectorAll("[data-card]").forEach(el=>el.onclick=()=>selectCard(el.dataset.card));
+  document.querySelectorAll("[data-player]").forEach(el=>el.onclick=()=>choosePlayer(el.dataset.player));
+  $("attackField").onclick=()=>{if(game.can_defend)confirmDefense()};
+  $("defenseField").onclick=()=>{if(game.can_defend)confirmDefense()};
+}
+function selectCard(uid){
+  const mine=me();if(!mine)return;
+  if(game.phase==="defense"&&game.can_defend){selected.includes(uid)?selected=selected.filter(x=>x!==uid):selected.push(uid);sound();render();return}
+  if(game.phase==="trade_sell"){saleUid=uid;selected=[uid];sound();render();return}
+  if(game.phase!=="turn"||!current()?.is_me)return;
+  const card=mine.hand.find(c=>c.uid===uid)||mine.learned_magics?.find(c=>c.uid===uid);if(!card)return;
+  if(!selected.length){selected=[uid];sound();if(["sell","buy","exchange"].includes(card.effect)){action({action:"play",card_uid:uid});return}render();return}
+  if(selected[0]===uid){selected=[];render();return}
+  const support=card.catalogGroup==="additional_weapon"||(card.type==="magic"&&["add_magic_attack","double_attack","sure_all_attack"].includes(card.effect))||card.effect==="mp_free_magic";
+  if(support){selected.includes(uid)?selected=selected.filter(x=>x!==uid):selected.push(uid);sound();render()}else{selected=[uid];sound();render()}
+}
+function choosePlayer(userId){
+  if(game.can_defend&&me()?.user_id===userId){confirmDefense();return}
+  if(game.phase==="trade_sell"){if(!saleUid){toast("売るカードを先に選んでください");return}action({action:"trade",card_uid:saleUid,target_id:userId});return}
+  if(game.phase==="trade_buy"){action({action:"trade",target_id:userId,confirm:false});return}
+  if(game.phase==="turn"&&current()?.is_me&&selected.length)playCard(userId)
+}
+function playCard(targetId){const cards=selectedCards();if(!cards.length)return;action({action:"play",card_uid:cards[0].uid,support_uids:cards.slice(1).map(c=>c.uid),target_id:targetId})}
+function confirmDefense(){action({action:"defend",defense_uids:[...selected]})}
+function renderTrade(){
+  const pending=game.pending_trade;if(!pending)return;
+  if(game.phase==="trade_exchange")showExchange();
+  if(game.phase==="trade_buy_confirm"&&pending.offer)showBuy(pending);
+}
+function showExchange(){
+  if($("modal").classList.contains("show"))return;const mine=me(),total=mine.hp+mine.mp+mine.gold;
+  $("dialog").innerHTML=`<h2>両替</h2><p>合計 ${total} をHP・MP・￥へ分配します。</p><div class="exchange-grid">${["hp","mp","gold"].map((k,i)=>`<div><b>${["HP","MP","￥"][i]}</b><div class="step"><button data-step="${k}:10">+10</button><button data-step="${k}:1">+1</button></div><input id="ex-${k}" type="number" min="0" max="99" value="${mine[k]}"><div class="step"><button data-step="${k}:-1">-1</button><button data-step="${k}:-10">-10</button></div></div>`).join("")}</div><p id="exTotal">変更前 HP${mine.hp} MP${mine.mp} ￥${mine.gold} → 合計 ${total}</p><div class="dialog-actions"><button class="btn" id="dialogCancel">キャンセル</button><button class="btn primary" id="exchangeOk">確定</button></div>`;
+  $("modal").classList.add("show");document.querySelectorAll("[data-step]").forEach(b=>b.onclick=()=>{const [k,d]=b.dataset.step.split(":");const input=$(`ex-${k}`);input.value=Math.max(0,Math.min(99,Number(input.value)+Number(d)));updateExchange(total,mine)});["hp","mp","gold"].forEach(k=>$(`ex-${k}`).oninput=()=>updateExchange(total,mine));$("dialogCancel").onclick=()=>{closeModal();action({action:"trade",cancel:true})};$("exchangeOk").onclick=()=>{const values=Object.fromEntries(["hp","mp","gold"].map(k=>[k,Number($(`ex-${k}`).value)]));closeModal();action({action:"trade",...values})}
+}
+function updateExchange(total,mine){const vals=["hp","mp","gold"].map(k=>Number($(`ex-${k}`).value)||0);$("exTotal").textContent=`変更前 HP${mine.hp} MP${mine.mp} ￥${mine.gold} → 変更後 HP${vals[0]} MP${vals[1]} ￥${vals[2]}（合計 ${vals.reduce((a,b)=>a+b,0)}/${total}）`}
+function showBuy(pending){if($("modal").classList.contains("show"))return;const c=pending.offer;$("dialog").innerHTML=`<h2>買う</h2><p>「${esc(c.name)}」が選ばれました。￥${c.price||0}で購入しますか？</p><img style="width:100%;max-height:240px;object-fit:contain" src="${img(c)}" alt=""><div class="dialog-actions"><button class="btn" id="buyNo">見送る</button><button class="btn primary" id="buyYes">購入</button></div>`;$("modal").classList.add("show");$("buyNo").onclick=()=>{closeModal();action({action:"trade",confirm:false,cancel:true})};$("buyYes").onclick=()=>{closeModal();action({action:"trade",target_id:pending.target_id,confirm:true})}}
+function closeModal(){$("modal").classList.remove("show");$("dialog").innerHTML=""}
+async function post(path,body){if(busy)return;busy=true;try{await json(`${API_BASE}/api/casino/oasisfield${path}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({session,room_id:room,...body})});selected=[];saleUid=null;closeModal();sound();await load()}catch(e){toast(e.message)}finally{busy=false}}
+const action=body=>post("/action",body);
+async function load(){if(!room||!session){$("message").textContent="部屋情報またはセッションがありません";return}try{roomInfo=await json(`${API_BASE}/api/casino/room-info?room_id=${encodeURIComponent(room)}`);const state=await json(`${API_BASE}/api/casino/oasisfield/state?room_id=${encodeURIComponent(room)}&session=${encodeURIComponent(session)}`);game=state.game;render()}catch(e){$("message").textContent=e.message}}
+$("backBtn").onclick=()=>location.href=`/lobby?game=oasisfield&session=${encodeURIComponent(session||"")}`;$("reloadBtn").onclick=load;
+$("volume").value=localStorage.getItem("ofVolume")||35;$("volume").oninput=()=>localStorage.setItem("ofVolume",$("volume").value);
+load();setInterval(load,1400);
+</script>
+</body>
+</html>

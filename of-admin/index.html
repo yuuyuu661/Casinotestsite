@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>おあしすフィールド 管理メニュー</title>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <link rel="stylesheet" href="style.css?v=10.9.0">
+</head>
+<body>
+<div class="admin-page">
+  <header class="topbar">
+    <div>
+      <h1>カード管理</h1>
+      <p>カード追加・編集・削除 / 画像・GIFも端末に保存</p>
+    </div>
+    <a class="admin-link" id="casinoBackLink" href="/">カジノへ戻る</a>
+  </header>
+
+  <section class="admin-grid">
+    <form id="cardForm" class="panel admin-form">
+      <input type="hidden" id="editUid">
+
+      <label>カード名
+        <input id="cardName" required>
+      </label>
+
+      <label>種類
+        <select id="cardType">
+          <option value="weapon">武器カード</option>
+          <option value="armor">防具カード</option>
+          <option value="enchant">エンチャントカード</option>
+          <option value="magic">魔法カード</option>
+          <option value="item">アイテムカード</option>
+        </select>
+      </label>
+
+      <label>付与する効果
+        <select id="cardEffect"></select>
+      </label>
+
+      <p id="effectHelp" class="form-help"></p>
+
+      <div class="form-row">
+        <label>攻撃力
+          <input id="attack" type="number" value="0">
+        </label>
+        <label>防御力
+          <input id="defense" type="number" value="0">
+        </label>
+      </div>
+
+      <div class="form-row">
+        <label>価格（ゴールド）
+          <input id="price" type="number" min="0" max="99" value="0">
+        </label>
+        <label>抽選重み（管理用）
+          <input id="drawRate" type="number" min="0" step="0.1" value="0.2">
+        </label>
+      </div>
+
+      <div class="form-row">
+        <label>効果量
+          <input id="effectPower" type="number" value="0">
+        </label>
+        <label>発動確率（%）
+          <input id="effectChance" type="number" min="0" max="100" value="100">
+        </label>
+      </div>
+
+      <div class="form-row">
+        <label>使用回数・攻撃回数
+          <input id="hitCount" type="number" min="1" value="1">
+        </label>
+        <label>追加数値
+          <input id="secondaryValue" type="number" value="0">
+        </label>
+      </div>
+
+      <div class="form-row">
+        <label>対象
+          <select id="target"></select>
+        </label>
+        <label>付与・解除する災い
+          <select id="statusEffect"></select>
+        </label>
+      </div>
+
+      <p id="statusHelp" class="form-help"></p>
+
+      <div class="form-row">
+        <label>回復量
+          <input id="heal" type="number" value="0">
+        </label>
+        <label>MP消費
+          <input id="mpCost" type="number" value="0">
+        </label>
+      </div>
+
+      <label>属性
+        <select id="element">
+          <option value="none">なし</option>
+          <option value="fire">火</option>
+          <option value="water">水</option>
+          <option value="wood">木</option>
+          <option value="earth">土</option>
+          <option value="light">光</option>
+          <option value="dark">闇</option>
+        </select>
+      </label>
+
+      <label>説明
+        <textarea id="desc" rows="4"></textarea>
+      </label>
+
+      <label>カード画像（GIF対応）
+        <input id="imageInput" type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/*">
+      </label>
+
+      <p class="form-help">画像はブラウザ内の専用保存領域に保管され、ページやPCを再起動しても残ります。GIFはアニメーションしたまま表示されます。</p>
+
+      <div id="imagePreview" class="image-preview">画像プレビュー</div>
+
+      <button class="primary-btn" type="submit">保存</button>
+      <button class="ghost-btn" type="button" id="clearBtn">新規入力に戻す</button>
+    </form>
+
+    <section class="panel admin-list">
+      <div id="catalogTitle" class="panel-title">実装カード一覧</div>
+      <div class="catalog-toolbar">
+        <label class="catalog-search">カード名・説明を検索
+          <input id="catalogSearch" type="search" placeholder="例：アイスブーツ">
+        </label>
+        <label class="catalog-filter">種類で絞り込み
+          <select id="catalogFilter">
+            <option value="all">すべて</option>
+            <option value="weapon">武器</option>
+            <option value="armor">防具</option>
+            <option value="enchant">エンチャント</option>
+            <option value="magic">魔法</option>
+            <option value="item">アイテム</option>
+          </select>
+        </label>
+      </div>
+      <div id="cardList" aria-live="polite">
+        <div class="admin-empty">カードカタログを読み込んでいます…</div>
+      </div>
+    </section>
+  </section>
+</div>
+
+<script src="card-effects.js?v=10.9.0"></script>
+<script src="card-storage.js?v=10.9.0"></script>
+<script src="catalog.js?v=10.9.0"></script>
+<script src="admin.js?v=10.9.0"></script>
+<script>
+  const ofAdminSession = new URLSearchParams(location.search).get("session");
+  document.getElementById("casinoBackLink").href = ofAdminSession
+    ? `/?session=${encodeURIComponent(ofAdminSession)}`
+    : "/";
+</script>
+</body>
+</html>

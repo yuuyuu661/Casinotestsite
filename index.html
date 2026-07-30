@@ -28,6 +28,8 @@ body{
 .top-actions{
   display:flex;
   justify-content:flex-end;
+  gap:8px;
+  flex-wrap:wrap;
   margin-bottom:8px;
 }
 
@@ -346,6 +348,7 @@ body{
 <main class="container">
   <div class="top-actions">
     <button type="button" class="admin-button" id="adminButton">管理ページ</button>
+    <button type="button" class="admin-button" id="ofAdminButton">OF管理ページ</button>
   </div>
 
   <section class="hero">
@@ -395,6 +398,12 @@ body{
             <div class="game-title">マルチブラックジャック</div>
             <div class="game-desc">参加者全員で21に近い手を競う対戦ブラックジャック。全員準備後、ホストが同じ流れで開始します。</div>
             <div class="tag-row"><span class="tag">カード</span><span class="tag">2〜10人</span></div>
+          </div>
+
+          <div class="game-card" id="oasisfieldCard">
+            <div class="game-title">オアシスフィールド</div>
+            <div class="game-desc">神器・奇跡・アイテムを授かり、最後の1人を目指す2〜8人対戦カードゲーム。終末の刻までに勝負を決めましょう。</div>
+            <div class="tag-row"><span class="tag">カード</span><span class="tag">2〜8人</span><span class="tag">0 rrc対応</span></div>
           </div>
 
           <div class="game-card" id="othelloCard">
@@ -669,9 +678,34 @@ document.getElementById("adminButton").addEventListener("click", async () => {
   }
 });
 
+document.getElementById("ofAdminButton").addEventListener("click", async () => {
+  if(!session){
+    alert("OF管理ページを開くにはログインが必要です");
+    return;
+  }
+  const password = prompt("管理パスワードを入力してください");
+  if(password === null) return;
+  try{
+    const res = await fetch(`${API_BASE}/api/casino/admin/profit-report`, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({session, password})
+    });
+    const data = await res.json();
+    if(!res.ok || !data.ok){
+      throw new Error(data.detail || "認証に失敗しました");
+    }
+    sessionStorage.setItem("oasisCasinoAdminPassword", password);
+    location.href = `/of-admin/?session=${encodeURIComponent(session)}`;
+  }catch(err){
+    alert(err.message === "Invalid admin password" ? "パスワードが違います" : err.message);
+  }
+});
+
 document.getElementById("pokerCard").addEventListener("click", () => goLobby("poker"));
 document.getElementById("baccaratCard").addEventListener("click", () => goLobby("baccarat"));
 document.getElementById("blackjackMultiCard").addEventListener("click", () => goLobby("blackjack_multi"));
+document.getElementById("oasisfieldCard").addEventListener("click", () => goLobby("oasisfield"));
 document.getElementById("othelloCard").addEventListener("click", () => goLobby("othello"));
 document.getElementById("dobutsuCard").addEventListener("click", () => goLobby("dobutsu"));
 document.getElementById("chinchiroCard").addEventListener("click", () => goLobby("chinchiro"));
