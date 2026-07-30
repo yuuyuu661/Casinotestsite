@@ -31,7 +31,7 @@
     .workspace{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:9px;min-height:0}
     .hand-panel,.detail{border:2px solid var(--line);border-radius:13px;background:var(--panel);padding:10px}.hand-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:7px}.hand-title h2,.detail h2{font-size:17px;margin:0}.actions{display:flex;gap:6px;flex-wrap:wrap}.btn{border:0;border-radius:9px;padding:9px 13px;background:#eefaf6;color:var(--ink);font-weight:1000}.btn.primary{background:var(--gold)}.btn.danger{background:#ba4348;color:#fff}.btn.pray{background:linear-gradient(#fff5a5,#ffd241);font-size:18px;border:3px solid #f3af18}.btn:disabled{opacity:.4}
     .hand{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:7px;max-height:310px;overflow:auto;padding:3px}
-    .card{position:relative;border:3px solid transparent;border-radius:9px;background:#dbffc9;overflow:hidden;min-width:0;cursor:pointer;padding:0;text-align:left}.card.selected{border-color:#ffbd18;transform:translateY(-2px)}.card img{display:block;width:100%;aspect-ratio:1/1;object-fit:cover;background:#cde8df}.card-stat{display:block;text-align:center;padding:4px 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#385652;font-size:14px}.card-order{position:absolute;top:3px;right:3px;background:#ffcd31;color:#543400;border-radius:50%;width:22px;height:22px;text-align:center;line-height:22px}.element{font-weight:1000}.fire{color:#ed442d}.water{color:#2587e8}.wood{color:#168d3e}.earth{color:#967239}.light{color:#d29b00}.dark{color:#9a42ba}
+    .card{position:relative;border:3px solid transparent;border-radius:9px;background:#dbffc9;overflow:hidden;min-width:0;cursor:pointer;padding:0;text-align:left}.card.selected{border-color:#ffbd18;transform:translateY(-2px)}.card.turn-locked{filter:saturate(.35);opacity:.58}.card img{display:block;width:100%;aspect-ratio:1/1;object-fit:cover;background:#cde8df}.card-stat{display:block;text-align:center;padding:4px 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#385652;font-size:14px}.card-order{position:absolute;top:3px;right:3px;background:#ffcd31;color:#543400;border-radius:50%;width:22px;height:22px;text-align:center;line-height:22px}.element{font-weight:1000}.fire{color:#ed442d}.water{color:#2587e8}.wood{color:#168d3e}.earth{color:#967239}.light{color:#d29b00}.dark{color:#9a42ba}
     .detail{min-width:0}.detail img{width:100%;aspect-ratio:16/10;object-fit:contain;background:#c7eee4;border-radius:9px}.detail .card-name{font-size:20px;margin:7px 0}.detail p{font-size:13px;line-height:1.55;margin:7px 0}.empty{height:100%;display:grid;place-items:center;color:#6e8f87;text-align:center}
     .modal{position:fixed;inset:0;background:#002d28a8;display:none;place-items:center;padding:14px;z-index:20}.modal.show{display:grid}.dialog{width:min(500px,100%);max-height:90vh;overflow:auto;border-radius:14px;background:#edfff9;padding:16px;border:3px solid var(--green)}.dialog h2{margin-top:0}.exchange-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}.exchange-grid input{width:100%;font-size:24px;text-align:center;padding:8px;border:1px solid #7caea6;border-radius:8px}.step{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:5px 0}.step button{border:0;border-radius:7px;padding:6px;background:#d2eee8}.dialog-actions{display:flex;justify-content:flex-end;gap:7px;margin-top:12px}
     .toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#092f2a;color:white;padding:10px 16px;border-radius:999px;z-index:30;opacity:0;pointer-events:none;transition:.2s}.toast.show{opacity:1}
@@ -84,13 +84,14 @@ function isAll(card){return card?.isAllAttack||card?.target==="all_enemies"||["a
 function needsTarget(card){return !isAll(card)&&card?.target!=="self"&&!["exchange","sell","buy"].includes(card?.effect)}
 function compact(card){const e=elementData[card.element]||elementData.none;if(card.catalogGroup==="additional_weapon")return `+${card.attack||0}${e[0]}`;if(card.attack)return `${card.effectChance<100?card.effectChance+"% ":""}攻${card.attack}${e[0]}`;if(card.defense)return `守${card.defense}${e[0]}`;if(card.mpCost)return `MP${card.mpCost} ${e[0]}`;if(card.effect==="sell")return "売る";if(card.effect==="buy")return "買う";if(card.effect==="exchange")return "両替";return card.effectPower?`効${card.effectPower}`:"特殊"}
 function special(card){if(card.statusEffect&&card.statusEffect!=="none")return `ダメージで${statusNames[card.statusEffect]||card.statusEffect}付与`;const map={multi_hit:`${card.hitCount||2}回攻撃`,reflect_normal:"攻撃を反射",reflect_magic:"奇跡を弾く",nullify_magic:"奇跡を止める",wall_defense:"無属性武器を止める",hp_drain:"ダメージ吸収",instant_defeat:"ダメージで即死",double_attack:"単体武器を2倍",sure_all_attack:"単体武器を全体化",add_magic_attack:`追加攻撃+${card.attack||card.effectPower||0}`,mp_free_magic:"直前の奇跡MP0"};return map[card.effect]||""}
-function cardView(card,index){return `<button class="card ${selected.includes(card.uid)?"selected":""}" data-card="${esc(card.uid)}"><img src="${img(card)}" alt="" onerror="this.style.visibility='hidden'"><span class="card-stat ${esc(card.element||"none")}">${esc(compact(card))}</span>${selected.includes(card.uid)?`<span class="card-order">${selected.indexOf(card.uid)+1}</span>`:""}</button>`}
+function cardView(card,index){const locked=game?.phase==="turn"&&card.type==="armor"&&card.effect!=="attack_defense";return `<button class="card ${selected.includes(card.uid)?"selected":""} ${locked?"turn-locked":""}" data-card="${esc(card.uid)}" ${locked?'aria-label="防御時のみ使用可能"':""}><img src="${img(card)}" alt="" onerror="this.style.visibility='hidden'"><span class="card-stat ${esc(card.element||"none")}">${esc(compact(card))}</span>${selected.includes(card.uid)?`<span class="card-order">${selected.indexOf(card.uid)+1}</span>`:""}</button>`}
 function battleCard(card){return `<div class="battle-card"><img src="${img(card)}" alt=""><div class="battle-copy"><b>${esc(card.name)}</b><small>${esc(compact(card))}${special(card)?`・${esc(special(card))}`:""}</small></div><span class="battle-num">${card.attack?`攻${card.attack}`:card.defense?`守${card.defense}`:""}</span></div>`}
 function render(){
   if(!game)return;
   const mine=me(),turn=current(),battle=game.battle||{};
-  $("gfLabel").textContent=`G.F.${game.end_time_limit}`;
-  $("roomLabel").textContent=`${room}・${game.turn_count}/${game.end_time_limit}${game.endgame?"・終末":""}`;
+  const configuredLimit=Number(roomInfo?.room?.custom_rules?.end_time_limit??game.end_time_limit??100);
+  $("gfLabel").textContent=`G.F.${configuredLimit}`;
+  $("roomLabel").textContent=`${room}・${game.turn_count}/${configuredLimit}${game.endgame?"・終末":""}`;
   $("message").classList.toggle("end",game.endgame);
   let msg=game.logs?.[0]||"";
   if(game.phase==="waiting")msg="全員が準備したらホストが開始してください。";
@@ -111,7 +112,7 @@ function render(){
 }
 function renderActions(){
   const mine=me(),turn=current(),isHost=mine&&String(game.host_user_id)===String(mine.user_id),wait=["waiting","finished"].includes(game.phase),myTurn=game.phase==="turn"&&turn?.is_me,card=selectedCards()[0];
-  const noWeapon=!(mine?.hand||[]).some(c=>c.type==="weapon");
+  const noWeapon=!(mine?.hand||[]).some(c=>c.type==="weapon"||c.effect==="attack_defense");
   let html=`<button class="btn primary" id="readyBtn" ${wait?"":"disabled"}>${mine?.ready?"準備解除":"準備完了"}</button><button class="btn primary" id="startBtn" ${isHost&&wait&&game.players.length>=2&&game.players.every(p=>p.ready)?"":"disabled"}>対戦開始</button>`;
   if(myTurn&&noWeapon)html+=`<button class="btn pray" id="prayBtn">✨ 祈る</button>`;
   if(myTurn&&card&&isAll(card))html+=`<button class="btn danger" id="allBtn">全体へ発動</button>`;
@@ -143,6 +144,7 @@ function selectCard(uid){
   if(game.phase==="trade_sell"){saleUid=uid;selected=[uid];sound();render();return}
   if(game.phase!=="turn"||!current()?.is_me)return;
   const card=mine.hand.find(c=>c.uid===uid)||mine.learned_magics?.find(c=>c.uid===uid);if(!card)return;
+  if(card.type==="armor"&&card.effect!=="attack_defense"){selected=[];toast("防具は攻撃を受けた時だけ使用できます");renderDetail();return}
   if(!selected.length){selected=[uid];sound();if(["sell","buy","exchange"].includes(card.effect)){action({action:"play",card_uid:uid});return}render();return}
   if(selected[0]===uid){selected=[];render();return}
   const support=card.catalogGroup==="additional_weapon"||(card.type==="magic"&&["add_magic_attack","double_attack","sure_all_attack"].includes(card.effect))||card.effect==="mp_free_magic";

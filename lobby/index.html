@@ -933,6 +933,17 @@ const rateLabels = {
   ultimate: "超絶頂レート"
 };
 
+function normalizeCustomRules(value){
+  if(typeof value === "string"){
+    try{
+      value = JSON.parse(value);
+    }catch(_error){
+      value = {};
+    }
+  }
+  return value && typeof value === "object" ? value : {};
+}
+
 function formatCreatedAt(value){
   if(!value){
     return "-";
@@ -986,7 +997,7 @@ async function loadRooms(){
         rate_name: r.rate_name,
         rate_amount: r.rate_amount,
         created_at: r.created_at,
-        custom_rules: r.custom_rules || {}
+        custom_rules: normalizeCustomRules(r.custom_rules)
       });
 
     });
