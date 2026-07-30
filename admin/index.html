@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Oasis Casino 管理</title>
+<link rel="icon" href="data:,">
+<style>
+*{box-sizing:border-box}
+:root{--bg:#020617;--panel:#0f172a;--panel2:#172033;--line:#334155;--gold:#facc15;--text:#f8fafc;--muted:#94a3b8;--good:#4ade80;--bad:#f87171}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);font-family:"Yu Gothic UI","Hiragino Sans",sans-serif}
+button,input{font:inherit}
+button{cursor:pointer}
+.page{width:min(1240px,100%);margin:auto;padding:20px}
+.header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}
+.header h1{margin:0;color:var(--gold);font-size:clamp(1.6rem,4vw,2.4rem)}
+.back{border:1px solid var(--line);border-radius:8px;background:var(--panel2);color:#fff;padding:10px 14px;font-weight:900}
+.toolbar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:end;padding:16px;border:1px solid var(--line);border-radius:8px;background:var(--panel)}
+.date-fields{display:flex;gap:10px;align-items:end;flex-wrap:wrap}
+.field{display:grid;gap:6px;color:#cbd5e1;font-size:.86rem;font-weight:900}
+.field input{min-height:42px;border:1px solid var(--line);border-radius:7px;background:#020617;color:#fff;padding:9px 11px;color-scheme:dark}
+.actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.button{min-height:42px;border:1px solid var(--line);border-radius:7px;background:#253149;color:#fff;padding:9px 13px;font-weight:900}
+.button.primary{border-color:#eab308;background:var(--gold);color:#111827}
+.quick{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.quick .button{min-height:36px;padding:7px 11px;font-size:.84rem}
+.tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:18px 0}
+.tab{border:1px solid var(--line);border-radius:8px;background:var(--panel2);color:#cbd5e1;padding:12px;font-weight:1000}
+.tab.active{border-color:var(--gold);background:var(--gold);color:#111827}
+.summary{display:grid;grid-template-columns:minmax(220px,1.4fr) repeat(3,minmax(140px,1fr));gap:10px}
+.stat{min-height:105px;padding:16px;border:1px solid var(--line);border-radius:8px;background:var(--panel)}
+.stat-label{color:var(--muted);font-size:.86rem;font-weight:800}
+.stat-value{margin-top:10px;font-size:1.45rem;font-weight:1000}
+.stat.main .stat-value{font-size:clamp(1.8rem,5vw,2.7rem)}
+.positive{color:var(--good)}
+.negative{color:var(--bad)}
+.zero{color:#e2e8f0}
+.period{margin:12px 2px 0;color:#cbd5e1;font-size:.88rem}
+.grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:14px;margin-top:16px}
+.panel{border:1px solid var(--line);border-radius:8px;background:var(--panel);overflow:hidden}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line)}
+.panel-title{color:var(--gold);font-weight:1000}
+.table-wrap{overflow:auto;max-height:620px}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+th,td{padding:11px 13px;border-bottom:1px solid rgba(51,65,85,.7);text-align:right;white-space:nowrap}
+th{position:sticky;top:0;background:#111c31;color:#cbd5e1;font-size:.78rem;z-index:1}
+th:first-child,td:first-child{text-align:left}
+tbody tr:hover{background:rgba(255,255,255,.025)}
+.empty{padding:32px 16px;text-align:center;color:var(--muted)}
+.notice{margin-top:14px;padding:12px 14px;border:1px solid var(--line);border-radius:8px;background:#0b1220;color:#cbd5e1;font-size:.84rem;line-height:1.65}
+.error{display:none;margin-top:14px;padding:12px 14px;border:1px solid #7f1d1d;border-radius:8px;background:#450a0a;color:#fecaca}
+.error.show{display:block}
+@media(max-width:850px){
+  .page{padding:12px}
+  .header{align-items:flex-start}
+  .toolbar{grid-template-columns:1fr}
+  .actions{justify-content:flex-start}
+  .summary{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .stat.main{grid-column:1/-1}
+  .grid{grid-template-columns:1fr}
+}
+@media(max-width:480px){
+  .summary{grid-template-columns:1fr}
+  .stat.main{grid-column:auto}
+  .date-fields{display:grid;grid-template-columns:1fr 1fr}
+  .field input{width:100%}
+  .actions .button{flex:1}
+}
+</style>
+</head>
+<body>
+<main class="page">
+  <header class="header">
+    <div>
+      <h1>Casino Management</h1>
+      <div class="period">収支管理・JST集計</div>
+    </div>
+    <button class="back" id="backButton">トップへ戻る</button>
+  </header>
+
+  <section class="toolbar">
+    <div>
+      <div class="date-fields">
+        <label class="field">開始日
+          <input type="date" id="startDate">
+        </label>
+        <label class="field">終了日
+          <input type="date" id="endDate">
+        </label>
+      </div>
+      <div class="quick">
+        <button class="button" type="button" data-days="1">今日</button>
+        <button class="button" type="button" data-days="7">7日</button>
+        <button class="button" type="button" data-days="30">30日</button>
+        <button class="button" type="button" id="allTimeButton">全期間</button>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="button" type="button" id="logoutButton">認証解除</button>
+      <button class="button primary" type="button" id="loadButton">集計を更新</button>
+    </div>
+  </section>
+
+  <div class="error" id="errorBox"></div>
+
+  <nav class="tabs" aria-label="収支表示">
+    <button class="tab active" type="button" data-mode="casino">カジノ収支</button>
+    <button class="tab" type="button" data-mode="user">ユーザー収支</button>
+  </nav>
+
+  <section class="summary">
+    <div class="stat main">
+      <div class="stat-label" id="mainLabel">カジノ側・期間収支</div>
+      <div class="stat-value zero" id="mainProfit">0 rrc</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">収支記録数</div>
+      <div class="stat-value" id="resultCount">0</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">利用ユーザー数</div>
+      <div class="stat-value" id="userCount">0</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">集計日数</div>
+      <div class="stat-value" id="dayCount">0</div>
+    </div>
+  </section>
+  <div class="period" id="periodText">集計期間を読み込み中...</div>
+
+  <section class="grid">
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title" id="dailyTitle">カジノ収支・日別合計</div>
+        <div class="period">新しい日付順</div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>日付</th><th>収支</th><th>記録</th><th>ユーザー</th></tr></thead>
+          <tbody id="dailyBody"></tbody>
+        </table>
+        <div class="empty" id="dailyEmpty">データがありません</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title" id="gameTitle">カジノ収支・ゲーム別</div>
+        <div class="period">指定期間内</div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>ゲーム</th><th>収支</th><th>記録</th><th>ユーザー</th></tr></thead>
+          <tbody id="gameBody"></tbody>
+        </table>
+        <div class="empty" id="gameEmpty">データがありません</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="notice">
+    ユーザー収支は、対象ギルド内の全ユーザーの純損益合計です。カジノ収支はその符号を反転した値です。
+    対人ゲームは参加者間の移動となるため、カジノ収支は原則0になります。
+  </div>
+</main>
+
+<script>
+const API_BASE="https://api.oasis.red";
+const params=new URLSearchParams(location.search);
+const session=params.get("session");
+const passwordKey="oasisCasinoAdminPassword";
+const gameNames={
+  poker:"ポーカー",baccarat:"バカラ",blackjack:"ブラックジャック",
+  blackjack_multi:"マルチブラックジャック",othello:"オセロ",
+  dobutsu:"どうぶつしょうぎ",chinchiro:"チンチロ",daifugo:"大富豪",
+  minesweeper:"マインスイーパー",roulette:"ルーレット",
+  slot:"スロット",juggler:"ジャグラー"
+};
+let report=null;
+let mode="casino";
+let allTime=false;
+
+const $=id=>document.getElementById(id);
+const pad=value=>String(value).padStart(2,"0");
+const localDateString=date=>`${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}`;
+const profitKey=()=>`${mode}_profit`;
+const modeLabel=()=>mode==="casino"?"カジノ収支":"ユーザー収支";
+function formatProfit(value){
+  const amount=Number(value||0);
+  return `${amount>0?"+":""}${amount.toLocaleString()} rrc`;
+}
+function profitClass(value){
+  const amount=Number(value||0);
+  return amount>0?"positive":amount<0?"negative":"zero";
+}
+function setRange(days){
+  const end=new Date();
+  const start=new Date(end);
+  start.setDate(end.getDate()-days+1);
+  $("startDate").value=localDateString(start);
+  $("endDate").value=localDateString(end);
+  allTime=false;
+}
+function requirePassword(){
+  let password=sessionStorage.getItem(passwordKey)||"";
+  if(password)return password;
+  password=prompt("管理パスワードを入力してください")||"";
+  if(password)sessionStorage.setItem(passwordKey,password);
+  return password;
+}
+function showError(message){
+  $("errorBox").textContent=message;
+  $("errorBox").classList.add("show");
+}
+function clearError(){
+  $("errorBox").classList.remove("show");
+  $("errorBox").textContent="";
+}
+async function loadReport(retryPassword=true){
+  clearError();
+  if(!session){
+    showError("ログインセッションがありません。トップページから開き直してください。");
+    return;
+  }
+  const password=requirePassword();
+  if(!password){
+    showError("管理パスワードが必要です。");
+    return;
+  }
+  $("loadButton").disabled=true;
+  $("loadButton").textContent="集計中...";
+  try{
+    const res=await fetch(`${API_BASE}/api/casino/admin/profit-report`,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        session,
+        password,
+        start_date:allTime?null:$("startDate").value,
+        end_date:allTime?null:$("endDate").value,
+        all_time:allTime
+      })
+    });
+    const data=await res.json();
+    if(!res.ok||!data.ok)throw new Error(data.detail||"集計に失敗しました");
+    report=data;
+    render();
+  }catch(err){
+    if(err.message==="Invalid admin password"&&retryPassword){
+      sessionStorage.removeItem(passwordKey);
+      alert("パスワードが違います");
+      await loadReport(false);
+      return;
+    }
+    showError(err.message);
+  }finally{
+    $("loadButton").disabled=false;
+    $("loadButton").textContent="集計を更新";
+  }
+}
+function render(){
+  $("mainLabel").textContent=`${modeLabel()}・期間合計`;
+  $("dailyTitle").textContent=`${modeLabel()}・日別合計`;
+  $("gameTitle").textContent=`${modeLabel()}・ゲーム別`;
+  if(!report)return;
+  const key=profitKey();
+  const total=report.summary[key];
+  $("mainProfit").textContent=formatProfit(total);
+  $("mainProfit").className=`stat-value ${profitClass(total)}`;
+  $("resultCount").textContent=Number(report.summary.result_count||0).toLocaleString();
+  $("userCount").textContent=Number(report.summary.user_count||0).toLocaleString();
+  $("dayCount").textContent=Number(report.daily.length||0).toLocaleString();
+  $("periodText").textContent=report.range.all_time
+    ? `集計期間：全期間（${report.summary.first_date||"-"} 〜 ${report.summary.last_date||"-"} / JST）`
+    : `集計期間：${report.range.start_date} 〜 ${report.range.end_date}（JST）`;
+
+  $("dailyBody").innerHTML=report.daily.map(row=>`
+    <tr>
+      <td>${row.date}</td>
+      <td class="${profitClass(row[key])}">${formatProfit(row[key])}</td>
+      <td>${Number(row.result_count).toLocaleString()}</td>
+      <td>${Number(row.user_count).toLocaleString()}</td>
+    </tr>
+  `).join("");
+  $("dailyEmpty").style.display=report.daily.length?"none":"block";
+
+  $("gameBody").innerHTML=report.games.map(row=>`
+    <tr>
+      <td>${gameNames[row.game_type]||row.game_type}</td>
+      <td class="${profitClass(row[key])}">${formatProfit(row[key])}</td>
+      <td>${Number(row.result_count).toLocaleString()}</td>
+      <td>${Number(row.user_count).toLocaleString()}</td>
+    </tr>
+  `).join("");
+  $("gameEmpty").style.display=report.games.length?"none":"block";
+}
+
+document.querySelectorAll("[data-mode]").forEach(button=>{
+  button.addEventListener("click",()=>{
+    mode=button.dataset.mode;
+    document.querySelectorAll("[data-mode]").forEach(item=>item.classList.toggle("active",item===button));
+    render();
+  });
+});
+document.querySelectorAll("[data-days]").forEach(button=>{
+  button.addEventListener("click",()=>{
+    setRange(Number(button.dataset.days));
+    loadReport();
+  });
+});
+$("allTimeButton").addEventListener("click",()=>{allTime=true;loadReport()});
+$("loadButton").addEventListener("click",()=>{allTime=false;loadReport()});
+$("logoutButton").addEventListener("click",()=>{
+  sessionStorage.removeItem(passwordKey);
+  location.href=`/${session?`?session=${encodeURIComponent(session)}`:""}`;
+});
+$("backButton").addEventListener("click",()=>{
+  location.href=`/${session?`?session=${encodeURIComponent(session)}`:""}`;
+});
+
+setRange(30);
+loadReport();
+</script>
+</body>
+</html>

@@ -25,6 +25,27 @@ body{
   padding:24px;
 }
 
+.top-actions{
+  display:flex;
+  justify-content:flex-end;
+  margin-bottom:8px;
+}
+
+.admin-button{
+  padding:10px 16px;
+  border:1px solid rgba(250,204,21,0.48);
+  border-radius:8px;
+  background:#172033;
+  color:#facc15;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.admin-button:hover{
+  background:#253149;
+  border-color:#facc15;
+}
+
 .hero{
   display:grid;
   grid-template-columns:minmax(0,1.25fr) minmax(280px,0.75fr);
@@ -323,6 +344,10 @@ body{
 
 <body>
 <main class="container">
+  <div class="top-actions">
+    <button type="button" class="admin-button" id="adminButton">管理ページ</button>
+  </div>
+
   <section class="hero">
     <div>
       <div class="eyebrow">OASIS GAME FLOOR</div>
@@ -498,6 +523,7 @@ categories.forEach(category => {
 
 const params = new URLSearchParams(location.search);
 const session = params.get("session");
+const API_BASE = "https://api.oasis.red";
 
 async function loadMe(){
   if(!session){
@@ -616,6 +642,32 @@ function goLobby(game){
   const query = session ? `?game=${game}&session=${session}` : `?game=${game}`;
   location.href = `/lobby${query}`;
 }
+
+document.getElementById("adminButton").addEventListener("click", async () => {
+  if(!session){
+    alert("管理ページを開くにはログインが必要です");
+    return;
+  }
+
+  const password = prompt("管理パスワードを入力してください");
+  if(password === null) return;
+
+  try{
+    const res = await fetch(`${API_BASE}/api/casino/admin/profit-report`, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({session, password})
+    });
+    const data = await res.json();
+    if(!res.ok || !data.ok){
+      throw new Error(data.detail || "認証に失敗しました");
+    }
+    sessionStorage.setItem("oasisCasinoAdminPassword", password);
+    location.href = `/admin/?session=${encodeURIComponent(session)}`;
+  }catch(err){
+    alert(err.message === "Invalid admin password" ? "パスワードが違います" : err.message);
+  }
+});
 
 document.getElementById("pokerCard").addEventListener("click", () => goLobby("poker"));
 document.getElementById("baccaratCard").addEventListener("click", () => goLobby("baccarat"));
