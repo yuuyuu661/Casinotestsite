@@ -23,20 +23,23 @@
     .player.me .name{color:var(--blue)}.player.turn{outline:4px solid var(--gold)}.player.dead{opacity:.5;filter:grayscale(1)}.player.targetable{animation:pulse 1.2s infinite;cursor:pointer}.player.defender{outline:4px solid #e64763}
     @keyframes pulse{50%{box-shadow:0 0 0 6px #ffda5270}}
     .name{font-size:18px;color:var(--green);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.stats{white-space:nowrap;font-size:13px;color:#4d6762}.badges{grid-column:1/-1;font-size:11px;color:#8c4d17;padding-left:2px}
-    .table{border:2px solid var(--line);border-radius:13px;background:var(--panel);padding:10px;min-height:260px;display:grid;grid-template-columns:1fr 116px 1fr;gap:8px}
-    .field{border-radius:12px;background:#dff8f2cc;min-height:188px;padding:8px;display:flex;flex-direction:column;gap:5px}
+    .table{position:relative;overflow:hidden;border:2px solid var(--line);border-radius:13px;background:var(--panel);padding:10px;min-height:260px;display:grid;grid-template-columns:1fr 116px 1fr;gap:8px}
+    .field{border-radius:12px;background:#dff8f2cc;min-height:188px;padding:8px;display:flex;flex-direction:column;gap:5px;transition:.2s}
+    .field.preview{outline:3px solid #f4bd26;background:#f1fff0}.private-note{font-size:10px;color:#8b6712;margin-left:5px}
     .field h2{text-align:center;margin:0 0 3px;font-size:14px}.battle-cards{display:flex;flex-direction:column;gap:5px;align-items:stretch}.battle-card{display:grid;grid-template-columns:58px 1fr auto;min-height:55px;border:1px solid #84cbbd;border-radius:9px;background:#effff7;overflow:hidden}.battle-card img{width:58px;height:55px;object-fit:cover}.battle-copy{padding:5px;min-width:0}.battle-copy b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.battle-copy small{display:block;color:#5e746f}.battle-num{align-self:center;padding-right:8px;font-size:20px}
     .total{margin-top:auto;border:3px solid #555;border-radius:9px;background:#dfffc9;padding:4px;text-align:center;font-size:27px}
     .versus{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}.versus b{font-size:38px;color:#fff3a2;text-shadow:0 2px 3px #777}.versus .damage{font-size:24px;color:var(--red)}.versus small{font-size:11px}
     .workspace{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:9px;min-height:0}
     .hand-panel,.detail{border:2px solid var(--line);border-radius:13px;background:var(--panel);padding:10px}.hand-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:7px}.hand-title h2,.detail h2{font-size:17px;margin:0}.actions{display:flex;gap:6px;flex-wrap:wrap}.btn{border:0;border-radius:9px;padding:9px 13px;background:#eefaf6;color:var(--ink);font-weight:1000}.btn.primary{background:var(--gold)}.btn.danger{background:#ba4348;color:#fff}.btn.pray{background:linear-gradient(#fff5a5,#ffd241);font-size:18px;border:3px solid #f3af18}.btn:disabled{opacity:.4}
-    .hand{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:7px;max-height:310px;overflow:auto;padding:3px}
-    .card{position:relative;border:3px solid transparent;border-radius:9px;background:#dbffc9;overflow:hidden;min-width:0;cursor:pointer;padding:0;text-align:left}.card.selected{border-color:#ffbd18;transform:translateY(-2px)}.card.turn-locked{filter:saturate(.35);opacity:.58}.card img{display:block;width:100%;aspect-ratio:1/1;object-fit:cover;background:#cde8df}.card-stat{display:block;text-align:center;padding:4px 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#385652;font-size:14px}.card-order{position:absolute;top:3px;right:3px;background:#ffcd31;color:#543400;border-radius:50%;width:22px;height:22px;text-align:center;line-height:22px}.element{font-weight:1000}.fire{color:#ed442d}.water{color:#2587e8}.wood{color:#168d3e}.earth{color:#967239}.light{color:#d29b00}.dark{color:#9a42ba}
-    .detail{min-width:0}.detail img{width:100%;aspect-ratio:16/10;object-fit:contain;background:#c7eee4;border-radius:9px}.detail .card-name{font-size:20px;margin:7px 0}.detail p{font-size:13px;line-height:1.55;margin:7px 0}.empty{height:100%;display:grid;place-items:center;color:#6e8f87;text-align:center}
+    .hand,.learned{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:7px;max-height:310px;overflow:auto;padding:3px}
+    .learned-section{margin-top:10px;padding-top:9px;border-top:2px solid #9ed7cc}.learned-section.hidden{display:none}.learned-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}.learned-title h3{margin:0;font-size:15px}.learned .card{background:#e8e2ff}.learned .card:after{content:"再使用";position:absolute;left:3px;top:3px;padding:2px 5px;border-radius:999px;background:#6d61c9;color:#fff;font-size:9px}
+    .card{position:relative;border:3px solid transparent;border-radius:9px;background:#dbffc9;overflow:hidden;min-width:0;cursor:pointer;padding:0;text-align:left}.card.selected{border-color:#ffbd18;transform:translateY(-2px)}.card.turn-locked{filter:saturate(.35);opacity:.58}.card img{display:block;width:100%;aspect-ratio:1/1;object-fit:cover;background:#cde8df}.card-stat{display:block;text-align:center;padding:4px 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#385652;font-size:14px}.card-price{position:absolute;left:3px;top:3px;padding:2px 6px;border:2px solid #d8a700;border-radius:999px;background:#fff3a4;color:#6d4b00;font-size:11px;box-shadow:0 1px 2px #0003}.card-order{position:absolute;top:3px;right:3px;background:#ffcd31;color:#543400;border-radius:50%;width:22px;height:22px;text-align:center;line-height:22px}.element{font-weight:1000}.fire{color:#ed442d}.water{color:#2587e8}.wood{color:#168d3e}.earth{color:#967239}.light{color:#d29b00}.dark{color:#9a42ba}
+    .detail{min-width:0;position:relative}.detail img{width:100%;aspect-ratio:16/10;object-fit:contain;background:#c7eee4;border-radius:9px}.detail .card-name{font-size:20px;margin:7px 0}.detail p{font-size:13px;line-height:1.55;margin:7px 0}.detail-close{display:none;position:absolute;right:7px;top:7px;z-index:2;width:34px;height:34px;border:0;border-radius:50%;background:#163e38;color:#fff;font-size:22px}.empty{height:100%;display:grid;place-items:center;color:#6e8f87;text-align:center}
+    .effect-layer{position:absolute;inset:0;z-index:12;display:grid;place-items:center;pointer-events:none;opacity:0;transform:scale(.86);transition:opacity .2s,transform .24s;background:radial-gradient(circle,#ffffffd9 0,#a7f4e4b8 45%,transparent 72%)}.effect-layer.show{opacity:1;transform:scale(1)}.effect-card{min-width:min(420px,82%);padding:18px 24px;border:4px solid #fff;border-radius:18px;background:#087f68e8;color:#fff;text-align:center;box-shadow:0 12px 30px #003b3270}.effect-icon{display:block;font-size:48px;line-height:1}.effect-text{display:block;margin-top:6px;font-size:21px}.effect-layer.fire .effect-card{background:#b93f2ce8}.effect-layer.water .effect-card{background:#257dc2e8}.effect-layer.wood .effect-card{background:#218747e8}.effect-layer.earth .effect-card{background:#886a32e8}.effect-layer.light .effect-card{background:#b48b19e8}.effect-layer.dark .effect-card{background:#633184e8}
     .modal{position:fixed;inset:0;background:#002d28a8;display:none;place-items:center;padding:14px;z-index:20}.modal.show{display:grid}.dialog{width:min(500px,100%);max-height:90vh;overflow:auto;border-radius:14px;background:#edfff9;padding:16px;border:3px solid var(--green)}.dialog h2{margin-top:0}.exchange-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}.exchange-grid input{width:100%;font-size:24px;text-align:center;padding:8px;border:1px solid #7caea6;border-radius:8px}.step{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:5px 0}.step button{border:0;border-radius:7px;padding:6px;background:#d2eee8}.dialog-actions{display:flex;justify-content:flex-end;gap:7px;margin-top:12px}
     .toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#092f2a;color:white;padding:10px 16px;border-radius:999px;z-index:30;opacity:0;pointer-events:none;transition:.2s}.toast.show{opacity:1}
-    @media(max-width:700px){.app{padding:6px}.top{height:56px}.gf b{min-width:130px;font-size:22px}.volume{width:65px}.players{grid-template-columns:1fr}.player{min-height:45px;padding-top:5px;padding-bottom:5px}.table{grid-template-columns:1fr 76px 1fr;padding:6px;min-height:230px}.field{padding:5px;min-height:180px}.battle-card{grid-template-columns:45px 1fr}.battle-card img{width:45px;height:48px}.battle-num{display:none}.total{font-size:22px}.versus b{font-size:27px}.workspace{grid-template-columns:1fr}.detail{display:none}.hand{grid-template-columns:repeat(5,minmax(58px,1fr));gap:5px;max-height:none}.card-stat{font-size:12px}.hand-panel{padding:7px}.top-tools .icon-btn{display:none}}
-    @media(max-width:430px){.hand{grid-template-columns:repeat(4,minmax(58px,1fr))}.player .name{font-size:17px}.stats{font-size:12px}.message{font-size:13px}.table{grid-template-columns:1fr 55px 1fr}.versus small{display:none}}
+    @media(max-width:700px){.app{padding:6px}.top{height:56px}.gf b{min-width:130px;font-size:22px}.volume{width:65px}.players{grid-template-columns:1fr}.player{min-height:45px;padding-top:5px;padding-bottom:5px}.table{grid-template-columns:1fr 76px 1fr;padding:6px;min-height:230px}.field{padding:5px;min-height:180px}.battle-card{grid-template-columns:45px 1fr}.battle-card img{width:45px;height:48px}.battle-num{display:none}.total{font-size:22px}.versus b{font-size:27px}.workspace{grid-template-columns:1fr}.detail{display:none}.detail.has-card{display:grid;position:fixed;left:6px;right:6px;bottom:calc(6px + env(safe-area-inset-bottom));z-index:18;max-height:44vh;overflow:auto;grid-template-columns:92px minmax(0,1fr);gap:9px;align-items:start;border:3px solid var(--green);box-shadow:0 10px 35px #003d347d}.detail.has-card img{aspect-ratio:1/1}.detail.has-card .detail-close{display:block}.detail.has-card .detail-copy{padding-right:29px}.detail.has-card .card-name{margin-top:0}.hand,.learned{grid-template-columns:repeat(5,minmax(58px,1fr));gap:5px;max-height:none}.card-stat{font-size:12px}.hand-panel{padding:7px}.top-tools .icon-btn{display:none}.effect-card{padding:13px 16px}.effect-icon{font-size:40px}.effect-text{font-size:17px}}
+    @media(max-width:430px){.hand,.learned{grid-template-columns:repeat(4,minmax(58px,1fr))}.player .name{font-size:17px}.stats{font-size:12px}.message{font-size:13px}.table{grid-template-columns:1fr 55px 1fr}.versus small{display:none}}
   </style>
 </head>
 <body>
@@ -49,14 +52,19 @@
   <div class="message" id="message">読み込み中...</div>
   <section class="players" id="players"></section>
   <section class="table" id="battleTable">
-    <div class="field" id="attackField"><h2>攻撃の場</h2><div class="battle-cards" id="attackCards"></div><div class="total" id="attackTotal">攻 0</div></div>
+    <div class="field" id="attackField"><h2>攻撃の場 <span class="private-note" id="attackPrivate"></span></h2><div class="battle-cards" id="attackCards"></div><div class="total" id="attackTotal">攻 0</div></div>
     <div class="versus"><b>VS</b><div class="damage" id="damage">待機中</div><small id="elementText"></small></div>
-    <div class="field" id="defenseField"><h2>防御の場</h2><div class="battle-cards" id="defenseCards"></div><div class="total" id="defenseTotal">守 0</div></div>
+    <div class="field" id="defenseField"><h2>防御の場 <span class="private-note" id="defensePrivate"></span></h2><div class="battle-cards" id="defenseCards"></div><div class="total" id="defenseTotal">守 0</div></div>
+    <div class="effect-layer" id="effectLayer"><div class="effect-card"><span class="effect-icon" id="effectIcon"></span><span class="effect-text" id="effectText"></span></div></div>
   </section>
   <section class="workspace">
     <div class="hand-panel">
       <div class="hand-title"><h2>手札 <span id="handCount"></span></h2><div class="actions" id="actions"></div></div>
       <div class="hand" id="hand"></div>
+      <div class="learned-section hidden" id="learnedSection">
+        <div class="learned-title"><h3>習得した奇跡</h3><span id="learnedCount">0 / 6</span></div>
+        <div class="learned" id="learned"></div>
+      </div>
     </div>
     <aside class="detail" id="detail"><div class="empty">カードを選ぶと詳細を表示します。</div></aside>
   </section>
@@ -69,11 +77,28 @@ const qs=new URLSearchParams(location.search);
 const room=qs.get("room"),session=qs.get("session");
 const $=id=>document.getElementById(id);
 let game=null,roomInfo=null,selected=[],saleUid=null,lastPhase="",busy=false;
-let audioCtx=null;
+let audioCtx=null,lastEventId=null,presentationUntil=0,effectTimer=null,detailDismissedUid=null,focusedUid=null;
 const statusNames={cold:"風邪",fever:"熱病",hell:"地獄病",heaven:"天国病",fog:"霧",dream:"夢",dark_cloud:"暗雲",flash:"閃光",frenzy:"熱狂"};
 const elementData={fire:["🔥","火"],water:["💧","水"],wood:["🌿","木"],earth:["◆","土"],light:["☀","光"],dark:["☾","闇"],none:["",""]};
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-function sound(kind="tap"){const volume=Number($("volume").value)/100;if(!volume)return;audioCtx??=new (window.AudioContext||window.webkitAudioContext)();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.frequency.value=kind==="hit"?180:kind==="block"?520:360;g.gain.value=.09*volume;o.connect(g);g.connect(audioCtx.destination);o.start();g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+.16);o.stop(audioCtx.currentTime+.17)}
+function sound(kind="tap",element="none"){
+  const volume=Number($("volume").value)/100;if(!volume)return;
+  audioCtx??=new (window.AudioContext||window.webkitAudioContext)();audioCtx.resume?.();
+  const elementShift={fire:70,water:-25,wood:20,earth:-60,light:110,dark:-100,none:0}[element]||0;
+  const patterns={
+    tap:[[360,.07,"sine"]],attack:[[250,.10,"square"],[165,.18,"sawtooth"]],
+    magic:[[520,.10,"sine"],[690,.12,"sine"],[860,.18,"triangle"]],
+    item:[[440,.10,"triangle"],[660,.16,"sine"]],trade:[[740,.08,"square"],[920,.13,"triangle"]],
+    block:[[620,.06,"square"],[390,.20,"triangle"]],damage:[[210,.08,"sawtooth"],[125,.22,"square"]]
+  };
+  let at=audioCtx.currentTime+.01;
+  for(const [base,duration,type] of patterns[kind]||patterns.tap){
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.type=type;o.frequency.setValueAtTime(Math.max(70,base+elementShift),at);
+    g.gain.setValueAtTime(.08*volume,at);g.gain.exponentialRampToValueAtTime(.001,at+duration);
+    o.connect(g);g.connect(audioCtx.destination);o.start(at);o.stop(at+duration);at+=duration*.72;
+  }
+}
 function toast(text){$("toast").textContent=text;$("toast").classList.add("show");setTimeout(()=>$("toast").classList.remove("show"),2100)}
 async function json(url,options){const res=await fetch(url,options);let data={};try{data=await res.json()}catch{}if(!res.ok||data.ok===false)throw new Error(data.detail||data.error||"通信に失敗しました");return data}
 function img(card){return `/of-admin/${String(card?.image||"").replace(/^\/+/,"")}`}
@@ -81,10 +106,33 @@ function me(){return game?.players.find(p=>p.is_me)}
 function current(){return game?.players.find(p=>p.is_turn)}
 function selectedCards(){const hand=[...(me()?.hand||[]),...(me()?.learned_magics||[])];return selected.map(uid=>hand.find(c=>c.uid===uid)).filter(Boolean)}
 function isAll(card){return card?.isAllAttack||card?.target==="all_enemies"||["all_attack","magic_all_attack"].includes(card?.effect)}
-function isAttack(card){return card?.type==="weapon"||card?.effect==="attack_defense"||(card?.type==="magic"&&["magic_attack","magic_all_attack","hp_drain","inflict_status"].includes(card?.effect))}
+function isAdditional(card){return card?.catalogGroup==="additional_weapon"}
+function isAttack(card){return card?.type==="weapon"||isAdditional(card)||card?.effect==="attack_defense"||(card?.type==="magic"&&["magic_attack","magic_all_attack","hp_drain","inflict_status"].includes(card?.effect))}
 function needsTarget(card){return !isAll(card)&&card?.target!=="self"&&!["exchange","sell","buy"].includes(card?.effect)}
+function presentationLocked(){return Date.now()<presentationUntil}
+function eventIcon(event){
+  const element=event?.element||event?.cards?.[0]?.element||"none";
+  if(event?.kind==="block")return "🛡️";
+  if(event?.kind==="damage")return Number(event.amount||0)>0?"💥":"🛡️";
+  if(event?.kind==="trade")return "🪙";
+  if(event?.kind==="item")return "🎁";
+  if(event?.kind==="magic")return "✨";
+  return elementData[element]?.[0]||"⚔️";
+}
+function handleLatestEvent(){
+  const event=game?.last_event;if(!event||event.id===lastEventId)return;
+  lastEventId=event.id;
+  const duration=event.kind==="attack"?2300:["magic","item","trade"].includes(event.kind)?1700:1300;
+  presentationUntil=Date.now()+duration;
+  const element=event.element||event.cards?.[0]?.element||"none",layer=$("effectLayer");
+  layer.className=`effect-layer show ${element}`;$("effectIcon").textContent=eventIcon(event);$("effectText").textContent=event.message||"効果が発動しました";
+  const primary=event.cards?.[0],soundKind=event.kind==="attack"?(primary?.type==="magic"?"magic":"attack"):event.kind==="damage"?"damage":event.kind;
+  sound(soundKind,element);
+  clearTimeout(effectTimer);effectTimer=setTimeout(()=>{layer.className="effect-layer";render()},duration);
+}
 function canChoosePlayer(player){
   const turn=current(),card=selectedCards()[0];
+  if(presentationLocked())return false;
   if(!player?.alive)return false;
   if(game.can_defend)return Boolean(player.is_me);
   if(["trade_sell","trade_buy"].includes(game.phase))return !player.is_me;
@@ -118,11 +166,26 @@ function canSelectDefense(card){
 }
 function compact(card){const e=elementData[card.element]||elementData.none;if(card.catalogGroup==="additional_weapon")return `+${card.attack||0}${e[0]}`;if(card.attack)return `${card.effectChance<100?card.effectChance+"% ":""}攻${card.attack}${e[0]}`;if(card.defense)return `守${card.defense}${e[0]}`;if(card.mpCost)return `MP${card.mpCost} ${e[0]}`;if(card.effect==="sell")return "売る";if(card.effect==="buy")return "買う";if(card.effect==="exchange")return "両替";return card.effectPower?`効${card.effectPower}`:"特殊"}
 function special(card){if(card.statusEffect&&card.statusEffect!=="none")return `ダメージで${statusNames[card.statusEffect]||card.statusEffect}付与`;const map={multi_hit:`${card.hitCount||2}回攻撃`,reflect_normal:"攻撃を反射",reflect_magic:"奇跡を弾く",nullify_magic:"奇跡を止める",wall_defense:"無属性武器を止める",hp_drain:"ダメージ吸収",instant_defeat:"ダメージで即死",double_attack:"単体武器を2倍",sure_all_attack:"単体武器を全体化",add_magic_attack:`追加攻撃+${card.attack||card.effectPower||0}`,mp_free_magic:"直前の奇跡MP0"};return map[card.effect]||""}
-function cardView(card,index){const turnLocked=game?.phase==="turn"&&card.type==="armor"&&card.effect!=="attack_defense",defenseLocked=game?.phase==="defense"&&game.can_defend&&!selected.includes(card.uid)&&!canSelectDefense(card),locked=turnLocked||defenseLocked;return `<button class="card ${selected.includes(card.uid)?"selected":""} ${locked?"turn-locked":""}" data-card="${esc(card.uid)}" ${locked?'aria-label="現在は使用できません"':""}><img src="${img(card)}" alt="" onerror="this.style.visibility='hidden'"><span class="card-stat ${esc(card.element||"none")}">${esc(compact(card))}</span>${selected.includes(card.uid)?`<span class="card-order">${selected.indexOf(card.uid)+1}</span>`:""}</button>`}
+function cardView(card,index){const learned=String(card.uid).startsWith("learned-"),selling=game?.phase==="trade_sell"&&!learned,turnLocked=game?.phase==="turn"&&card.type==="armor"&&card.effect!=="attack_defense",defenseLocked=game?.phase==="defense"&&game.can_defend&&!selected.includes(card.uid)&&!canSelectDefense(card),locked=turnLocked||defenseLocked||(game?.phase==="trade_sell"&&learned);return `<button class="card ${selected.includes(card.uid)?"selected":""} ${locked?"turn-locked":""}" data-card="${esc(card.uid)}" ${locked?'aria-label="現在は使用できません"':""}><img src="${img(card)}" alt="" onerror="this.style.visibility='hidden'">${selling?`<span class="card-price">￥${Number(card.price||0)}</span>`:""}<span class="card-stat ${esc(card.element||"none")}">${esc(compact(card))}</span>${selected.includes(card.uid)?`<span class="card-order">${selected.indexOf(card.uid)+1}</span>`:""}</button>`}
 function battleCard(card){return `<div class="battle-card"><img src="${img(card)}" alt=""><div class="battle-copy"><b>${esc(card.name)}</b><small>${esc(compact(card))}${special(card)?`・${esc(special(card))}`:""}</small></div><span class="battle-num">${card.attack?`攻${card.attack}`:card.defense?`守${card.defense}`:""}</span></div>`}
+function previewAttack(){
+  if(game.phase!=="turn"||!current()?.is_me||!selected.length)return null;
+  const cards=selectedCards();if(!cards.length)return null;
+  const primary=cards[0],minePlayer=me();
+  let attack=primary.effect==="mp_scaled_attack"?Number(minePlayer?.mp||0):Number(primary.attack||primary.effectPower||0);
+  attack+=cards.slice(1).filter(card=>isAdditional(card)||card.effect==="add_magic_attack").reduce((sum,card)=>sum+Number(card.attack||card.effectPower||0),0);
+  attack=Math.max(0,(attack+Number(minePlayer?.attack_boost||0))*(cards.some(card=>card.effect==="double_attack")?2:1));
+  return {cards,attack};
+}
+function previewDefense(){
+  if(game.phase!=="defense"||!game.can_defend||!selected.length)return null;
+  const cards=selectedCards();return {cards,defense:cards.reduce((sum,card)=>sum+Number(card.defense||0),0)};
+}
 function render(){
   if(!game)return;
+  handleLatestEvent();
   const mine=me(),turn=current(),battle=game.battle||{};
+  const attackPreview=previewAttack(),defensePreview=previewDefense(),locked=presentationLocked();
   const configuredLimit=Number(roomInfo?.room?.custom_rules?.end_time_limit??game.end_time_limit??100);
   $("gfLabel").textContent=`G.F.${configuredLimit}`;
   $("roomLabel").textContent=`${room}・${game.turn_count}/${configuredLimit}${game.endgame?"・終末":""}`;
@@ -130,23 +193,31 @@ function render(){
   let msg=game.logs?.[0]||"";
   if(game.phase==="waiting")msg="全員が準備したらホストが開始してください。";
   if(game.phase==="defense"&&game.can_defend)msg=battle.hit?"防御カードを選び、自分のステータスをタップして確定してください。":"攻撃は外れました。自分のステータスをタップして進めてください。";
+  if(game.phase==="trade_sell")msg=saleUid?"売却先のプレイヤーを選んでください。":"￥価格を確認して、売るカードを選んでください。";
+  if(game.phase==="trade_buy")msg="購入先のプレイヤーを選んでください。";
   if(game.phase==="turn"&&turn?.is_me)msg=selected.length?"使用対象のステータスをタップしてください。":"カードを選んでください。武器がなければ祈れます。";
+  if(locked&&game.last_event?.message)msg=game.last_event.message;
   if(game.phase==="finished")msg=game.winner_ids.includes(mine?.user_id)?"あなたの勝利です！":"対戦終了";
   $("message").innerHTML=esc(msg);
   $("players").innerHTML=game.players.map(p=>`<div class="player ${p.is_me?"me":""} ${p.is_turn?"turn":""} ${!p.alive?"dead":""} ${battle.defender_id===p.user_id?"defender":""} ${canChoosePlayer(p)?"targetable":""}" data-player="${esc(p.user_id)}"><span class="name">${esc(p.user_name)}</span><span class="stats">HP ${p.hp??"?"}　MP ${p.mp??"?"}　￥ ${p.gold??"?"}</span>${p.statuses.length||p.guardian?`<span class="badges">${p.statuses.map(s=>esc(statusNames[s]||s)).join("・")}${p.guardian?`${p.statuses.length?"・":""}守護神 ${esc(p.guardian.name)}`:""}</span>`:""}</div>`).join("");
-  $("attackCards").innerHTML=(battle.attack_cards||[]).map(battleCard).join("")||'<div class="empty">攻撃カードなし</div>';
-  $("defenseCards").innerHTML=(battle.defense_cards||[]).map(battleCard).join("")||'<div class="empty">防御カードなし</div>';
-  $("attackTotal").textContent=`攻 ${battle.attack||0}`;$("defenseTotal").textContent=`守 ${battle.defense||0}`;
+  const shownAttackCards=attackPreview?.cards||battle.attack_cards||[],shownDefenseCards=defensePreview?.cards||battle.defense_cards||[];
+  $("attackCards").innerHTML=shownAttackCards.map(battleCard).join("")||'<div class="empty">攻撃カードなし</div>';
+  $("defenseCards").innerHTML=shownDefenseCards.map(battleCard).join("")||'<div class="empty">防御カードなし</div>';
+  $("attackTotal").textContent=`攻 ${attackPreview?.attack??battle.attack??0}`;$("defenseTotal").textContent=`守 ${defensePreview?.defense??battle.defense??0}`;
+  $("attackField").classList.toggle("preview",Boolean(attackPreview));$("defenseField").classList.toggle("preview",Boolean(defensePreview));
+  $("attackPrivate").textContent=attackPreview?"自分だけに表示":"";$("defensePrivate").textContent=defensePreview?"自分だけに表示":"";
   $("damage").textContent=battle.damage==null?(battle.hit===false?"はずれ":"待機中"):`${battle.damage} ダメージ`;
   const ed=elementData[battle.element]||elementData.none;$("elementText").textContent=ed[1]?`${ed[0]} ${ed[1]}属性`:"無属性";
-  const hand=mine?.hand||[];$("handCount").textContent=`${hand.length}/${18}`;$("hand").innerHTML=hand.map(cardView).join("");
+  const hand=mine?.hand||[],learned=mine?.learned_magics||[];
+  $("handCount").textContent=`${hand.length}/${18}`;$("hand").innerHTML=hand.map(cardView).join("");
+  $("learnedSection").classList.toggle("hidden",!learned.length);$("learnedCount").textContent=`${learned.length} / 6`;$("learned").innerHTML=learned.map(cardView).join("");
   renderActions();renderDetail();bind();
-  if(lastPhase&&lastPhase!==game.phase&&battle.damage!=null)sound(battle.blocked?"block":"hit");lastPhase=game.phase;
+  if(!game.last_event&&lastPhase&&lastPhase!==game.phase&&battle.damage!=null)sound(battle.blocked?"block":"damage",battle.element);lastPhase=game.phase;
   if(game.phase.startsWith("trade_"))renderTrade();
 }
 function renderActions(){
-  const mine=me(),turn=current(),isHost=mine&&String(game.host_user_id)===String(mine.user_id),wait=["waiting","finished"].includes(game.phase),myTurn=game.phase==="turn"&&turn?.is_me,card=selectedCards()[0];
-  const noWeapon=!(mine?.hand||[]).some(c=>c.type==="weapon"||c.effect==="attack_defense");
+  const mine=me(),turn=current(),isHost=mine&&String(game.host_user_id)===String(mine.user_id),wait=["waiting","finished"].includes(game.phase),myTurn=game.phase==="turn"&&turn?.is_me&&!presentationLocked(),card=selectedCards()[0];
+  const noWeapon=!(mine?.hand||[]).some(c=>c.type==="weapon"||isAdditional(c)||c.effect==="attack_defense");
   let html=`<button class="btn primary" id="readyBtn" ${wait?"":"disabled"}>${mine?.ready?"準備解除":"準備完了"}</button><button class="btn primary" id="startBtn" ${isHost&&wait&&game.players.length>=2&&game.players.every(p=>p.ready)?"":"disabled"}>対戦開始</button>`;
   if(myTurn&&noWeapon)html+=`<button class="btn pray" id="prayBtn">✨ 祈る</button>`;
   if(myTurn&&card&&isAll(card))html+=`<button class="btn danger" id="allBtn">全体へ発動</button>`;
@@ -163,8 +234,13 @@ function renderActions(){
   $("cancelTradeBtn")?.addEventListener("click",()=>action({action:"trade",cancel:true}));
 }
 function renderDetail(){
-  const card=selectedCards().at(-1);if(!card){$("detail").innerHTML='<div class="empty">カードを選ぶと詳細を表示します。</div>';return}
-  const e=elementData[card.element]||elementData.none;$("detail").innerHTML=`<h2>カード詳細</h2><img src="${img(card)}" alt=""><div class="card-name">${esc(card.name)}</div><p>${esc(compact(card))} ${e[1]?`<span class="${card.element}">${e[0]} ${e[1]}属性</span>`:""}</p>${special(card)?`<p><strong>${esc(special(card))}</strong></p>`:""}<p>${esc(card.desc||"")}</p><p>価格 ￥${card.price||0}</p>`
+  const minePlayer=me(),all=[...(minePlayer?.hand||[]),...(minePlayer?.learned_magics||[])];
+  const card=selectedCards().at(-1)||all.find(value=>value.uid===focusedUid),detail=$("detail");
+  if(!card){detail.classList.remove("has-card");detail.innerHTML='<div class="empty">カードを選ぶと詳細を表示します。</div>';return}
+  const e=elementData[card.element]||elementData.none,learned=String(card.uid).startsWith("learned-");
+  detail.classList.toggle("has-card",card.uid!==detailDismissedUid);
+  detail.innerHTML=`<button class="detail-close" id="detailClose" aria-label="詳細を閉じる">×</button><img src="${img(card)}" alt=""><div class="detail-copy"><h2>カード詳細</h2><div class="card-name">${esc(card.name)}</div><p>${esc(compact(card))} ${e[1]?`<span class="${card.element}">${e[0]} ${e[1]}属性</span>`:""}${learned?"・習得済み（MPを払って再使用可能）":""}</p>${special(card)?`<p><strong>${esc(special(card))}</strong></p>`:""}<p>${esc(card.desc||"")}</p><p>価格 ￥${card.price||0}${card.type==="magic"?`　消費MP ${card.mpCost||0}`:""}</p></div>`;
+  $("detailClose").onclick=()=>{detailDismissedUid=card.uid;detail.classList.remove("has-card")};
 }
 function bind(){
   document.querySelectorAll("[data-card]").forEach(el=>el.onclick=()=>selectCard(el.dataset.card));
@@ -175,13 +251,15 @@ function bind(){
 function selectCard(uid){
   const mine=me();if(!mine)return;
   const card=mine.hand.find(c=>c.uid===uid)||mine.learned_magics?.find(c=>c.uid===uid);if(!card)return;
+  focusedUid=uid;detailDismissedUid=null;
+  if(presentationLocked()){renderDetail();toast("カード演出のあとに操作できます");return}
   if(game.phase==="defense"&&game.can_defend){
     if(selected.includes(uid)){selected=selected.filter(x=>x!==uid);sound();render();return}
     if(mine.statuses.includes("flash")&&selected.length){toast("閃光状態では防御カードを1枚しか使えません");return}
     if(!canSelectDefense(card)){toast("このカードでは攻撃を防げません");return}
     selected.push(uid);sound();render();return
   }
-  if(game.phase==="trade_sell"){saleUid=uid;selected=[uid];sound();render();return}
+  if(game.phase==="trade_sell"){if(String(uid).startsWith("learned-")){toast("習得した奇跡は売却できません");return}saleUid=uid;selected=[uid];sound();render();return}
   if(game.phase!=="turn"||!current()?.is_me)return;
   if(card.type==="armor"&&card.effect!=="attack_defense"){selected=[];toast("防具は攻撃を受けた時だけ使用できます");renderDetail();return}
   if(!selected.length){selected=[uid];sound();if(["sell","buy","exchange"].includes(card.effect)){action({action:"play",card_uid:uid});return}render();return}
@@ -190,6 +268,7 @@ function selectCard(uid){
   if(support){selected.includes(uid)?selected=selected.filter(x=>x!==uid):selected.push(uid);sound();render()}else{selected=[uid];sound();render()}
 }
 function choosePlayer(userId){
+  if(presentationLocked()){toast("カード演出のあとに操作できます");return}
   if(game.can_defend&&me()?.user_id===userId){confirmDefense();return}
   if(game.phase==="trade_sell"){if(me()?.user_id===userId){toast("自分とは取引できません");return}if(!saleUid){toast("売るカードを先に選んでください");return}action({action:"trade",card_uid:saleUid,target_id:userId});return}
   if(game.phase==="trade_buy"){if(me()?.user_id===userId){toast("自分とは取引できません");return}action({action:"trade",target_id:userId,confirm:false});return}
@@ -200,8 +279,8 @@ function choosePlayer(userId){
     playCard(userId)
   }
 }
-function playCard(targetId){const cards=selectedCards();if(!cards.length)return;action({action:"play",card_uid:cards[0].uid,support_uids:cards.slice(1).map(c=>c.uid),target_id:targetId})}
-function confirmDefense(){action({action:"defend",defense_uids:[...selected]})}
+function playCard(targetId){if(presentationLocked())return;const cards=selectedCards();if(!cards.length)return;action({action:"play",card_uid:cards[0].uid,support_uids:cards.slice(1).map(c=>c.uid),target_id:targetId})}
+function confirmDefense(){if(presentationLocked()){toast("攻撃カードを確認してください");return}action({action:"defend",defense_uids:[...selected]})}
 function renderTrade(){
   const pending=game.pending_trade;if(!pending)return;
   if(game.phase==="trade_exchange")showExchange();
@@ -215,7 +294,7 @@ function showExchange(){
 function updateExchange(total,mine){const vals=["hp","mp","gold"].map(k=>Number($(`ex-${k}`).value)||0);$("exTotal").textContent=`変更前 HP${mine.hp} MP${mine.mp} ￥${mine.gold} → 変更後 HP${vals[0]} MP${vals[1]} ￥${vals[2]}（合計 ${vals.reduce((a,b)=>a+b,0)}/${total}）`}
 function showBuy(pending){if($("modal").classList.contains("show"))return;const c=pending.offer;$("dialog").innerHTML=`<h2>買う</h2><p>「${esc(c.name)}」が選ばれました。￥${c.price||0}で購入しますか？</p><img style="width:100%;max-height:240px;object-fit:contain" src="${img(c)}" alt=""><div class="dialog-actions"><button class="btn" id="buyNo">見送る</button><button class="btn primary" id="buyYes">購入</button></div>`;$("modal").classList.add("show");$("buyNo").onclick=()=>{closeModal();action({action:"trade",confirm:false,cancel:true})};$("buyYes").onclick=()=>{closeModal();action({action:"trade",target_id:pending.target_id,confirm:true})}}
 function closeModal(){$("modal").classList.remove("show");$("dialog").innerHTML=""}
-async function post(path,body){if(busy)return;busy=true;try{await json(`${API_BASE}/api/casino/oasisfield${path}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({session,room_id:room,...body})});selected=[];saleUid=null;closeModal();sound();await load()}catch(e){toast(e.message)}finally{busy=false}}
+async function post(path,body){if(busy)return;busy=true;try{await json(`${API_BASE}/api/casino/oasisfield${path}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({session,room_id:room,...body})});selected=[];saleUid=null;focusedUid=null;closeModal();await load()}catch(e){toast(e.message)}finally{busy=false}}
 const action=body=>post("/action",body);
 async function load(){if(!room||!session){$("message").textContent="部屋情報またはセッションがありません";return}try{roomInfo=await json(`${API_BASE}/api/casino/room-info?room_id=${encodeURIComponent(room)}`);const state=await json(`${API_BASE}/api/casino/oasisfield/state?room_id=${encodeURIComponent(room)}&session=${encodeURIComponent(session)}`);game=state.game;render()}catch(e){$("message").textContent=e.message}}
 $("backBtn").onclick=()=>location.href=`/lobby?game=oasisfield&session=${encodeURIComponent(session||"")}`;$("reloadBtn").onclick=load;
