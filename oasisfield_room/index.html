@@ -82,9 +82,31 @@ function current(){return game?.players.find(p=>p.is_turn)}
 function selectedCards(){const hand=[...(me()?.hand||[]),...(me()?.learned_magics||[])];return selected.map(uid=>hand.find(c=>c.uid===uid)).filter(Boolean)}
 function isAll(card){return card?.isAllAttack||card?.target==="all_enemies"||["all_attack","magic_all_attack"].includes(card?.effect)}
 function needsTarget(card){return !isAll(card)&&card?.target!=="self"&&!["exchange","sell","buy"].includes(card?.effect)}
+function isDefenseCard(card){return Boolean(card)&&(card.type==="armor"||Number(card.defense||0)>0||["reflect_normal","reflect_magic","nullify_magic","wall_defense","element_change"].includes(card.effect)||["reflect_magic","nullify_magic"].includes(card.secondaryEffect))}
+function defenseElementCanBlock(attackElement,defenseElement){if(["none","dark"].includes(attackElement))return true;if(attackElement==="light")return false;return ({fire:["water","light"],water:["fire","light"],wood:["earth","light"],earth:["wood","light"]}[attackElement]||[]).includes(defenseElement||"none")}
+function canSelectDefense(card){
+  if(!card||game?.battle?.hit!==true)return false;
+  const chosen=selectedCards(),previous=chosen.at(-1);
+  if(card.effect==="mp_free_magic")return previous?.type==="magic";
+  if(!isDefenseCard(card))return false;
+  const battle=game.battle||{},primary=(battle.attack_cards||[])[0]||{};
+  const originalElement=battle.element||"none",isMagic=primary.type==="magic";
+  const sourceName=card.sourceName||card.name;
+  const magicSpecial=["reflect_magic","nullify_magic"].includes(card.effect)||["reflect_magic","nullify_magic"].includes(card.secondaryEffect);
+  const hasBaseDefense=card.type==="armor"||Number(card.defense||0)>0;
+  if(sourceName==="スーパーミラー")return true;
+  if(card.effect==="element_change")return originalElement!=="none";
+  const element=chosen.some(value=>value.effect==="element_change")&&originalElement!=="none"?"none":originalElement;
+  if(card.effect==="wall_defense")return !isMagic&&element==="none";
+  if(isMagic&&magicSpecial)return true;
+  if(isMagic&&Number(battle.attack||0)<=0)return false;
+  if(card.effect==="reflect_normal")return !isMagic&&element==="none";
+  if(magicSpecial&&!hasBaseDefense)return false;
+  return defenseElementCanBlock(element,card.element);
+}
 function compact(card){const e=elementData[card.element]||elementData.none;if(card.catalogGroup==="additional_weapon")return `+${card.attack||0}${e[0]}`;if(card.attack)return `${card.effectChance<100?card.effectChance+"% ":""}攻${card.attack}${e[0]}`;if(card.defense)return `守${card.defense}${e[0]}`;if(card.mpCost)return `MP${card.mpCost} ${e[0]}`;if(card.effect==="sell")return "売る";if(card.effect==="buy")return "買う";if(card.effect==="exchange")return "両替";return card.effectPower?`効${card.effectPower}`:"特殊"}
 function special(card){if(card.statusEffect&&card.statusEffect!=="none")return `ダメージで${statusNames[card.statusEffect]||card.statusEffect}付与`;const map={multi_hit:`${card.hitCount||2}回攻撃`,reflect_normal:"攻撃を反射",reflect_magic:"奇跡を弾く",nullify_magic:"奇跡を止める",wall_defense:"無属性武器を止める",hp_drain:"ダメージ吸収",instant_defeat:"ダメージで即死",double_attack:"単体武器を2倍",sure_all_attack:"単体武器を全体化",add_magic_attack:`追加攻撃+${card.attack||card.effectPower||0}`,mp_free_magic:"直前の奇跡MP0"};return map[card.effect]||""}
-function cardView(card,index){const locked=game?.phase==="turn"&&card.type==="armor"&&card.effect!=="attack_defense";return `<button class="card ${selected.includes(card.uid)?"selected":""} ${locked?"turn-locked":""}" data-card="${esc(card.uid)}" ${locked?'aria-label="防御時のみ使用可能"':""}><img src="${img(card)}" alt="" onerror="this.style.visibility='hidden'"><span class="card-stat ${esc(card.element||"none")}">${esc(compact(card))}</span>${selected.includes(card.uid)?`<span class="card-order">${selected.indexOf(card.uid)+1}</span>`:""}</button>`}
+function cardView(card,index){const turnLocked=game?.phase==="turn"&&card.type==="armor"&&card.effect!=="attack_defense",defenseLocked=game?.phase==="defense"&&game.can_defend&&!selected.includes(card.uid)&&!canSelectDefense(card),locked=turnLocked||defenseLocked;return `<button class="card ${selected.includes(card.uid)?"selected":""} ${locked?"turn-locked":""}" data-card="${esc(card.uid)}" ${locked?'aria-label="現在は使用できません"':""}><img src="${img(card)}" alt="" onerror="this.style.visibility='hidden'"><span class="card-stat ${esc(card.element||"none")}">${esc(compact(card))}</span>${selected.includes(card.uid)?`<span class="card-order">${selected.indexOf(card.uid)+1}</span>`:""}</button>`}
 function battleCard(card){return `<div class="battle-card"><img src="${img(card)}" alt=""><div class="battle-copy"><b>${esc(card.name)}</b><small>${esc(compact(card))}${special(card)?`・${esc(special(card))}`:""}</small></div><span class="battle-num">${card.attack?`攻${card.attack}`:card.defense?`守${card.defense}`:""}</span></div>`}
 function render(){
   if(!game)return;
@@ -140,10 +162,15 @@ function bind(){
 }
 function selectCard(uid){
   const mine=me();if(!mine)return;
-  if(game.phase==="defense"&&game.can_defend){selected.includes(uid)?selected=selected.filter(x=>x!==uid):selected.push(uid);sound();render();return}
+  const card=mine.hand.find(c=>c.uid===uid)||mine.learned_magics?.find(c=>c.uid===uid);if(!card)return;
+  if(game.phase==="defense"&&game.can_defend){
+    if(selected.includes(uid)){selected=selected.filter(x=>x!==uid);sound();render();return}
+    if(mine.statuses.includes("flash")&&selected.length){toast("閃光状態では防御カードを1枚しか使えません");return}
+    if(!canSelectDefense(card)){toast("このカードでは攻撃を防げません");return}
+    selected.push(uid);sound();render();return
+  }
   if(game.phase==="trade_sell"){saleUid=uid;selected=[uid];sound();render();return}
   if(game.phase!=="turn"||!current()?.is_me)return;
-  const card=mine.hand.find(c=>c.uid===uid)||mine.learned_magics?.find(c=>c.uid===uid);if(!card)return;
   if(card.type==="armor"&&card.effect!=="attack_defense"){selected=[];toast("防具は攻撃を受けた時だけ使用できます");renderDetail();return}
   if(!selected.length){selected=[uid];sound();if(["sell","buy","exchange"].includes(card.effect)){action({action:"play",card_uid:uid});return}render();return}
   if(selected[0]===uid){selected=[];render();return}
