@@ -8,7 +8,9 @@
   <style>
     :root{--green:#079473;--deep:#006b56;--mint:#c9f7ef;--panel:#ecfffaf0;--line:#80cec0;--gold:#ffd65a;--red:#e73355;--ink:#073c34;--blue:#3659df}
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-    body{margin:0;min-height:100vh;color:var(--ink);font-family:system-ui,-apple-system,"Yu Gothic",sans-serif;background:radial-gradient(circle at 30% 10%,#ddffff 0,#96eadf 42%,#45b99b 100%);font-weight:700}
+    body{margin:0;min-height:100vh;color:var(--ink);font-family:system-ui,-apple-system,"Yu Gothic",sans-serif;background:radial-gradient(circle at 30% 10%,#ddffff 0,#96eadf 42%,#45b99b 100%);font-weight:700;transition:background .5s}
+    body.endgame-mode{background:radial-gradient(circle at 30% 10%,#ffd9d9 0,#c74b55 46%,#3d1018 100%)}
+    body.endgame-transition{animation:endgameFlash 2.2s ease both}
     button,input{font:inherit}button{touch-action:manipulation}
     .app{width:min(1180px,100%);min-height:100vh;margin:auto;padding:10px;display:grid;grid-template-rows:auto auto auto 1fr;gap:9px}
     .top{height:62px;border-radius:12px;background:var(--green);display:grid;grid-template-columns:64px 1fr auto;align-items:center;padding:7px 10px;color:white;box-shadow:0 3px 0 #00715a}
@@ -17,12 +19,12 @@
     .top-tools{display:flex;gap:7px;align-items:center}.volume{width:90px}
     .message{min-height:43px;border:3px solid var(--green);border-radius:11px;background:#f1fffb;padding:8px 12px;text-align:center;font-size:15px}
     .message.end{border-color:#c63343;background:#fff0f1}.message strong{color:#d8274b}
-    .players{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:7px}
-    .player{position:relative;border:3px solid #aaa;border-radius:999px;background:#f5f5f5;padding:7px 12px 7px 31px;display:grid;grid-template-columns:minmax(72px,1fr) auto;gap:7px;align-items:center;cursor:pointer;min-height:51px}
+    .players{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:7px}
+    .player{position:relative;border:3px solid #aaa;border-radius:999px;background:#f5f5f5;padding:7px 12px 7px 31px;display:grid;grid-template-columns:minmax(62px,1fr) auto;gap:7px;align-items:center;cursor:pointer;min-height:51px;min-width:0}
     .player:before{content:"";position:absolute;left:8px;top:50%;width:16px;height:16px;transform:translateY(-50%);border-radius:50%;background:#aaa}
     .player.me .name{color:var(--blue)}.player.turn{outline:4px solid var(--gold)}.player.dead{opacity:.5;filter:grayscale(1)}.player.targetable{animation:pulse 1.2s infinite;cursor:pointer}.player.defender{outline:4px solid #e64763}
     @keyframes pulse{50%{box-shadow:0 0 0 6px #ffda5270}}
-    .name{font-size:18px;color:var(--green);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.stats{white-space:nowrap;font-size:13px;color:#4d6762}.badges{grid-column:1/-1;font-size:11px;color:#8c4d17;padding-left:2px}
+    .name{font-size:clamp(17px,1.7vw,21px);color:var(--green);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.stats{display:flex;align-items:center;justify-content:flex-end;gap:clamp(5px,1vw,12px);white-space:nowrap;font-size:clamp(14px,1.45vw,18px);color:#4d6762;font-variant-numeric:tabular-nums}.stats b{font-size:1.08em}.stats .hp{color:#dc3153}.badges{grid-column:1/-1;font-size:12px;color:#8c4d17;padding-left:2px}
     .table{position:relative;overflow:hidden;border:2px solid var(--line);border-radius:13px;background:var(--panel);padding:10px;min-height:260px;display:grid;grid-template-columns:1fr 116px 1fr;gap:8px}
     .field{border-radius:12px;background:#dff8f2cc;min-height:188px;padding:8px;display:flex;flex-direction:column;gap:5px;transition:.2s}
     .field.preview{outline:3px solid #f4bd26;background:#f1fff0}.private-note{font-size:10px;color:#8b6712;margin-left:5px}
@@ -35,11 +37,13 @@
     .learned-section{margin-top:10px;padding-top:9px;border-top:2px solid #9ed7cc}.learned-section.hidden{display:none}.learned-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}.learned-title h3{margin:0;font-size:15px}.learned .card{background:#e8e2ff}.learned .card:after{content:"再使用";position:absolute;left:3px;top:3px;padding:2px 5px;border-radius:999px;background:#6d61c9;color:#fff;font-size:9px}
     .card{position:relative;border:3px solid transparent;border-radius:9px;background:#dbffc9;overflow:hidden;min-width:0;cursor:pointer;padding:0;text-align:left}.card.selected{border-color:#ffbd18;transform:translateY(-2px)}.card.turn-locked{filter:saturate(.35);opacity:.58}.card img{display:block;width:100%;aspect-ratio:1/1;object-fit:cover;background:#cde8df}.card-stat{display:block;text-align:center;padding:4px 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#385652;font-size:14px}.card-price{position:absolute;left:3px;top:3px;padding:2px 6px;border:2px solid #d8a700;border-radius:999px;background:#fff3a4;color:#6d4b00;font-size:11px;box-shadow:0 1px 2px #0003}.card-order{position:absolute;top:3px;right:3px;background:#ffcd31;color:#543400;border-radius:50%;width:22px;height:22px;text-align:center;line-height:22px}.element{font-weight:1000}.fire{color:#ed442d}.water{color:#2587e8}.wood{color:#168d3e}.earth{color:#967239}.light{color:#d29b00}.dark{color:#9a42ba}
     .detail{min-width:0;position:relative}.detail img{width:100%;aspect-ratio:16/10;object-fit:contain;background:#c7eee4;border-radius:9px}.detail .card-name{font-size:20px;margin:7px 0}.detail p{font-size:13px;line-height:1.55;margin:7px 0}.detail-close{display:none;position:absolute;right:7px;top:7px;z-index:2;width:34px;height:34px;border:0;border-radius:50%;background:#163e38;color:#fff;font-size:22px}.empty{height:100%;display:grid;place-items:center;color:#6e8f87;text-align:center}
-    .effect-layer{position:absolute;inset:0;z-index:12;display:grid;place-items:center;pointer-events:none;opacity:0;transform:scale(.86);transition:opacity .2s,transform .24s;background:radial-gradient(circle,#ffffffd9 0,#a7f4e4b8 45%,transparent 72%)}.effect-layer.show{opacity:1;transform:scale(1)}.effect-card{min-width:min(420px,82%);padding:18px 24px;border:4px solid #fff;border-radius:18px;background:#087f68e8;color:#fff;text-align:center;box-shadow:0 12px 30px #003b3270}.effect-icon{display:block;font-size:48px;line-height:1}.effect-text{display:block;margin-top:6px;font-size:21px}.effect-layer.fire .effect-card{background:#b93f2ce8}.effect-layer.water .effect-card{background:#257dc2e8}.effect-layer.wood .effect-card{background:#218747e8}.effect-layer.earth .effect-card{background:#886a32e8}.effect-layer.light .effect-card{background:#b48b19e8}.effect-layer.dark .effect-card{background:#633184e8}
+    .effect-layer{position:absolute;inset:0;z-index:12;display:grid;place-items:center;pointer-events:none;opacity:0;transform:scale(.86);transition:opacity .2s,transform .24s;background:radial-gradient(circle,#ffffffd9 0,#a7f4e4b8 45%,transparent 72%)}.effect-layer.show{opacity:1;transform:scale(1)}.effect-card{min-width:min(470px,88%);max-width:92%;padding:18px 24px;border:4px solid #fff;border-radius:18px;background:#087f68e8;color:#fff;text-align:center;box-shadow:0 12px 30px #003b3270}.effect-icon{display:block;font-size:48px;line-height:1}.effect-text{display:block;margin-top:6px;font-size:21px}.effect-event-cards{display:flex;flex-direction:column;gap:5px;margin-top:10px}.effect-event-card{display:grid;grid-template-columns:44px minmax(0,1fr) auto;align-items:center;gap:7px;border:2px solid #ffffff99;border-radius:9px;background:#effff7;color:var(--ink);overflow:hidden;text-align:left}.effect-event-card img{width:44px;height:44px;object-fit:cover}.effect-event-card b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.effect-event-card span{padding-right:7px;font-size:16px}.effect-layer.fire .effect-card{background:#b93f2ce8}.effect-layer.water .effect-card{background:#257dc2e8}.effect-layer.wood .effect-card{background:#218747e8}.effect-layer.earth .effect-card{background:#886a32e8}.effect-layer.light .effect-card{background:#b48b19e8}.effect-layer.dark .effect-card{background:#633184e8}.effect-layer.hit .effect-card{background:#b68712ee}.effect-layer.miss .effect-card{background:#61717be8}.effect-layer.heal .effect-card{background:#15945eea}.effect-layer.mp .effect-card{background:#376ccaea}.effect-layer.damage .effect-card{background:#a6293bea}.effect-layer.demon .effect-card{background:#54145cea}.effect-layer.fairy .effect-card{background:#dc8b24ed}.effect-layer.endgame{background:radial-gradient(circle,#ffddddea 0,#ba2836dd 48%,#240008e8 100%)}.effect-layer.endgame .effect-card{background:#7c0b19f2;animation:endgameCard 1s ease infinite alternate}.effect-layer.block .effect-card{background:#536e7de8}
     .modal{position:fixed;inset:0;background:#002d28a8;display:none;place-items:center;padding:14px;z-index:20}.modal.show{display:grid}.dialog{width:min(500px,100%);max-height:90vh;overflow:auto;border-radius:14px;background:#edfff9;padding:16px;border:3px solid var(--green)}.dialog h2{margin-top:0}.exchange-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}.exchange-grid input{width:100%;font-size:24px;text-align:center;padding:8px;border:1px solid #7caea6;border-radius:8px}.step{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:5px 0}.step button{border:0;border-radius:7px;padding:6px;background:#d2eee8}.dialog-actions{display:flex;justify-content:flex-end;gap:7px;margin-top:12px}
     .toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#092f2a;color:white;padding:10px 16px;border-radius:999px;z-index:30;opacity:0;pointer-events:none;transition:.2s}.toast.show{opacity:1}
-    @media(max-width:700px){.app{padding:6px}.top{height:56px}.gf b{min-width:130px;font-size:22px}.volume{width:65px}.players{grid-template-columns:1fr}.player{min-height:45px;padding-top:5px;padding-bottom:5px}.table{grid-template-columns:1fr 76px 1fr;padding:6px;min-height:230px}.field{padding:5px;min-height:180px}.battle-card{grid-template-columns:45px 1fr}.battle-card img{width:45px;height:48px}.battle-num{display:none}.total{font-size:22px}.versus b{font-size:27px}.workspace{grid-template-columns:1fr}.detail{display:none}.detail.has-card{display:grid;position:fixed;left:6px;right:6px;bottom:calc(6px + env(safe-area-inset-bottom));z-index:18;max-height:44vh;overflow:auto;grid-template-columns:92px minmax(0,1fr);gap:9px;align-items:start;border:3px solid var(--green);box-shadow:0 10px 35px #003d347d}.detail.has-card img{aspect-ratio:1/1}.detail.has-card .detail-close{display:block}.detail.has-card .detail-copy{padding-right:29px}.detail.has-card .card-name{margin-top:0}.hand,.learned{grid-template-columns:repeat(5,minmax(58px,1fr));gap:5px;max-height:none}.card-stat{font-size:12px}.hand-panel{padding:7px}.top-tools .icon-btn{display:none}.effect-card{padding:13px 16px}.effect-icon{font-size:40px}.effect-text{font-size:17px}}
-    @media(max-width:430px){.hand,.learned{grid-template-columns:repeat(4,minmax(58px,1fr))}.player .name{font-size:17px}.stats{font-size:12px}.message{font-size:13px}.table{grid-template-columns:1fr 55px 1fr}.versus small{display:none}}
+    @keyframes endgameFlash{0%,100%{filter:none}18%,52%{filter:saturate(1.5) brightness(.62)}35%,70%{filter:saturate(1.8) brightness(1.2)}}
+    @keyframes endgameCard{to{transform:scale(1.04);box-shadow:0 0 30px #ffef9d}}
+    @media(max-width:700px){.app{padding:6px}.top{height:56px}.gf b{min-width:130px;font-size:22px}.volume{width:65px}.players{grid-template-columns:1fr}.player{min-height:45px;padding-top:5px;padding-bottom:5px}.table{grid-template-columns:1fr 76px 1fr;padding:6px;min-height:230px}.field{padding:5px;min-height:180px}.battle-card{grid-template-columns:45px 1fr}.battle-card img{width:45px;height:48px}.battle-num{display:none}.total{font-size:22px}.versus b{font-size:27px}.workspace{grid-template-columns:1fr}.detail{display:none}.detail.has-card{display:grid;position:fixed;left:6px;right:6px;bottom:calc(6px + env(safe-area-inset-bottom));z-index:18;max-height:44vh;overflow:auto;grid-template-columns:92px minmax(0,1fr);gap:9px;align-items:start;border:3px solid var(--green);box-shadow:0 10px 35px #003d347d}.detail.has-card img{aspect-ratio:1/1}.detail.has-card .detail-close{display:block}.detail.has-card .detail-copy{padding-right:29px}.detail.has-card .card-name{margin-top:0}.hand,.learned{grid-template-columns:repeat(5,minmax(58px,1fr));gap:5px;max-height:none}.card-stat{font-size:12px}.hand-panel{padding:7px}.top-tools .icon-btn{display:none}.effect-card{padding:13px 16px}.effect-icon{font-size:40px}.effect-text{font-size:17px}.stats{font-size:clamp(14px,4vw,17px)}}
+    @media(max-width:430px){.hand,.learned{grid-template-columns:repeat(4,minmax(58px,1fr))}.player .name{font-size:17px}.stats{font-size:14px;gap:5px}.message{font-size:13px}.table{grid-template-columns:1fr 55px 1fr}.versus small{display:none}}
   </style>
 </head>
 <body>
@@ -55,7 +59,7 @@
     <div class="field" id="attackField"><h2>攻撃の場 <span class="private-note" id="attackPrivate"></span></h2><div class="battle-cards" id="attackCards"></div><div class="total" id="attackTotal">攻 0</div></div>
     <div class="versus"><b>VS</b><div class="damage" id="damage">待機中</div><small id="elementText"></small></div>
     <div class="field" id="defenseField"><h2>防御の場 <span class="private-note" id="defensePrivate"></span></h2><div class="battle-cards" id="defenseCards"></div><div class="total" id="defenseTotal">守 0</div></div>
-    <div class="effect-layer" id="effectLayer"><div class="effect-card"><span class="effect-icon" id="effectIcon"></span><span class="effect-text" id="effectText"></span></div></div>
+    <div class="effect-layer" id="effectLayer"><div class="effect-card"><span class="effect-icon" id="effectIcon"></span><span class="effect-text" id="effectText"></span><div class="effect-event-cards" id="effectCards"></div></div></div>
   </section>
   <section class="workspace">
     <div class="hand-panel">
@@ -78,6 +82,7 @@ const room=qs.get("room"),session=qs.get("session");
 const $=id=>document.getElementById(id);
 let game=null,roomInfo=null,selected=[],saleUid=null,lastPhase="",busy=false;
 let audioCtx=null,lastEventId=null,presentationUntil=0,effectTimer=null,detailDismissedUid=null,focusedUid=null;
+let presentationQueue=[],activePresentation=null,presentationBattle=null;
 const statusNames={cold:"風邪",fever:"熱病",hell:"地獄病",heaven:"天国病",fog:"霧",dream:"夢",dark_cloud:"暗雲",flash:"閃光",frenzy:"熱狂"};
 const elementData={fire:["🔥","火"],water:["💧","水"],wood:["🌿","木"],earth:["◆","土"],light:["☀","光"],dark:["☾","闇"],none:["",""]};
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -89,7 +94,11 @@ function sound(kind="tap",element="none"){
     tap:[[360,.07,"sine"]],attack:[[250,.10,"square"],[165,.18,"sawtooth"]],
     magic:[[520,.10,"sine"],[690,.12,"sine"],[860,.18,"triangle"]],
     item:[[440,.10,"triangle"],[660,.16,"sine"]],trade:[[740,.08,"square"],[920,.13,"triangle"]],
-    block:[[620,.06,"square"],[390,.20,"triangle"]],damage:[[210,.08,"sawtooth"],[125,.22,"square"]]
+    block:[[620,.06,"square"],[390,.20,"triangle"]],defense:[[330,.08,"square"],[470,.13,"triangle"]],
+    damage:[[210,.08,"sawtooth"],[125,.22,"square"]],hit:[[520,.07,"square"],[780,.18,"triangle"]],
+    miss:[[280,.12,"sine"],[170,.22,"triangle"]],heal:[[420,.08,"sine"],[620,.10,"sine"],[820,.18,"triangle"]],
+    mp:[[350,.08,"sine"],[520,.10,"triangle"],[700,.18,"sine"]],endgame:[[120,.35,"sawtooth"],[90,.48,"square"],[180,.32,"sawtooth"]],
+    demon:[[150,.12,"sawtooth"],[95,.28,"square"]],fairy:[[620,.08,"sine"],[840,.10,"triangle"],[1040,.2,"sine"]]
   };
   let at=audioCtx.currentTime+.01;
   for(const [base,duration,type] of patterns[kind]||patterns.tap){
@@ -107,28 +116,82 @@ function current(){return game?.players.find(p=>p.is_turn)}
 function selectedCards(){const hand=[...(me()?.hand||[]),...(me()?.learned_magics||[])];return selected.map(uid=>hand.find(c=>c.uid===uid)).filter(Boolean)}
 function isAll(card){return card?.isAllAttack||card?.target==="all_enemies"||["all_attack","magic_all_attack"].includes(card?.effect)}
 function isAdditional(card){return card?.catalogGroup==="additional_weapon"}
+function isAttackSupport(card){return isAdditional(card)||(card?.type==="magic"&&["add_magic_attack","double_attack","sure_all_attack"].includes(card?.effect))||card?.effect==="mp_free_magic"||card?.effect==="boost_attack"}
 function isAttack(card){return card?.type==="weapon"||isAdditional(card)||card?.effect==="attack_defense"||(card?.type==="magic"&&["magic_attack","magic_all_attack","hp_drain","inflict_status"].includes(card?.effect))}
 function needsTarget(card){return !isAll(card)&&card?.target!=="self"&&!["exchange","sell","buy"].includes(card?.effect)}
-function presentationLocked(){return Date.now()<presentationUntil}
+function presentationLocked(){return Boolean(activePresentation||presentationQueue.length)||Date.now()<presentationUntil}
 function eventIcon(event){
   const element=event?.element||event?.cards?.[0]?.element||"none";
+  if(event?.kind==="endgame")return "終末";
+  if(event?.kind==="hit")return "🎯";
+  if(event?.kind==="miss")return "💨";
+  if(event?.kind==="demon")return "👿";
+  if(event?.kind==="fairy")return "🧚";
   if(event?.kind==="block")return "🛡️";
   if(event?.kind==="damage")return Number(event.amount||0)>0?"💥":"🛡️";
   if(event?.kind==="trade")return "🪙";
+  if(["item","magic"].includes(event?.kind)&&event?.outcome==="heal")return event.resource==="mp"?"MP＋":event.resource==="gold"?"￥＋":"HP＋";
+  if(event?.kind==="item"&&event?.outcome==="damage")return "💥";
   if(event?.kind==="item")return "🎁";
   if(event?.kind==="magic")return "✨";
   return elementData[element]?.[0]||"⚔️";
 }
-function handleLatestEvent(){
-  const event=game?.last_event;if(!event||event.id===lastEventId)return;
-  lastEventId=event.id;
-  const duration=event.kind==="attack"?2300:["magic","item","trade"].includes(event.kind)?1700:1300;
+function eventDuration(event){
+  if(event.kind==="endgame")return 2800;
+  if(["attack","block","damage"].includes(event.kind))return 2200;
+  if(["hit","miss","demon","fairy"].includes(event.kind))return 1900;
+  return 1700;
+}
+function eventTone(event){
+  if(event.kind==="endgame")return "endgame";
+  if(event.kind==="hit")return "hit";
+  if(event.kind==="miss")return "miss";
+  if(event.kind==="demon")return "demon";
+  if(event.kind==="fairy")return "fairy";
+  if(event.kind==="block")return "block";
+  if(event.kind==="item"&&event.outcome==="damage")return "damage";
+  if(["item","magic"].includes(event.kind)&&event.outcome==="heal")return event.resource==="mp"?"mp":"heal";
+  return event.element||event.cards?.[0]?.element||"none";
+}
+function eventSound(event){
+  if(["hit","miss","endgame","demon","fairy","block"].includes(event.kind))return event.kind;
+  if(["item","magic"].includes(event.kind)&&event.outcome==="heal")return event.resource==="mp"?"mp":"heal";
+  if(event.kind==="damage"||(event.kind==="item"&&event.outcome==="damage"))return "damage";
+  if(event.kind==="attack")return event.cards?.[0]?.type==="magic"?"magic":"attack";
+  return event.kind;
+}
+function eventCardsHtml(event){
+  if(!event.cards?.length)return "";
+  return (event.cards||[]).map(card=>`<div class="effect-event-card"><img src="${img(card)}" alt=""><b>${esc(card.name)}</b><span>${esc(compact(card))}</span></div>`).join("");
+}
+function updatePresentationBattle(event){
+  if(["attack","hit","miss"].includes(event.kind)){
+    presentationBattle={attackCards:event.cards||[],defenseCards:[],attack:Number(event.attack||0),defense:0,element:event.element||"none",damage:null,hit:event.kind!=="miss"};
+  }else if(["block","damage"].includes(event.kind)){
+    presentationBattle={attackCards:event.attack_cards||presentationBattle?.attackCards||[],defenseCards:event.cards||[],attack:Number(event.attack||presentationBattle?.attack||0),defense:Number(event.defense||0),element:event.element||presentationBattle?.element||"none",damage:Number(event.amount||0),hit:true,blocked:event.kind==="block"};
+  }
+}
+function playNextPresentation(){
+  if(activePresentation||!presentationQueue.length)return;
+  const event=presentationQueue.shift();activePresentation=event;updatePresentationBattle(event);
+  const duration=eventDuration(event),tone=eventTone(event),layer=$("effectLayer");
   presentationUntil=Date.now()+duration;
-  const element=event.element||event.cards?.[0]?.element||"none",layer=$("effectLayer");
-  layer.className=`effect-layer show ${element}`;$("effectIcon").textContent=eventIcon(event);$("effectText").textContent=event.message||"効果が発動しました";
-  const primary=event.cards?.[0],soundKind=event.kind==="attack"?(primary?.type==="magic"?"magic":"attack"):event.kind==="damage"?"damage":event.kind;
-  sound(soundKind,element);
-  clearTimeout(effectTimer);effectTimer=setTimeout(()=>{layer.className="effect-layer";render()},duration);
+  layer.className=`effect-layer show ${tone}`;$("effectIcon").textContent=eventIcon(event);$("effectText").textContent=event.message||"効果が発動しました";$("effectCards").innerHTML=eventCardsHtml(event);
+  if(event.kind==="endgame")document.body.classList.add("endgame-transition");
+  sound(eventSound(event),event.element||"none");
+  clearTimeout(effectTimer);effectTimer=setTimeout(()=>{
+    if(event.kind==="endgame")document.body.classList.remove("endgame-transition");
+    activePresentation=null;presentationUntil=0;
+    if(presentationQueue.length){playNextPresentation();render()}else{presentationBattle=null;layer.className="effect-layer";$("effectCards").innerHTML="";render()}
+  },duration);
+}
+function handleLatestEvents(){
+  const events=Array.isArray(game?.events)&&game.events.length?game.events:(game?.last_event?[game.last_event]:[]);
+  if(!events.length)return;
+  const fresh=lastEventId===null?events.slice(-1):events.filter(event=>Number(event.id)>Number(lastEventId));
+  if(!fresh.length)return;
+  lastEventId=Math.max(...fresh.map(event=>Number(event.id)||0),Number(lastEventId)||0);
+  presentationQueue.push(...fresh);playNextPresentation();
 }
 function canChoosePlayer(player){
   const turn=current(),card=selectedCards()[0];
@@ -137,6 +200,7 @@ function canChoosePlayer(player){
   if(game.can_defend)return Boolean(player.is_me);
   if(["trade_sell","trade_buy"].includes(game.phase))return !player.is_me;
   if(game.phase!=="turn"||!turn?.is_me||!card)return false;
+  if(card.effect==="boost_attack")return false;
   if(isAll(card))return false;
   if(isAttack(card))return card.effect==="random_target"||!player.is_me;
   if(card.target==="self")return Boolean(player.is_me);
@@ -164,8 +228,8 @@ function canSelectDefense(card){
   if(magicSpecial&&!hasBaseDefense)return false;
   return defenseElementCanBlock(element,card.element);
 }
-function compact(card){const e=elementData[card.element]||elementData.none;if(card.catalogGroup==="additional_weapon")return `+${card.attack||0}${e[0]}`;if(card.attack)return `${card.effectChance<100?card.effectChance+"% ":""}攻${card.attack}${e[0]}`;if(card.defense)return `守${card.defense}${e[0]}`;if(card.mpCost)return `MP${card.mpCost} ${e[0]}`;if(card.effect==="sell")return "売る";if(card.effect==="buy")return "買う";if(card.effect==="exchange")return "両替";return card.effectPower?`効${card.effectPower}`:"特殊"}
-function special(card){if(card.statusEffect&&card.statusEffect!=="none")return `ダメージで${statusNames[card.statusEffect]||card.statusEffect}付与`;const map={multi_hit:`${card.hitCount||2}回攻撃`,reflect_normal:"攻撃を反射",reflect_magic:"奇跡を弾く",nullify_magic:"奇跡を止める",wall_defense:"無属性武器を止める",hp_drain:"ダメージ吸収",instant_defeat:"ダメージで即死",double_attack:"単体武器を2倍",sure_all_attack:"単体武器を全体化",add_magic_attack:`追加攻撃+${card.attack||card.effectPower||0}`,mp_free_magic:"直前の奇跡MP0"};return map[card.effect]||""}
+function compact(card){const e=elementData[card.element]||elementData.none;if(card.catalogGroup==="additional_weapon")return `+${card.attack||0}${e[0]}`;if(card.effect==="boost_attack")return `+${card.effectPower||0}`;if(card.attack)return `${card.effectChance<100?card.effectChance+"% ":""}攻${card.attack}${e[0]}`;if(card.defense)return `守${card.defense}${e[0]}`;if(card.mpCost)return `MP${card.mpCost} ${e[0]}`;if(card.effect==="sell")return "売る";if(card.effect==="buy")return "買う";if(card.effect==="exchange")return "両替";return card.effectPower?`効${card.effectPower}`:"特殊"}
+function special(card){if(card.statusEffect&&card.statusEffect!=="none")return `ダメージで${statusNames[card.statusEffect]||card.statusEffect}付与`;const map={multi_hit:`${card.hitCount||2}回攻撃`,reflect_normal:"攻撃を反射",reflect_magic:"奇跡を弾く",nullify_magic:"奇跡を止める",wall_defense:"無属性武器を止める",hp_drain:"ダメージ吸収",instant_defeat:"ダメージで即死",double_attack:"単体武器を2倍",sure_all_attack:"単体武器を全体化",add_magic_attack:`追加攻撃+${card.attack||card.effectPower||0}`,boost_attack:`同時攻撃+${card.effectPower||0}`,mp_free_magic:"直前の奇跡MP0"};return map[card.effect]||""}
 function cardView(card,index){const learned=String(card.uid).startsWith("learned-"),selling=game?.phase==="trade_sell"&&!learned,turnLocked=game?.phase==="turn"&&card.type==="armor"&&card.effect!=="attack_defense",defenseLocked=game?.phase==="defense"&&game.can_defend&&!selected.includes(card.uid)&&!canSelectDefense(card),locked=turnLocked||defenseLocked||(game?.phase==="trade_sell"&&learned);return `<button class="card ${selected.includes(card.uid)?"selected":""} ${locked?"turn-locked":""}" data-card="${esc(card.uid)}" ${locked?'aria-label="現在は使用できません"':""}><img src="${img(card)}" alt="" onerror="this.style.visibility='hidden'">${selling?`<span class="card-price">￥${Number(card.price||0)}</span>`:""}<span class="card-stat ${esc(card.element||"none")}">${esc(compact(card))}</span>${selected.includes(card.uid)?`<span class="card-order">${selected.indexOf(card.uid)+1}</span>`:""}</button>`}
 function battleCard(card){return `<div class="battle-card"><img src="${img(card)}" alt=""><div class="battle-copy"><b>${esc(card.name)}</b><small>${esc(compact(card))}${special(card)?`・${esc(special(card))}`:""}</small></div><span class="battle-num">${card.attack?`攻${card.attack}`:card.defense?`守${card.defense}`:""}</span></div>`}
 function previewAttack(){
@@ -173,7 +237,7 @@ function previewAttack(){
   const cards=selectedCards();if(!cards.length)return null;
   const primary=cards[0],minePlayer=me();
   let attack=primary.effect==="mp_scaled_attack"?Number(minePlayer?.mp||0):Number(primary.attack||primary.effectPower||0);
-  attack+=cards.slice(1).filter(card=>isAdditional(card)||card.effect==="add_magic_attack").reduce((sum,card)=>sum+Number(card.attack||card.effectPower||0),0);
+  attack+=cards.slice(1).filter(card=>isAdditional(card)||["add_magic_attack","boost_attack"].includes(card.effect)).reduce((sum,card)=>sum+Number(card.attack||card.effectPower||0),0);
   attack=Math.max(0,(attack+Number(minePlayer?.attack_boost||0))*(cards.some(card=>card.effect==="double_attack")?2:1));
   return {cards,attack};
 }
@@ -183,10 +247,12 @@ function previewDefense(){
 }
 function render(){
   if(!game)return;
-  handleLatestEvent();
+  handleLatestEvents();
   const mine=me(),turn=current(),battle=game.battle||{};
   const attackPreview=previewAttack(),defensePreview=previewDefense(),locked=presentationLocked();
+  const presented=activePresentation&&["attack","hit","miss","block","damage"].includes(activePresentation.kind)?presentationBattle:null;
   const configuredLimit=Number(roomInfo?.room?.custom_rules?.end_time_limit??game.end_time_limit??100);
+  document.body.classList.toggle("endgame-mode",Boolean(game.endgame));
   $("gfLabel").textContent=`G.F.${configuredLimit}`;
   $("roomLabel").textContent=`${room}・${game.turn_count}/${configuredLimit}${game.endgame?"・終末":""}`;
   $("message").classList.toggle("end",game.endgame);
@@ -195,24 +261,25 @@ function render(){
   if(game.phase==="defense"&&game.can_defend)msg=battle.hit?"防御カードを選び、自分のステータスをタップして確定してください。":"攻撃は外れました。自分のステータスをタップして進めてください。";
   if(game.phase==="trade_sell")msg=saleUid?"売却先のプレイヤーを選んでください。":"￥価格を確認して、売るカードを選んでください。";
   if(game.phase==="trade_buy")msg="購入先のプレイヤーを選んでください。";
-  if(game.phase==="turn"&&turn?.is_me)msg=selected.length?"使用対象のステータスをタップしてください。":"カードを選んでください。武器がなければ祈れます。";
-  if(locked&&game.last_event?.message)msg=game.last_event.message;
+  if(game.phase==="turn"&&turn?.is_me)msg=selected.length?(selectedCards()[0]?.effect==="boost_attack"?"ちからの粉と同時に使う単体武器を選んでください。":"使用対象のステータスをタップしてください。"):"カードを選んでください。武器がなければ祈れます。";
+  if(locked&&activePresentation?.message)msg=activePresentation.message;
   if(game.phase==="finished")msg=game.winner_ids.includes(mine?.user_id)?"あなたの勝利です！":"対戦終了";
   $("message").innerHTML=esc(msg);
-  $("players").innerHTML=game.players.map(p=>`<div class="player ${p.is_me?"me":""} ${p.is_turn?"turn":""} ${!p.alive?"dead":""} ${battle.defender_id===p.user_id?"defender":""} ${canChoosePlayer(p)?"targetable":""}" data-player="${esc(p.user_id)}"><span class="name">${esc(p.user_name)}</span><span class="stats">HP ${p.hp??"?"}　MP ${p.mp??"?"}　￥ ${p.gold??"?"}</span>${p.statuses.length||p.guardian?`<span class="badges">${p.statuses.map(s=>esc(statusNames[s]||s)).join("・")}${p.guardian?`${p.statuses.length?"・":""}守護神 ${esc(p.guardian.name)}`:""}</span>`:""}</div>`).join("");
-  const shownAttackCards=attackPreview?.cards||battle.attack_cards||[],shownDefenseCards=defensePreview?.cards||battle.defense_cards||[];
+  $("players").innerHTML=game.players.map(p=>`<div class="player ${p.is_me?"me":""} ${p.is_turn?"turn":""} ${!p.alive?"dead":""} ${battle.defender_id===p.user_id?"defender":""} ${canChoosePlayer(p)?"targetable":""}" data-player="${esc(p.user_id)}"><span class="name">${esc(p.user_name)}</span><span class="stats"><span class="hp">HP <b>${p.hp??"?"}</b></span><span>MP <b>${p.mp??"?"}</b></span><span>￥ <b>${p.gold??"?"}</b></span></span>${p.statuses.length||p.guardian?`<span class="badges">${p.statuses.map(s=>esc(statusNames[s]||s)).join("・")}${p.guardian?`${p.statuses.length?"・":""}守護神 ${esc(p.guardian.name)}`:""}</span>`:""}</div>`).join("");
+  const shownAttackCards=attackPreview?.cards||presented?.attackCards||battle.attack_cards||[],shownDefenseCards=defensePreview?.cards||presented?.defenseCards||battle.defense_cards||[];
   $("attackCards").innerHTML=shownAttackCards.map(battleCard).join("")||'<div class="empty">攻撃カードなし</div>';
   $("defenseCards").innerHTML=shownDefenseCards.map(battleCard).join("")||'<div class="empty">防御カードなし</div>';
-  $("attackTotal").textContent=`攻 ${attackPreview?.attack??battle.attack??0}`;$("defenseTotal").textContent=`守 ${defensePreview?.defense??battle.defense??0}`;
+  $("attackTotal").textContent=`攻 ${attackPreview?.attack??presented?.attack??battle.attack??0}`;$("defenseTotal").textContent=`守 ${defensePreview?.defense??presented?.defense??battle.defense??0}`;
   $("attackField").classList.toggle("preview",Boolean(attackPreview));$("defenseField").classList.toggle("preview",Boolean(defensePreview));
   $("attackPrivate").textContent=attackPreview?"自分だけに表示":"";$("defensePrivate").textContent=defensePreview?"自分だけに表示":"";
-  $("damage").textContent=battle.damage==null?(battle.hit===false?"はずれ":"待機中"):`${battle.damage} ダメージ`;
-  const ed=elementData[battle.element]||elementData.none;$("elementText").textContent=ed[1]?`${ed[0]} ${ed[1]}属性`:"無属性";
+  const shownDamage=presented?presented.damage:battle.damage,shownHit=presented?presented.hit:battle.hit;
+  $("damage").textContent=shownDamage==null?(shownHit===false?"はずれ":"待機中"):`${shownDamage} ダメージ`;
+  const shownElement=presented?.element??battle.element,ed=elementData[shownElement]||elementData.none;$("elementText").textContent=ed[1]?`${ed[0]} ${ed[1]}属性`:"無属性";
   const hand=mine?.hand||[],learned=mine?.learned_magics||[];
   $("handCount").textContent=`${hand.length}/${18}`;$("hand").innerHTML=hand.map(cardView).join("");
   $("learnedSection").classList.toggle("hidden",!learned.length);$("learnedCount").textContent=`${learned.length} / 6`;$("learned").innerHTML=learned.map(cardView).join("");
   renderActions();renderDetail();bind();
-  if(!game.last_event&&lastPhase&&lastPhase!==game.phase&&battle.damage!=null)sound(battle.blocked?"block":"damage",battle.element);lastPhase=game.phase;
+  if(!game.events?.length&&!game.last_event&&lastPhase&&lastPhase!==game.phase&&battle.damage!=null)sound(battle.blocked?"block":"damage",battle.element);lastPhase=game.phase;
   if(game.phase.startsWith("trade_"))renderTrade();
 }
 function renderActions(){
@@ -264,8 +331,12 @@ function selectCard(uid){
   if(card.type==="armor"&&card.effect!=="attack_defense"){selected=[];toast("防具は攻撃を受けた時だけ使用できます");renderDetail();return}
   if(!selected.length){selected=[uid];sound();if(["sell","buy","exchange"].includes(card.effect)){action({action:"play",card_uid:uid});return}render();return}
   if(selected[0]===uid){selected=[];render();return}
-  const support=card.catalogGroup==="additional_weapon"||(card.type==="magic"&&["add_magic_attack","double_attack","sure_all_attack"].includes(card.effect))||card.effect==="mp_free_magic";
-  if(support){selected.includes(uid)?selected=selected.filter(x=>x!==uid):selected.push(uid);sound();render()}else{selected=[uid];sound();render()}
+  if(isAttack(card)&&selectedCards()[0]?.effect==="boost_attack"){selected=[uid,...selected.filter(value=>value!==uid)];sound();render();return}
+  const support=isAttackSupport(card);
+  if(support){
+    if(isAll(selectedCards()[0])){toast("全体攻撃には補助カードを重ねられません");return}
+    selected.includes(uid)?selected=selected.filter(x=>x!==uid):selected.push(uid);sound();render()
+  }else{selected=[uid];sound();render()}
 }
 function choosePlayer(userId){
   if(presentationLocked()){toast("カード演出のあとに操作できます");return}
