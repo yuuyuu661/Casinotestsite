@@ -48,7 +48,7 @@ select{min-width:150px;padding:12px;background:#0f172a;color:#fff;border:1px sol
 .result.win{color:#fde047}.result.error{color:#fca5a5}
 .stat-list{display:grid;gap:10px}.stat{display:flex;justify-content:space-between;gap:10px;padding:10px;background:#0f172a;border-radius:6px}
 .stat strong{color:var(--gold)}
-.volume{width:100%}.note{color:#94a3b8;font-size:.85rem;line-height:1.6;margin-top:12px}
+.volume-label{display:flex;align-items:center;justify-content:space-between;gap:10px}.volume-value{color:var(--gold);font-variant-numeric:tabular-nums}.volume{width:100%;min-height:32px;touch-action:pan-x;accent-color:var(--gold)}.note{color:#94a3b8;font-size:.85rem;line-height:1.6;margin-top:12px}
 .coin{position:fixed;top:-50px;width:34px;height:34px;pointer-events:none;z-index:20;animation:fall 1.5s linear forwards}
 @keyframes fall{to{top:105vh;transform:rotate(540deg);opacity:0}}
 @media(max-width:1050px){.layout{grid-template-columns:1fr}.machine{order:-1}.side-pay{order:2}.side-stat{order:3}}
@@ -101,8 +101,9 @@ select{min-width:150px;padding:12px;background:#0f172a;color:#fff;border:1px sol
         <div class="stat"><span>獲得</span><strong id="winStat">-</strong></div>
         <div class="stat"><span>フリースピン</span><strong id="freeStat">0</strong></div>
       </div>
-      <label class="control" style="margin-top:16px">音量
-        <input id="volume" class="volume" type="range" min="0" max="100" value="35">
+      <label class="control" style="margin-top:16px">
+        <span class="volume-label"><span>音量</span><output id="volumeValue" class="volume-value" for="volume">35%</output></span>
+        <input id="volume" class="volume" type="range" min="0" max="100" step="1" value="35" aria-label="音量">
       </label>
       <div class="note">リールは好きな順番でSTOPできます。一定時間後は自動で停止します。</div>
     </aside>
@@ -132,29 +133,62 @@ const bonusPayouts = {
 const labels = {seven:"SEVEN",gem:"GEM",bell:"BELL",grape:"GRAPE",lemon:"LEMON",slime:"SLIME"};
 const sounds = ["bgmNormal","bgmBonus","startSound","stopSound","win3Sound","win4Sound","win5Sound"]
   .map(id => document.getElementById(id));
+const VOLUME_STORAGE_KEY = "oasisSlotVolume";
 let audioContext = null;
 let masterGain = null;
-let selectedVolume = .35;
+const mediaSources = new Map();
+function storedVolume(){
+  try{
+    const stored = localStorage.getItem(VOLUME_STORAGE_KEY);
+    if(stored === null)return 35;
+    const value = Number(stored);
+    return Number.isFinite(value) ? Math.max(0, Math.min(100, value)) : 35;
+  }catch{
+    return 35;
+  }
+}
+let selectedVolume = storedVolume() / 100;
 function prepareAudio(){
   if(!audioContext){
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
     if(AudioContextClass){
-      audioContext = new AudioContextClass();
-      masterGain = audioContext.createGain();
-      masterGain.gain.value = selectedVolume;
-      masterGain.connect(audioContext.destination);
-      sounds.forEach(sound => {
-        audioContext.createMediaElementSource(sound).connect(masterGain);
-        sound.volume = 1;
-      });
+      try{
+        audioContext = new AudioContextClass();
+        masterGain = audioContext.createGain();
+        masterGain.gain.value = selectedVolume;
+        masterGain.connect(audioContext.destination);
+        sounds.forEach(sound => {
+          try{
+            const source = audioContext.createMediaElementSource(sound);
+            source.connect(masterGain);
+            mediaSources.set(sound, source);
+            sound.volume = 1;
+          }catch{
+            sound.volume = selectedVolume;
+          }
+        });
+      }catch{
+        audioContext = null;
+        masterGain = null;
+      }
     }
   }
-  if(audioContext?.state === "suspended")audioContext.resume().catch(() => {});
+  if(audioContext?.state === "suspended")return audioContext.resume().catch(() => false);
+  return Promise.resolve(Boolean(audioContext));
 }
 function applyVolume(value){
   selectedVolume = Math.max(0, Math.min(1, Number(value)));
-  if(masterGain)masterGain.gain.setValueAtTime(selectedVolume, audioContext.currentTime);
-  else sounds.forEach(sound => sound.volume = selectedVolume);
+  if(masterGain && audioContext){
+    masterGain.gain.cancelScheduledValues(audioContext.currentTime);
+    masterGain.gain.setValueAtTime(selectedVolume, audioContext.currentTime);
+    sounds.forEach(sound => sound.volume = 1);
+  }else{
+    sounds.forEach(sound => sound.volume = selectedVolume);
+  }
+  const percent = Math.round(selectedVolume * 100);
+  document.getElementById("volumeValue").textContent = `${percent}%`;
+  document.getElementById("volume").setAttribute("aria-valuetext", `${percent}%`);
+  try{localStorage.setItem(VOLUME_STORAGE_KEY, String(percent))}catch{}
 }
 const reelsEl = document.getElementById("reels");
 const spinBtn = document.getElementById("spinBtn");
@@ -430,11 +464,19 @@ function renderPaytable(bonus){
 }
 
 const volumeControl = document.getElementById("volume");
-const updateVolume = event => applyVolume(Number(event.target.value) / 100);
+volumeControl.value = String(Math.round(selectedVolume * 100));
+const updateVolume = event => {
+  prepareAudio();
+  applyVolume(Number(event.target.value) / 100);
+};
 volumeControl.addEventListener("input", updateVolume);
 volumeControl.addEventListener("change", updateVolume);
+volumeControl.addEventListener("pointerdown", prepareAudio, {passive:true});
 volumeControl.addEventListener("touchstart", prepareAudio, {passive:true});
-applyVolume(.35);
+document.addEventListener("pointerdown", prepareAudio, {once:true,passive:true,capture:true});
+document.addEventListener("touchstart", prepareAudio, {once:true,passive:true,capture:true});
+document.addEventListener("keydown", prepareAudio, {once:true,capture:true});
+applyVolume(selectedVolume);
 spinBtn.addEventListener("click", spin);
 document.getElementById("backBtn").addEventListener("click", () => {
   location.href = `/${session ? `?session=${session}` : ""}`;
