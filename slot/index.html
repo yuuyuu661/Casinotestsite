@@ -9,6 +9,7 @@
 *{box-sizing:border-box}
 :root{--gold:#facc15;--red:#dc2626;--panel:#111827;--line:rgba(255,255,255,.12)}
 body{margin:0;min-height:100vh;background:#030712;color:#f8fafc;font-family:"Yu Gothic UI","Hiragino Sans",sans-serif}
+html,body,.page,.machine,.reels,.reel,.reel-window,.controls{touch-action:manipulation}
 button,select,input{font:inherit}
 button{border:0;border-radius:8px;font-weight:900;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 button:disabled{opacity:.45;cursor:not-allowed}
@@ -119,6 +120,15 @@ select{min-width:150px;padding:12px;background:#0f172a;color:#fff;border:1px sol
 <audio id="win5Sound" src="/slot/sounds/win5.mp3" preload="auto"></audio>
 
 <script>
+const doubleTapZones = new WeakMap();
+document.addEventListener("touchend", event => {
+  const zone = event.target.closest?.(".reel-window,.stop-btn,.spin-btn,.machine") || event.target;
+  const now = Date.now();
+  if(now - (doubleTapZones.get(zone) || 0) < 450)event.preventDefault();
+  doubleTapZones.set(zone, now);
+}, {passive:false});
+document.addEventListener("dblclick", event => event.preventDefault(), {passive:false});
+
 const API_BASE = "https://api.oasis.red";
 const session = new URLSearchParams(location.search).get("session");
 const symbols = ["seven","gem","bell","grape","lemon","slime","orb"];

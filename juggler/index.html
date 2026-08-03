@@ -9,6 +9,7 @@
 *{box-sizing:border-box}
 :root{--gold:#facc15;--red:#dc2626;--blue:#06184a;--panel:#0f172a;--line:rgba(255,255,255,.14)}
 body{margin:0;min-height:100vh;background:radial-gradient(circle at top,#122d71 0%,#020617 48%,#000 100%);color:#f8fafc;font-family:"Yu Gothic UI","Hiragino Sans",sans-serif}
+html,body,.page,.machine,.playfield,.reels,.reel-window,.stop-row,.controls{touch-action:manipulation}
 body.win-shake .machine{animation:cabinetPulse 1.2s ease-in-out 3}@keyframes cabinetPulse{0%,100%{filter:none;transform:translateY(0)}30%{filter:brightness(1.25) saturate(1.4);transform:translateY(-2px)}60%{filter:brightness(1.1);transform:translateY(1px)}}
 button,select,input{font:inherit}button{border:0;border-radius:8px;font-weight:900;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}button:disabled{opacity:.45;cursor:not-allowed}
 .page{width:min(1480px,100%);margin:auto;padding:18px}.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.back{padding:11px 16px;background:#1f2937;color:#fff;border:1px solid var(--line)}.wallet{display:flex;gap:18px;font-weight:900}.balance{color:var(--gold)}
@@ -135,6 +136,15 @@ button,select,input{font:inherit}button{border:0;border-radius:8px;font-weight:9
 <audio id="bgmSound" src="/juggler/sounds/jackpot_syndrome.mp3" preload="auto" loop></audio>
 
 <script>
+const doubleTapZones=new WeakMap();
+document.addEventListener("touchend",event=>{
+  const zone=event.target.closest?.(".reel-window,.stop-btn,.spin-btn,.machine")||event.target;
+  const now=Date.now();
+  if(now-(doubleTapZones.get(zone)||0)<450)event.preventDefault();
+  doubleTapZones.set(zone,now);
+},{passive:false});
+document.addEventListener("dblclick",event=>event.preventDefault(),{passive:false});
+
 const API_BASE="https://api.oasis.red";
 const session=new URLSearchParams(location.search).get("session");
 const reelKeys=["left","middle","right"];
