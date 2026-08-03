@@ -100,6 +100,7 @@ const portraitTableMedia=window.matchMedia("(max-width: 900px) and (pointer: coa
 const VOLUME_STORAGE_KEY="oasisPool8Volume";
 const bgmSound=new Audio("/static/pool8/sounds/bgm.mp3");
 const collisionSounds=Array.from({length:4},()=>new Audio("/static/pool8/sounds/collision.mp3"));
+const sounds=[bgmSound,...collisionSounds];
 bgmSound.loop=true;
 bgmSound.preload="auto";
 collisionSounds.forEach(sound=>sound.preload="auto");
@@ -113,6 +114,9 @@ let dragPoint=null;
 let collisionSoundIndex=0;
 let audioUnlocked=false;
 let selectedVolume=storedVolume()/100;
+let audioContext=null;
+let masterGain=null;
+const mediaSources=new Map();
 
 function storedVolume(){
   try{
@@ -124,8 +128,14 @@ function storedVolume(){
 
 function applyVolume(value){
   selectedVolume=Math.max(0,Math.min(1,Number(value)));
-  bgmSound.volume=selectedVolume*.55;
-  collisionSounds.forEach(sound=>sound.volume=selectedVolume);
+  if(masterGain&&audioContext){
+    masterGain.gain.cancelScheduledValues(audioContext.currentTime);
+    masterGain.gain.setValueAtTime(selectedVolume,audioContext.currentTime);
+    sounds.forEach(sound=>sound.volume=1);
+  }else{
+    bgmSound.volume=selectedVolume*.55;
+    collisionSounds.forEach(sound=>sound.volume=selectedVolume);
+  }
   const percent=Math.round(selectedVolume*100);
   $("volume").value=String(percent);
   $("volumeValue").textContent=`${percent}%`;
@@ -134,6 +144,40 @@ function applyVolume(value){
 }
 
 function prepareAudio(){
+  if(!audioContext){
+    const AudioContextClass=window.AudioContext||window.webkitAudioContext;
+    if(AudioContextClass){
+      try{
+        audioContext=new AudioContextClass();
+        masterGain=audioContext.createGain();
+        masterGain.gain.value=selectedVolume;
+        masterGain.connect(audioContext.destination);
+        sounds.forEach(sound=>{
+          try{
+            const source=audioContext.createMediaElementSource(sound);
+            if(sound===bgmSound){
+              const bgmGain=audioContext.createGain();
+              bgmGain.gain.value=.55;
+              source.connect(bgmGain);
+              bgmGain.connect(masterGain);
+              mediaSources.set(sound,{source,gain:bgmGain});
+            }else{
+              source.connect(masterGain);
+              mediaSources.set(sound,{source,gain:null});
+            }
+            sound.volume=1;
+          }catch{
+            sound.volume=selectedVolume*(sound === bgmSound ? 0.55 : 1);
+          }
+        });
+      }catch{
+        audioContext=null;
+        masterGain=null;
+      }
+    }
+  }
+  if(audioContext?.state==="suspended")audioContext.resume().catch(()=>{});
+  applyVolume(selectedVolume);
   audioUnlocked=true;
   if(bgmSound.paused)bgmSound.play().catch(()=>{});
 }
