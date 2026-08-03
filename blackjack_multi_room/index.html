@@ -6,7 +6,7 @@
 <title>Multi Blackjack</title>
 <link rel="icon" href="data:,">
 <style>
-*{box-sizing:border-box}body{margin:0;min-height:100vh;background:#020617;color:#f8fafc;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.page{min-height:100vh;padding:20px;display:grid;grid-template-columns:260px minmax(0,1fr) 300px;gap:16px;background:radial-gradient(circle at 50% 10%,#166534 0,#064e3b 42%,#020617 100%)}.panel,.table{background:rgba(15,23,42,.86);border:1px solid rgba(255,255,255,.12);border-radius:10px;box-shadow:0 18px 40px rgba(0,0,0,.28)}.panel{padding:16px}.table{position:relative;min-height:calc(100vh - 40px);padding:20px;border:9px solid #7c2d12;background:radial-gradient(circle,#047857 0,#065f46 55%,#064e3b 100%);box-shadow:inset 0 0 0 5px rgba(250,204,21,.32),0 22px 58px rgba(0,0,0,.36)}h1,h2{margin:0 0 12px;color:#facc15}.meta{display:grid;gap:9px}.stat{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.12)}.stat b{color:#facc15}.player-list{display:grid;gap:8px}.player-chip{padding:10px;border-radius:8px;background:rgba(30,41,59,.78);border:1px solid rgba(255,255,255,.08)}.player-chip.turn{outline:2px solid #facc15}.player-chip.me{background:rgba(30,64,175,.42)}.name{font-weight:900}.small{font-size:12px;color:#bfd2e9;line-height:1.6}.table-head{text-align:center;font-size:24px;font-weight:1000;color:#fef08a;margin-bottom:12px}.hands{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}.hand{padding:14px;border-radius:12px;background:rgba(2,44,34,.7);border:1px solid rgba(255,255,255,.14);text-align:center}.hand.me{outline:3px solid #60a5fa}.hand.turn{box-shadow:0 0 22px rgba(250,204,21,.42)}.hand-title{font-weight:1000;color:#bfdbfe;margin-bottom:8px}.cards{min-height:104px;display:flex;justify-content:center;gap:8px;flex-wrap:wrap}.card{width:70px;height:102px;object-fit:contain;border-radius:6px;filter:drop-shadow(0 8px 8px rgba(0,0,0,.35))}.total{margin-top:8px;font-weight:1000;color:#facc15}.message{text-align:center;margin:16px 0;font-size:20px;font-weight:1000;color:#fff}.controls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}.btn{border:0;border-radius:8px;padding:12px 18px;font-size:15px;font-weight:1000;cursor:pointer}.primary{background:#facc15;color:#111827}.action{background:#e5e7eb;color:#111827}.danger{background:#7f1d1d;color:#fff}.ghost{background:#334155;color:#fff}.btn:disabled{opacity:.45;cursor:not-allowed}.results{display:grid;gap:8px}.result{display:flex;justify-content:space-between;padding:9px;border-radius:8px;background:rgba(30,41,59,.78)}.win{color:#86efac}.lose,.bust{color:#fca5a5}.back{position:fixed;left:14px;top:14px;z-index:5;border:1px solid rgba(255,255,255,.2);background:rgba(15,23,42,.82);color:#fff;border-radius:999px;padding:9px 14px;font-weight:900;cursor:pointer}@media(max-width:980px){.page{grid-template-columns:1fr;padding:12px}.table{min-height:auto;padding:14px}.card{width:56px;height:82px}.panel{order:2}.table{order:1}.back{position:static;margin:10px}}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:#020617;color:#f8fafc;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.page{min-height:100vh;padding:20px;display:grid;grid-template-columns:260px minmax(0,1fr) 300px;gap:16px;background:radial-gradient(circle at 50% 10%,#166534 0,#064e3b 42%,#020617 100%)}.panel,.table{background:rgba(15,23,42,.86);border:1px solid rgba(255,255,255,.12);border-radius:8px;box-shadow:0 18px 40px rgba(0,0,0,.28)}.panel{padding:16px}.table{position:relative;min-height:calc(100vh - 40px);padding:20px;border:9px solid #7c2d12;background:radial-gradient(circle,#047857 0,#065f46 55%,#064e3b 100%);box-shadow:inset 0 0 0 5px rgba(250,204,21,.32),0 22px 58px rgba(0,0,0,.36)}h1,h2{margin:0 0 12px;color:#facc15}.meta{display:grid;gap:9px}.stat{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.12)}.stat b{color:#facc15}.player-list{display:grid;gap:8px}.player-chip{padding:10px;border-radius:8px;background:rgba(30,41,59,.78);border:1px solid rgba(255,255,255,.08)}.player-chip.turn{outline:2px solid #facc15}.player-chip.me{background:rgba(30,64,175,.42)}.name{font-weight:900}.small{font-size:12px;color:#bfd2e9;line-height:1.6}.table-head{text-align:center;font-size:24px;font-weight:1000;color:#fef08a;margin-bottom:12px}.dealer-hand{max-width:420px;margin:0 auto 18px;padding:14px;border-radius:8px;background:rgba(69,10,10,.52);border:1px solid rgba(254,202,202,.32);text-align:center}.dealer-label{font-weight:1000;color:#fecaca;margin-bottom:8px}.hands{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}.hand{padding:14px;border-radius:8px;background:rgba(2,44,34,.7);border:1px solid rgba(255,255,255,.14);text-align:center}.hand.me{outline:3px solid #60a5fa}.hand.turn{box-shadow:0 0 22px rgba(250,204,21,.42)}.hand-title{font-weight:1000;color:#bfdbfe;margin-bottom:8px}.cards{min-height:104px;display:flex;justify-content:center;gap:8px;flex-wrap:wrap}.card{width:70px;height:102px;object-fit:contain;border-radius:6px;filter:drop-shadow(0 8px 8px rgba(0,0,0,.35))}.card-back{display:grid;place-items:center;background:repeating-linear-gradient(45deg,#7f1d1d 0 8px,#facc15 8px 10px);border:5px solid #fff;color:#fff;font-size:28px;font-weight:1000}.total{margin-top:8px;font-weight:1000;color:#facc15}.message{text-align:center;margin:16px 0;font-size:20px;font-weight:1000;color:#fff}.controls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}.btn{border:0;border-radius:8px;padding:12px 18px;font-size:15px;font-weight:1000;cursor:pointer}.primary{background:#facc15;color:#111827}.action{background:#e5e7eb;color:#111827}.danger{background:#7f1d1d;color:#fff}.ghost{background:#334155;color:#fff}.btn:disabled{opacity:.45;cursor:not-allowed}.results{display:grid;gap:8px}.result{display:flex;justify-content:space-between;padding:9px;border-radius:8px;background:rgba(30,41,59,.78)}.win,.blackjack{color:#86efac}.push,.surrender{color:#fde68a}.lose,.bust{color:#fca5a5}.back{position:fixed;left:14px;top:14px;z-index:5;border:1px solid rgba(255,255,255,.2);background:rgba(15,23,42,.82);color:#fff;border-radius:999px;padding:9px 14px;font-weight:900;cursor:pointer}@media(max-width:980px){.page{grid-template-columns:1fr;padding:12px}.table{min-height:auto;padding:14px}.card{width:56px;height:82px}.panel{order:2}.table{order:1}.back{position:static;margin:10px}}
 </style>
 </head>
 <body>
@@ -27,14 +27,20 @@
   <section class="table">
     <div class="table-head">MULTI BLACKJACK</div>
     <div class="message" id="message">読み込み中...</div>
+    <div class="dealer-hand">
+      <div class="dealer-label">DEALER</div>
+      <div class="cards" id="dealerCards"></div>
+      <div class="total" id="dealerTotal">TOTAL -</div>
+    </div>
     <div class="hands" id="hands"></div>
     <div class="controls" id="controls"></div>
   </section>
 
   <aside class="panel">
     <h2>ルール</h2>
-    <p class="small">全員がプレイヤーです。各自が21を超えない範囲で一番21に近い手を目指します。勝者が複数いる場合はポットを山分けします。</p>
-    <p class="small">HITは1枚追加、STAYは勝負待ち、DOUBLEは同額を追加して1枚だけ引きます。SURRENDERは初手2枚の時だけ使え、半額が戻ります。</p>
+    <p class="small">2～8人が同じディーラーと個別に勝負します。他プレイヤーの手や勝敗は、自分の配当に影響しません。</p>
+    <p class="small">プレイヤーは順番に行動し、STAY・DOUBLE・SURRENDER、または21以上で次の人へ進みます。最後のプレイヤーが終わるとディーラーが17以上まで引きます。</p>
+    <p class="small">通常勝利は2倍、引き分けは返金、最初の2枚でBLACK JACKなら2.5倍、SURRENDERは半額返金です。</p>
     <h2 style="margin-top:18px">リザルト</h2>
     <div class="results" id="results"></div>
   </aside>
@@ -57,6 +63,8 @@ function cardSrc(card){
   return `/static/poker/cards/${suit}_${rank}.png`;
 }
 function statusLabel(status,result){
+  if(result==="blackjack")return "BLACK JACK";
+  if(result==="push")return "引き分け";
   if(result==="win")return "勝ち";
   if(result==="lose")return "負け";
   if(result==="bust"||status==="bust")return "バースト";
@@ -96,6 +104,11 @@ function render(){
   $("message").textContent=game.message||"";
   const me=game.players.find(p=>p.is_me);
   const current=Number.isInteger(game.current_turn)?game.players[game.current_turn]:null;
+  $("dealerCards").innerHTML=(game.dealer||[]).map(card=>card
+    ? `<img class="card" src="${cardSrc(card)}" alt="${esc(card)}">`
+    : '<div class="card card-back">?</div>'
+  ).join("");
+  $("dealerTotal").textContent=`TOTAL ${game.dealer_total??"?"}`;
   $("players").innerHTML=game.players.map(p=>`<div class="player-chip ${p.is_me?"me":""} ${current&&current.user_id===p.user_id?"turn":""}"><div class="name">${esc(p.user_name)}${p.is_me?"（自分）":""}</div><div class="small">${p.ready?"準備OK":"未準備"} / ${statusLabel(p.status,p.result)} / BET ${fmt(p.bet)}</div></div>`).join("");
   $("hands").innerHTML=game.players.map(p=>`<div class="hand ${p.is_me?"me":""} ${current&&current.user_id===p.user_id?"turn":""}"><div class="hand-title">${esc(p.user_name)}</div><div class="cards">${(p.hand||[]).map(c=>`<img class="card" src="${cardSrc(c)}" alt="${esc(c)}">`).join("")}</div><div class="total">TOTAL ${p.total??"-"}</div><div class="small">${statusLabel(p.status,p.result)} / 払戻 ${fmt(p.payout)}</div></div>`).join("");
   $("results").innerHTML=(game.results||[]).map(r=>`<div class="result"><span>${esc(r.user_name)} / ${r.total}</span><b class="${r.result}">${r.profit>=0?"+":""}${fmt(r.profit)}</b></div>`).join("")||'<div class="small">結果はまだありません</div>';
@@ -111,8 +124,8 @@ function renderControls(me,current){
     <button class="btn primary" id="startBtn" ${canStart?"":"disabled"}>ゲーム開始</button>
     <button class="btn action" id="hitBtn" ${myTurn?"":"disabled"}>HIT</button>
     <button class="btn action" id="standBtn" ${myTurn?"":"disabled"}>STAY</button>
-    <button class="btn action" id="doubleBtn" ${myTurn&&me.hand.length===2?"":"disabled"}>DOUBLE</button>
-    <button class="btn danger" id="surrenderBtn" ${myTurn&&me.hand.length===2?"":"disabled"}>SURRENDER</button>
+    <button class="btn action" id="doubleBtn" ${myTurn&&(me.hand||[]).length===2?"":"disabled"}>DOUBLE</button>
+    <button class="btn danger" id="surrenderBtn" ${myTurn&&(me.hand||[]).length===2?"":"disabled"}>SURRENDER</button>
   `;
   $("readyBtn").onclick=()=>post("/ready",{ready:!(me&&me.ready)});
   $("startBtn").onclick=()=>post("/start",{});

@@ -310,6 +310,12 @@ body{
   border-top:1px solid rgba(255,255,255,0.12);
 }
 
+.my-rank-box .rank-row + .rank-row{
+  margin-top:10px;
+  padding-top:10px;
+  border-top:1px solid rgba(255,255,255,0.08);
+}
+
 .notice{
   margin-top:28px;
   color:#cbd5e1;
@@ -396,8 +402,8 @@ body{
 
           <div class="game-card" id="blackjackMultiCard">
             <div class="game-title">マルチブラックジャック</div>
-            <div class="game-desc">参加者全員で21に近い手を競う対戦ブラックジャック。全員準備後、ホストが同じ流れで開始します。</div>
-            <div class="tag-row"><span class="tag">カード</span><span class="tag">2〜10人</span></div>
+            <div class="game-desc">2～8人が順番にプレイし、それぞれディーラーと勝負します。全員準備後、ホストが開始します。</div>
+            <div class="tag-row"><span class="tag">カード</span><span class="tag">2〜8人</span></div>
           </div>
 
           <div class="game-card" id="oasisfieldCard">
@@ -428,6 +434,12 @@ body{
             <div class="game-title">マインスイーパー</div>
             <div class="game-desc">共通盤面に地雷を仕込み合う2人対戦。自分の地雷を避けつつ、相手の罠を読み切ります。</div>
             <div class="tag-row"><span class="tag">2人対戦</span><span class="tag">読み合い</span></div>
+          </div>
+
+          <div class="game-card" id="pool8Card">
+            <div class="game-title">8ボールプール</div>
+            <div class="game-desc">ソリッドとストライプに分かれて球を落とし、最後に8番ボールを狙う2人対戦ビリヤードです。</div>
+            <div class="tag-row"><span class="tag">ビリヤード</span><span class="tag">2人対戦</span></div>
           </div>
 
           <div class="game-card" id="daifugoCard">
@@ -494,7 +506,7 @@ body{
   </section>
 
   <section class="ranking-box">
-    <h2 class="section-title">カジノ収支ランキング</h2>
+    <h2 class="section-title">今月のカジノ収支ランキング（日本時間）</h2>
     <div class="ranking-tabs">
       <button class="ranking-tab active" data-ranking-mode="top">上位50位</button>
       <button class="ranking-tab" data-ranking-mode="worst">ワースト10</button>
@@ -508,6 +520,10 @@ body{
     <div class="my-rank-box">
       <div class="rank-row" id="myPrizeRank">
         <div class="rank-left"><div class="rank-no">自分</div><div class="rank-name">読み込み中...</div></div>
+        <div class="rank-balance">-</div>
+      </div>
+      <div class="rank-row" id="myAllTimeProfit">
+        <div class="rank-left"><div class="rank-no">累計</div><div class="rank-name">今までの収支</div></div>
         <div class="rank-balance">-</div>
       </div>
     </div>
@@ -547,6 +563,7 @@ async function loadMe(){
     if(!res.ok){
       document.getElementById("balance").innerText = "認証に失敗しました";
       renderMyRank(null);
+      renderMyAllTime(null);
       return;
     }
 
@@ -555,6 +572,7 @@ async function loadMe(){
     if(!data.ok){
       document.getElementById("balance").innerText = "セッションが無効です";
       renderMyRank(data.my_rank);
+      renderMyAllTime(data.my_all_time);
       return;
     }
 
@@ -590,6 +608,15 @@ function renderMyRank(row){
   `;
 }
 
+function renderMyAllTime(row){
+  const target = document.getElementById("myAllTimeProfit");
+  if(!target) return;
+  target.innerHTML = `
+    <div class="rank-left"><div class="rank-no">累計</div><div class="rank-name">今までの収支</div></div>
+    <div class="rank-balance">${renderRankAmount(row?.total_prize || 0)}</div>
+  `;
+}
+
 async function loadPrizeRanking(){
   const list = document.getElementById("prizeRanking");
   if(!session){
@@ -599,6 +626,8 @@ async function loadPrizeRanking(){
         <div class="rank-balance">-</div>
       </div>
     `;
+    renderMyRank(null);
+    renderMyAllTime(null);
     return;
   }
 
@@ -607,6 +636,9 @@ async function loadPrizeRanking(){
     const limit = rankingMode === "worst" ? 10 : 50;
     const res = await fetch(`${API_BASE}/api/casino/prize-ranking?session=${session}&mode=${rankingMode}&limit=${limit}`);
     const data = await res.json();
+
+    renderMyRank(data.my_rank);
+    renderMyAllTime(data.my_all_time);
 
     if(!data.ok || !data.ranking.length){
       list.innerHTML = `
@@ -624,7 +656,6 @@ async function loadPrizeRanking(){
         <div class="rank-balance">${renderRankAmount(row.total_prize)}</div>
       </div>
     `).join("");
-    renderMyRank(data.my_rank);
   }
   catch(err){
     console.error(err);
@@ -635,6 +666,7 @@ async function loadPrizeRanking(){
       </div>
     `;
     renderMyRank(null);
+    renderMyAllTime(null);
   }
 }
 
@@ -710,6 +742,7 @@ document.getElementById("othelloCard").addEventListener("click", () => goLobby("
 document.getElementById("dobutsuCard").addEventListener("click", () => goLobby("dobutsu"));
 document.getElementById("chinchiroCard").addEventListener("click", () => goLobby("chinchiro"));
 document.getElementById("minesweeperCard").addEventListener("click", () => goLobby("minesweeper"));
+document.getElementById("pool8Card").addEventListener("click", () => goLobby("pool8"));
 document.getElementById("daifugoCard").addEventListener("click", () => goLobby("daifugo"));
 document.getElementById("rouletteCard").addEventListener("click", () => {
   location.href = `/roulette/${session ? `?session=${session}` : ""}`;
