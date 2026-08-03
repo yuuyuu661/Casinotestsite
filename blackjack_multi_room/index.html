@@ -8,6 +8,14 @@
 <style>
 *{box-sizing:border-box}body{margin:0;min-height:100vh;background:#020617;color:#f8fafc;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.page{min-height:100vh;padding:20px;display:grid;grid-template-columns:260px minmax(0,1fr) 300px;gap:16px;background:radial-gradient(circle at 50% 10%,#166534 0,#064e3b 42%,#020617 100%)}.panel,.table{background:rgba(15,23,42,.86);border:1px solid rgba(255,255,255,.12);border-radius:8px;box-shadow:0 18px 40px rgba(0,0,0,.28)}.panel{padding:16px}.table{position:relative;min-height:calc(100vh - 40px);padding:20px;border:9px solid #7c2d12;background:radial-gradient(circle,#047857 0,#065f46 55%,#064e3b 100%);box-shadow:inset 0 0 0 5px rgba(250,204,21,.32),0 22px 58px rgba(0,0,0,.36)}h1,h2{margin:0 0 12px;color:#facc15}.meta{display:grid;gap:9px}.stat{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.12)}.stat b{color:#facc15}.player-list{display:grid;gap:8px}.player-chip{padding:10px;border-radius:8px;background:rgba(30,41,59,.78);border:1px solid rgba(255,255,255,.08)}.player-chip.turn{outline:2px solid #facc15}.player-chip.me{background:rgba(30,64,175,.42)}.name{font-weight:900}.small{font-size:12px;color:#bfd2e9;line-height:1.6}.table-head{text-align:center;font-size:24px;font-weight:1000;color:#fef08a;margin-bottom:12px}.dealer-hand{max-width:420px;margin:0 auto 18px;padding:14px;border-radius:8px;background:rgba(69,10,10,.52);border:1px solid rgba(254,202,202,.32);text-align:center}.dealer-label{font-weight:1000;color:#fecaca;margin-bottom:8px}.hands{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}.hand{padding:14px;border-radius:8px;background:rgba(2,44,34,.7);border:1px solid rgba(255,255,255,.14);text-align:center}.hand.me{outline:3px solid #60a5fa}.hand.turn{box-shadow:0 0 22px rgba(250,204,21,.42)}.hand-title{font-weight:1000;color:#bfdbfe;margin-bottom:8px}.cards{min-height:104px;display:flex;justify-content:center;gap:8px;flex-wrap:wrap}.card{width:70px;height:102px;object-fit:contain;border-radius:6px;filter:drop-shadow(0 8px 8px rgba(0,0,0,.35))}.card-back{display:grid;place-items:center;background:repeating-linear-gradient(45deg,#7f1d1d 0 8px,#facc15 8px 10px);border:5px solid #fff;color:#fff;font-size:28px;font-weight:1000}.total{margin-top:8px;font-weight:1000;color:#facc15}.message{text-align:center;margin:16px 0;font-size:20px;font-weight:1000;color:#fff}.controls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}.btn{border:0;border-radius:8px;padding:12px 18px;font-size:15px;font-weight:1000;cursor:pointer}.primary{background:#facc15;color:#111827}.action{background:#e5e7eb;color:#111827}.danger{background:#7f1d1d;color:#fff}.ghost{background:#334155;color:#fff}.btn:disabled{opacity:.45;cursor:not-allowed}.results{display:grid;gap:8px}.result{display:flex;justify-content:space-between;padding:9px;border-radius:8px;background:rgba(30,41,59,.78)}.win,.blackjack{color:#86efac}.push,.surrender{color:#fde68a}.lose,.bust{color:#fca5a5}.back{position:fixed;left:14px;top:14px;z-index:5;border:1px solid rgba(255,255,255,.2);background:rgba(15,23,42,.82);color:#fff;border-radius:999px;padding:9px 14px;font-weight:900;cursor:pointer}@media(max-width:980px){.page{grid-template-columns:1fr;padding:12px}.table{min-height:auto;padding:14px}.card{width:56px;height:82px}.panel{order:2}.table{order:1}.back{position:static;margin:10px}}
 </style>
+<style>
+.dealer-action{min-height:38px;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:1000;letter-spacing:.08em;color:#fef3c7;text-shadow:0 2px 12px rgba(0,0,0,.7)}
+.dealer-action:empty{visibility:hidden}
+.dealer-action.hit{color:#fde047;animation:dealerPulse .8s ease-in-out infinite alternate}
+.dealer-action.stand{color:#93c5fd}.dealer-action.bust{color:#fca5a5}.dealer-action.blackjack{color:#86efac}.dealer-action.reveal{font-size:18px;color:#e2e8f0}.dealer-action.result{color:#fef08a}
+@keyframes dealerPulse{from{transform:scale(1);filter:brightness(1)}to{transform:scale(1.08);filter:brightness(1.35)}}
+@media(max-width:980px){.dealer-action{font-size:24px}}
+</style>
 </head>
 <body>
 <button class="back" id="backBtn">← ロビー</button>
@@ -29,6 +37,7 @@
     <div class="message" id="message">読み込み中...</div>
     <div class="dealer-hand">
       <div class="dealer-label">DEALER</div>
+      <div class="dealer-action" id="dealerAction"></div>
       <div class="cards" id="dealerCards"></div>
       <div class="total" id="dealerTotal">TOTAL -</div>
     </div>
@@ -89,7 +98,7 @@ async function loadMe(){
 async function loadState(){
   if(!room||!session)return;
   try{
-    roomInfo=await fetchJson(`${API_BASE}/api/casino/room-info?room_id=${room}`);
+    if(!roomInfo)roomInfo=await fetchJson(`${API_BASE}/api/casino/room-info?room_id=${room}`);
     const state=await fetchJson(`${API_BASE}/api/casino/blackjack-multi/state?room_id=${room}&session=${session}`);
     game=state.game;
     render();
@@ -104,6 +113,10 @@ function render(){
   $("message").textContent=game.message||"";
   const me=game.players.find(p=>p.is_me);
   const current=Number.isInteger(game.current_turn)?game.players[game.current_turn]:null;
+  const dealerActions={reveal:"伏せ札を公開",hit:"HIT",stand:"STAY",bust:"BUST",blackjack:"BLACK JACK",result:"RESULT"};
+  const dealerAction=game.dealer_action||"";
+  $("dealerAction").className=`dealer-action ${dealerAction}`;
+  $("dealerAction").textContent=dealerActions[dealerAction]||"";
   $("dealerCards").innerHTML=(game.dealer||[]).map(card=>card
     ? `<img class="card" src="${cardSrc(card)}" alt="${esc(card)}">`
     : '<div class="card card-back">?</div>'
@@ -142,7 +155,7 @@ async function post(path,body){
   }catch(e){alert(e.message)}
 }
 $("backBtn").onclick=()=>{location.href=`/lobby?game=blackjack_multi${session?`&session=${session}`:""}`};
-loadMe();loadState();setInterval(loadState,2000);setInterval(loadMe,5000);
+loadMe();loadState();setInterval(loadState,800);setInterval(loadMe,5000);
 </script>
 </body>
 </html>

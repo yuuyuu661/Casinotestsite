@@ -13,7 +13,7 @@ button{font:inherit}
 .panel,.table-panel{border:1px solid rgba(255,255,255,.12);border-radius:8px;background:rgba(8,18,32,.9);box-shadow:0 18px 40px rgba(0,0,0,.32)}
 .panel{padding:16px}.panel h1,.panel h2{margin:0 0 14px;color:#facc15}.panel h1{font-size:24px}.panel h2{font-size:18px;margin-top:22px}
 .stat{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.1)}.stat b{color:#fde68a;text-align:right}
-.players{display:grid;gap:9px}.player{padding:11px;border:1px solid rgba(255,255,255,.1);border-radius:8px;background:#111c2e}.player.me{border-color:#60a5fa}.player.turn{box-shadow:inset 4px 0 #facc15}.player-name{font-weight:900}.player-meta{margin-top:5px;color:#adc0d8;font-size:12px}
+.players{display:grid;gap:9px}.player{padding:11px;border:1px solid rgba(255,255,255,.1);border-radius:8px;background:#111c2e}.player.me{border-color:#60a5fa}.player.turn{box-shadow:inset 4px 0 #facc15}.player-name{font-weight:900}.player-meta{margin-top:5px;color:#adc0d8;font-size:12px}.player-targets{margin-top:9px;padding-top:8px;border-top:1px solid rgba(255,255,255,.08)}.target-label{display:block;margin-bottom:6px;color:#fde68a;font-size:11px;font-weight:900}.target-balls{display:flex;gap:5px;flex-wrap:wrap}.target-ball{width:25px;height:25px;display:grid;place-items:center;border:2px solid rgba(255,255,255,.82);border-radius:50%;background:var(--ball-color);color:#111827;font-size:9px;font-weight:1000;box-shadow:0 3px 6px rgba(0,0,0,.3)}.target-ball.stripe{background:linear-gradient(#fff 0 27%,var(--ball-color) 27% 73%,#fff 73%)}.target-ball.eight{color:#fff}.player.me .target-ball{animation:target-focus 2.6s ease-in-out infinite}.target-wait{color:#64748b;font-size:11px}@keyframes target-focus{0%,65%,100%{box-shadow:0 3px 6px rgba(0,0,0,.3)}78%{box-shadow:0 0 0 4px rgba(250,204,21,.25),0 0 14px #facc15}}
 .table-panel{min-width:0;padding:18px;background:linear-gradient(180deg,rgba(12,30,29,.96),rgba(5,18,22,.96))}.title{text-align:center;color:#facc15;font-size:clamp(22px,3vw,38px);font-weight:1000}.message{text-align:center;min-height:30px;margin:8px 0 14px;color:#fef3c7;font-weight:900}
 .canvas-wrap{position:relative;width:100%;border:10px solid #6b3217;border-radius:8px;background:#073b2b;box-shadow:inset 0 0 0 4px #d6a64d,0 18px 35px rgba(0,0,0,.35);overflow:hidden}
 canvas{display:block;width:100%;aspect-ratio:2/1;touch-action:none;cursor:crosshair}
@@ -21,6 +21,7 @@ canvas{display:block;width:100%;aspect-ratio:2/1;touch-action:none;cursor:crossh
 .controls{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:16px}.btn{border:0;border-radius:8px;padding:12px 20px;font-weight:1000;cursor:pointer}.btn:disabled{opacity:.42;cursor:not-allowed}.primary{background:#facc15;color:#111827}.secondary{background:#334155;color:#fff}.back{position:fixed;left:12px;top:12px;z-index:10;border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:9px 14px;background:rgba(15,23,42,.9);color:#fff;font-weight:900;cursor:pointer}
 .power{max-width:420px;margin:12px auto 0}.power-label{display:flex;justify-content:space-between;color:#cbd5e1;font-size:12px}.power-track{height:10px;margin-top:5px;border-radius:999px;background:#1e293b;overflow:hidden}.power-fill{height:100%;width:0;background:linear-gradient(90deg,#22c55e,#facc15,#ef4444)}
 .rule{margin:0 0 12px;color:#cbd5e1;font-size:13px;line-height:1.7}.legend{display:grid;gap:8px}.legend-row{display:flex;align-items:center;gap:8px;color:#cbd5e1;font-size:13px}.sample{width:22px;height:22px;border-radius:50%;border:2px solid rgba(255,255,255,.65)}.solid{background:#facc15}.stripe{background:linear-gradient(#fff 0 29%,#2563eb 29% 71%,#fff 71%)}.eight{background:#050505}
+.volume-control{display:grid;gap:7px}.volume-head{display:flex;justify-content:space-between;color:#cbd5e1;font-size:13px;font-weight:900}.volume-slider{width:100%;min-height:32px;margin:0;accent-color:#facc15;touch-action:pan-x}
 .hint{margin-top:13px;padding:10px;border-left:3px solid #facc15;background:rgba(250,204,21,.08);color:#fde68a;font-size:12px;line-height:1.6}
 @media(max-width:1050px){.page{grid-template-columns:1fr;padding:12px;padding-top:58px}.table-panel{order:1}.panel{order:2}.canvas-wrap{border-width:6px}.back{position:absolute}.side-status{display:grid;grid-template-columns:1fr 1fr;gap:16px}.side-status h1,.side-status .meta{grid-column:1/-1}}
 @media(max-width:620px){.page{padding:8px;padding-top:54px}.table-panel,.panel{padding:11px}.title{font-size:22px}.message{font-size:13px}.canvas-wrap{border-width:4px}.side-status{display:block}.btn{flex:1;padding:11px 8px}.result-title{font-size:23px}}
@@ -75,6 +76,11 @@ canvas{display:block;width:100%;aspect-ratio:2/1;touch-action:none;cursor:crossh
       <div class="legend-row"><span class="sample stripe"></span>ストライプ 9～15</div>
       <div class="legend-row"><span class="sample eight"></span>8番ボール</div>
     </div>
+    <h2>サウンド</h2>
+    <label class="volume-control" for="volume">
+      <span class="volume-head"><span>音量</span><b id="volumeValue">35%</b></span>
+      <input class="volume-slider" id="volume" type="range" min="0" max="100" value="35" aria-label="音量">
+    </label>
     <div class="hint" id="hint">自分のターンでは手球から後ろへドラッグして、離すとショットします。</div>
   </aside>
 </main>
@@ -89,6 +95,12 @@ const fmt=value=>`${Number(value||0).toLocaleString()} rrc`;
 const esc=value=>String(value??"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[char]);
 const canvas=$("table");
 const ctx=canvas.getContext("2d");
+const VOLUME_STORAGE_KEY="oasisPool8Volume";
+const bgmSound=new Audio("/static/pool8/sounds/bgm.mp3");
+const collisionSounds=Array.from({length:4},()=>new Audio("/static/pool8/sounds/collision.mp3"));
+bgmSound.loop=true;
+bgmSound.preload="auto";
+collisionSounds.forEach(sound=>sound.preload="auto");
 let game=null;
 let roomInfo=null;
 let displayedBalls=[];
@@ -96,6 +108,40 @@ let animatedSeq=-1;
 let animating=false;
 let dragging=false;
 let dragPoint=null;
+let collisionSoundIndex=0;
+let audioUnlocked=false;
+let selectedVolume=storedVolume()/100;
+
+function storedVolume(){
+  try{
+    const value=Number(localStorage.getItem(VOLUME_STORAGE_KEY));
+    if(Number.isFinite(value)&&value>=0&&value<=100)return value;
+  }catch(_error){}
+  return 35;
+}
+
+function applyVolume(value){
+  selectedVolume=Math.max(0,Math.min(1,Number(value)));
+  bgmSound.volume=selectedVolume*.55;
+  collisionSounds.forEach(sound=>sound.volume=selectedVolume);
+  const percent=Math.round(selectedVolume*100);
+  $("volume").value=String(percent);
+  $("volumeValue").textContent=`${percent}%`;
+  $("volume").setAttribute("aria-valuetext",`${percent}%`);
+  try{localStorage.setItem(VOLUME_STORAGE_KEY,String(percent))}catch(_error){}
+}
+
+function prepareAudio(){
+  audioUnlocked=true;
+  if(bgmSound.paused)bgmSound.play().catch(()=>{});
+}
+
+function playCollision(){
+  if(!audioUnlocked||selectedVolume<=0)return;
+  const sound=collisionSounds[collisionSoundIndex++%collisionSounds.length];
+  sound.currentTime=0;
+  sound.play().catch(()=>{});
+}
 
 async function fetchJson(url,options){
   const response=await fetch(url,options);
@@ -130,6 +176,25 @@ async function loadState(){
 
 function phaseLabel(phase){return {waiting:"準備中",playing:"対戦中",finished:"終了"}[phase]||phase}
 function groupLabel(group){return group==="solids"?"ソリッド":group==="stripes"?"ストライプ":"未決定"}
+function groupIds(group){return group==="solids"?[1,2,3,4,5,6,7]:group==="stripes"?[9,10,11,12,13,14,15]:[]}
+
+function targetIdsFor(player){
+  if(!player?.group||!game)return [];
+  const active=new Set((game.balls||[]).filter(ball=>ball.active).map(ball=>ball.id));
+  const remaining=groupIds(player.group).filter(id=>active.has(id));
+  return remaining.length?remaining:(active.has(8)?[8]:[]);
+}
+
+function targetBallHtml(id){
+  const type=id===8?"eight":id>=9?"stripe":"solid";
+  return `<span class="target-ball ${type}" style="--ball-color:${ballColor(id)}">${id}</span>`;
+}
+
+function playerTargetsHtml(player){
+  if(!player.group)return '<div class="target-wait">グループ決定待ち</div>';
+  const ids=targetIdsFor(player);
+  return `<div class="player-targets"><span class="target-label">次に狙う球</span><div class="target-balls">${ids.map(targetBallHtml).join("")||"-"}</div></div>`;
+}
 
 function acceptState(next){
   game=next;
@@ -155,6 +220,7 @@ function renderUi(){
     <div class="player ${player.is_me?"me":""} ${index===game.current_turn?"turn":""}">
       <div class="player-name">${esc(player.user_name)}${player.is_me?"（自分）":""}</div>
       <div class="player-meta">${player.ready?"準備OK":"未準備"} / ${groupLabel(player.group)}${player.group?` 残り${player.remaining}`:""}</div>
+      ${playerTargetsHtml(player)}
     </div>`).join("");
   const isHost=me&&String(game.host_user_id)===String(me.user_id);
   const canReady=me&&["waiting","finished"].includes(game.phase);
@@ -197,7 +263,9 @@ function draw(){
   const felt=ctx.createRadialGradient(500,250,20,500,250,560);felt.addColorStop(0,"#159565");felt.addColorStop(1,"#07543b");ctx.fillStyle=felt;ctx.fillRect(28,28,944,444);
   ctx.strokeStyle="rgba(255,255,255,.08)";ctx.lineWidth=2;ctx.strokeRect(34,34,932,432);
   [[34,34],[500,29],[966,34],[34,466],[500,471],[966,466]].forEach(([x,y])=>{ctx.beginPath();ctx.fillStyle="#020617";ctx.arc(x,y,28,0,Math.PI*2);ctx.fill()});
-  displayedBalls.filter(ball=>ball.active).forEach(drawBall);
+  const me=game?.players.find(player=>player.is_me);
+  const focusTargets=new Set(targetIdsFor(me));
+  displayedBalls.filter(ball=>ball.active).forEach(ball=>drawBall(ball,focusTargets.has(ball.id)));
   if(dragging&&dragPoint&&game&&!animating){
     const cue=displayedBalls.find(ball=>ball.id===0&&ball.active);
     if(cue){
@@ -208,7 +276,7 @@ function draw(){
   }
 }
 
-function drawBall(ball){
+function drawBall(ball,isTarget=false){
   const radius=13;
   ctx.save();ctx.translate(ball.x,ball.y);
   ctx.shadowColor="rgba(0,0,0,.45)";ctx.shadowBlur=7;ctx.shadowOffsetY=4;
@@ -218,14 +286,21 @@ function drawBall(ball){
     if(ball.id>=9){ctx.rect(-radius,-5,radius*2,10);ctx.fill()}else{ctx.arc(0,0,radius-1,0,Math.PI*2);ctx.fill()}
     ctx.beginPath();ctx.fillStyle="#fff";ctx.arc(0,0,6.8,0,Math.PI*2);ctx.fill();ctx.fillStyle="#111827";ctx.font="bold 8px system-ui";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(String(ball.id),0,.5);
   }
+  if(isTarget){
+    const pulse=(Math.sin(Date.now()/420)+1)/2;
+    ctx.beginPath();ctx.strokeStyle=`rgba(250,204,21,${.42+pulse*.52})`;ctx.lineWidth=2+pulse*2;ctx.shadowColor="#facc15";ctx.shadowBlur=6+pulse*10;ctx.arc(0,0,17+pulse*1.5,0,Math.PI*2);ctx.stroke();
+  }
   ctx.restore();
 }
 
 async function animateFrames(shot){
   animating=true;dragging=false;setPower(0);
   const frames=shot.frames||[];
-  for(const frame of frames){
+  const collisionFrames=new Set(shot.collision_frames||[]);
+  for(let index=0;index<frames.length;index++){
+    const frame=frames[index];
     displayedBalls=frame.map(([id,x,y,active])=>({id,x,y,active}));
+    if(collisionFrames.has(index))playCollision();
     draw();
     await new Promise(resolve=>setTimeout(resolve,Math.max(16,Number(shot.frame_ms||50))));
   }
@@ -275,7 +350,20 @@ canvas.addEventListener("pointercancel",()=>{dragging=false;dragPoint=null;setPo
 $("readyBtn").onclick=()=>{const me=game?.players.find(player=>player.is_me);post("/ready",{ready:!me?.ready}).catch(error=>alert(error.message))};
 $("startBtn").onclick=()=>post("/start").catch(error=>alert(error.message));
 $("backBtn").onclick=()=>{location.href=`/lobby?game=pool8${session?`&session=${session}`:""}`};
+applyVolume(selectedVolume);
+["input","change"].forEach(eventName=>$("volume").addEventListener(eventName,event=>{prepareAudio();applyVolume(event.target.value/100)}));
+$("volume").addEventListener("pointerdown",prepareAudio,{passive:true});
+$("volume").addEventListener("touchstart",prepareAudio,{passive:true});
+document.addEventListener("pointerdown",prepareAudio,{once:true,passive:true,capture:true});
+document.addEventListener("touchstart",prepareAudio,{once:true,passive:true,capture:true});
+document.addEventListener("keydown",prepareAudio,{once:true,capture:true});
+let lastFocusPaint=0;
+function focusLoop(timestamp){
+  if(timestamp-lastFocusPaint>80){draw();lastFocusPaint=timestamp}
+  requestAnimationFrame(focusLoop);
+}
 new ResizeObserver(resizeCanvas).observe(canvas);
+requestAnimationFrame(focusLoop);
 loadMe();loadState();setInterval(loadState,1200);setInterval(loadMe,5000);
 </script>
 </body>
