@@ -25,6 +25,7 @@ canvas{display:block;width:100%;aspect-ratio:2/1;touch-action:none;cursor:crossh
 .hint{margin-top:13px;padding:10px;border-left:3px solid #facc15;background:rgba(250,204,21,.08);color:#fde68a;font-size:12px;line-height:1.6}
 @media(max-width:1050px){.page{grid-template-columns:1fr;padding:12px;padding-top:58px}.table-panel{order:1}.panel{order:2}.canvas-wrap{border-width:6px}.back{position:absolute}.side-status{display:grid;grid-template-columns:1fr 1fr;gap:16px}.side-status h1,.side-status .meta{grid-column:1/-1}}
 @media(max-width:620px){.page{padding:8px;padding-top:54px}.table-panel,.panel{padding:11px}.title{font-size:22px}.message{font-size:13px}.canvas-wrap{border-width:4px}.side-status{display:block}.btn{flex:1;padding:11px 8px}.result-title{font-size:23px}}
+@media(max-width:900px) and (pointer:coarse){.canvas-wrap{width:min(100%,460px);margin-inline:auto}canvas{aspect-ratio:1/2}}
 </style>
 </head>
 <body>
@@ -95,6 +96,7 @@ const fmt=value=>`${Number(value||0).toLocaleString()} rrc`;
 const esc=value=>String(value??"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[char]);
 const canvas=$("table");
 const ctx=canvas.getContext("2d");
+const portraitTableMedia=window.matchMedia("(max-width: 900px) and (pointer: coarse)");
 const VOLUME_STORAGE_KEY="oasisPool8Volume";
 const bgmSound=new Audio("/static/pool8/sounds/bgm.mp3");
 const collisionSounds=Array.from({length:4},()=>new Audio("/static/pool8/sounds/collision.mp3"));
@@ -251,13 +253,18 @@ function resizeCanvas(){
   const rect=canvas.getBoundingClientRect();
   const ratio=Math.min(window.devicePixelRatio||1,2);
   canvas.width=Math.max(1,Math.round(rect.width*ratio));
-  canvas.height=Math.max(1,Math.round(rect.width*.5*ratio));
+  canvas.height=Math.max(1,Math.round(rect.height*ratio));
   draw();
 }
 
 function draw(){
-  const sx=canvas.width/1000,sy=canvas.height/500;
-  ctx.setTransform(sx,0,0,sy,0,0);
+  if(portraitTableMedia.matches){
+    const sx=canvas.width/500,sy=canvas.height/1000;
+    ctx.setTransform(0,sy,-sx,0,canvas.width,0);
+  }else{
+    const sx=canvas.width/1000,sy=canvas.height/500;
+    ctx.setTransform(sx,0,0,sy,0,0);
+  }
   ctx.clearRect(0,0,1000,500);
   ctx.fillStyle="#075b3d";ctx.fillRect(0,0,1000,500);
   const felt=ctx.createRadialGradient(500,250,20,500,250,560);felt.addColorStop(0,"#159565");felt.addColorStop(1,"#07543b");ctx.fillStyle=felt;ctx.fillRect(28,28,944,444);
@@ -279,6 +286,7 @@ function draw(){
 function drawBall(ball,isTarget=false){
   const radius=13;
   ctx.save();ctx.translate(ball.x,ball.y);
+  if(portraitTableMedia.matches)ctx.rotate(-Math.PI/2);
   ctx.shadowColor="rgba(0,0,0,.45)";ctx.shadowBlur=7;ctx.shadowOffsetY=4;
   ctx.beginPath();ctx.fillStyle="#fff";ctx.arc(0,0,radius,0,Math.PI*2);ctx.fill();ctx.shadowColor="transparent";
   if(ball.id!==0){
@@ -311,6 +319,9 @@ async function animateFrames(shot){
 
 function tablePoint(event){
   const rect=canvas.getBoundingClientRect();
+  if(portraitTableMedia.matches){
+    return {x:(event.clientY-rect.top)/rect.height*1000,y:(rect.right-event.clientX)/rect.width*500};
+  }
   return {x:(event.clientX-rect.left)/rect.width*1000,y:(event.clientY-rect.top)/rect.height*500};
 }
 function isMyTurn(){const me=game?.players.find(player=>player.is_me);return me&&game.phase==="playing"&&String(game.current_user_id)===String(me.user_id)}
